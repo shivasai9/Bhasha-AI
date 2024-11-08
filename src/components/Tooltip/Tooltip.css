@@ -1,0 +1,41 @@
+.tooltip {
+  position: fixed;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  width: 320px;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 50;
+}
+
+.tooltip.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tooltip-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tooltip-icon-button {
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tooltip-content {
+  padding: 12px 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}

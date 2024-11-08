@@ -10,20 +10,47 @@ export function useQuiz(article) {
 
   useEffect(() => {
     if (article) {
-      // In a real implementation, this would use Chrome's AI API to generate questions
+      // Sample questions based on the article content
       setQuestions([
         {
-          question: 'Sample question 1?',
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          isCorrect: (answer) => answer === 'Option A',
-          explanation: 'Explanation for the correct answer'
+          question: "What role do coffee beans' origin and roast play in coffee making?",
+          options: [
+            "They only affect the color",
+            "They are crucial for the final taste",
+            "They only matter for espresso",
+            "They have no impact on flavor"
+          ],
+          isCorrect: (answer) => answer === "They are crucial for the final taste",
+          explanation: "The origin and roast of coffee beans play a crucial role in determining the final taste of the coffee, affecting its flavor profile and characteristics."
         },
-        // Add more sample questions
+        {
+          question: "Which of these is NOT mentioned as a coffee brewing technique?",
+          options: [
+            "Pour-over",
+            "Cold brew",
+            "French press",
+            "Espresso"
+          ],
+          isCorrect: (answer) => answer === "Cold brew",
+          explanation: "While pour-over, espresso, and French press are mentioned as brewing techniques, cold brew is not discussed in the article."
+        },
+        {
+          question: "What is the main skill a barista needs to develop?",
+          options: [
+            "Speed of service",
+            "Customer relations",
+            "Balancing brewing variables",
+            "Coffee bean selection"
+          ],
+          isCorrect: (answer) => answer === "Balancing brewing variables",
+          explanation: "According to the article, a barista learns to balance various brewing variables to bring out the unique qualities of each bean."
+        }
       ]);
     }
   }, [article]);
 
   const handleAnswerSelect = (answer) => {
+    if (selectedAnswer) return; // Prevent changing answer once selected
     setSelectedAnswer(answer);
     if (questions[currentQuestionIndex].isCorrect(answer)) {
       setCorrectAnswers(prev => prev + 1);
@@ -54,6 +81,8 @@ export function useQuiz(article) {
     selectedAnswer,
     showResult,
     score,
+    currentQuestionIndex,
+    totalQuestions: questions.length,
     handleAnswerSelect,
     handleNextQuestion,
     restartQuiz

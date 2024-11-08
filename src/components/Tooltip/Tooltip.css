@@ -8,6 +8,7 @@
   transform: scale(0.95);
   transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: 50;
+  max-height: 80vh;
 }
 
 .tooltip.show {
@@ -21,6 +22,12 @@
   align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
+  background: white;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .tooltip-actions {
@@ -35,7 +42,6 @@
 }
 
 .tooltip-content {
-  padding: 12px 16px;
-  max-height: 400px;
   overflow-y: auto;
+  max-height: calc(80vh - 57px);
 }

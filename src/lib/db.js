@@ -109,9 +109,9 @@ const openDB = () => {
       }
 
       // Create summaryStore if it doesn't exist
-      if (!db.objectStoreNames.contains(STORES.SUMMARY)) {
+      if (!db.objectStoreNames.contains(STORES.SUMMARY_CHALLENGE)) {
         // `summaryStore` schema to store user-generated summaries and AI feedback
-        const summaryStore = db.createObjectStore(STORES.SUMMARY, {
+        const summaryStore = db.createObjectStore(STORES.SUMMARY_CHALLENGE, {
           keyPath: "summaryID",
           autoIncrement: true,
         });
@@ -129,6 +129,16 @@ const openDB = () => {
         summaryStore.createIndex("timestampIndex", "timestamp", {
           unique: false,
         });
+      }
+
+      // Create languages store if it doesn't exist
+      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
+        db.createObjectStore(STORES.SETTINGS, {
+          keyPath: "userId",
+          autoIncrement: true,
+        });
+        // - langCode: Unique identifier for each language (e.g., "en", "es")
+        // - language: Full name of the language (e.g., "English", "Spanish")
       }
     };
   });

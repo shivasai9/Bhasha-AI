@@ -32,7 +32,7 @@ export default function LanguageSelector() {
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
-                    onClick={() => handleLanguageSelect(lang.code)}
+                    onClick={() => handleLanguageSelect(lang.name)}
                     className="flex items-center justify-center p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 hover:border-indigo-300 transition-all duration-300 hover:scale-105"
                   >
                     <div className="text-center">

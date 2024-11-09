@@ -74,7 +74,7 @@ const openDB = () => {
       if (!db.objectStoreNames.contains(STORES.ARTICLES_CONTENT)) {
         // `articlesContent` schema to store content for each article by difficulty level
         const articleContentsStore = db.createObjectStore(
-          STORES.ARTICLES_CONTENTS,
+          STORES.ARTICLES_CONTENT,
           {
             keyPath: ["articleID", "level"],
           }

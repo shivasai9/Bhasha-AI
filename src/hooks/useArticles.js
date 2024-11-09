@@ -59,9 +59,10 @@ export function useArticles() {
     setLoading(true);
     setGeneratingCount(3);
     try {
-      await generateArticles(language, null, 3, (updatedArticles) => {
+      const targetCount = articles.length + 3; // Calculate target count dynamically
+      await generateArticles(language, null, targetCount, (updatedArticles) => {
         setArticles(prev => [...prev, ...updatedArticles.slice(prev.length)]);
-        setGeneratingCount(3 - updatedArticles.length);
+        setGeneratingCount(targetCount - updatedArticles.length);
       });
     } catch (error) {
       console.error('Error generating more articles:', error);
@@ -80,6 +81,7 @@ export function useArticles() {
     loading,
     initialLoading, // Add this to return
     generatingCount,
-    generateCustomArticle
+    generateCustomArticle,
+    generateMoreArticles,
   };
 }

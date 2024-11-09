@@ -86,7 +86,7 @@ export default function ArticleList() {
                       key={article.articleID}
                       article={article}
                       onDifficultySelect={handleDifficultySelect}
-                      disabled={loading || generatingCount > 0}
+                      disabled={false}
                     />
                   ))}
                 </div>

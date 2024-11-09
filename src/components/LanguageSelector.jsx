@@ -1,20 +1,14 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Globe2, BookOpen, Sparkles } from 'lucide-react';
+import { Globe2, BookOpen, Sparkles } from "lucide-react";
+import useLanguageSelector from "../hooks/uselanguageSelector";
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
 ];
 
 export default function LanguageSelector() {
-  const navigate = useNavigate();
-
-  const handleLanguageSelect = (langCode) => {
-    localStorage.setItem('selectedLanguage', langCode);
-    navigate('/articles');
-  };
+  const { handleLanguageSelect } = useLanguageSelector();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
@@ -25,13 +19,15 @@ export default function LanguageSelector() {
               <Globe2 className="w-12 h-12 text-indigo-600 mr-4" />
               <h1 className="text-4xl font-bold text-gray-800">Basha AI</h1>
             </div>
-            
+
             <div className="space-y-6">
               <div className="flex items-center space-x-4 text-gray-600">
                 <BookOpen className="w-6 h-6" />
-                <p className="text-lg">Choose your preferred language to begin your learning journey</p>
+                <p className="text-lg">
+                  Choose your preferred language to begin your learning journey
+                </p>
               </div>
-              
+
               <div className="grid gap-4 md:grid-cols-3">
                 {languages.map((lang) => (
                   <button
@@ -41,7 +37,9 @@ export default function LanguageSelector() {
                   >
                     <div className="text-center">
                       <span className="text-4xl mb-2 block">{lang.flag}</span>
-                      <span className="text-lg font-medium text-gray-700">{lang.name}</span>
+                      <span className="text-lg font-medium text-gray-700">
+                        {lang.name}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -49,7 +47,7 @@ export default function LanguageSelector() {
 
               <div className="mt-8 flex items-center justify-center space-x-2 text-sm text-gray-500">
                 <Sparkles className="w-4 h-4" />
-                <p>Powered by AI for personalized learning</p>
+                <p>Powered by Chrome Built-In AI</p>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getArticle } from '../lib/db';
+import { getArticleById, saveWord } from '../lib/dbUtils';
 
 export function useArticleView(articleId, difficulty) {
   const [article, setArticle] = useState(null);
@@ -10,7 +10,7 @@ export function useArticleView(articleId, difficulty) {
   useEffect(() => {
     const loadArticle = async () => {
       try {
-        const articleData = await getArticle(articleId);
+        const articleData = await getArticleById(articleId);
         // Add the text content from the article
         setArticle({
           ...articleData,

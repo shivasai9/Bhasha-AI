@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { saveWord, getWord } from '../lib/db';
+import { saveWord, getWordById } from '../lib/dbUtils';
 
 export function useWordInteraction(word) {
   const [wordDetails, setWordDetails] = useState(null);
@@ -11,7 +11,7 @@ export function useWordInteraction(word) {
   useEffect(() => {
     const checkIfWordIsSaved = async () => {
       try {
-        const savedWord = await getWord(word);
+        const savedWord = await getWordById(word);
         setIsSaved(!!savedWord);
       } catch (error) {
         console.error('Error checking if word is saved:', error);

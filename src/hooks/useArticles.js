@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { generateArticles } from '../lib/articleGenerator';
-import { saveArticle } from '../lib/db';
+import { saveArticle } from '../lib/dbUtils';
 
 export function useArticles() {
   const [articles, setArticles] = useState([]);

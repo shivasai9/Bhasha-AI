@@ -20,7 +20,7 @@ const presetDifficulties = [
   }
 ];
 
-export default function ArticleCard({ article, onDifficultySelect }) {
+export default function ArticleCard({ article, onDifficultySelect, disabled }) {
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
   const getThumbnailUrl = (keywords) => {
@@ -28,11 +28,13 @@ export default function ArticleCard({ article, onDifficultySelect }) {
   };
 
   const handlePresetDifficulty = (difficulty) => {
-    onDifficultySelect(article.id, difficulty);
+    onDifficultySelect(article.articleID, difficulty);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden flex">
+    <div className={`bg-white rounded-lg shadow-md overflow-hidden flex h-[240px] ${
+      disabled ? 'opacity-70' : ''
+    }`}>
       <div className="w-1/3 relative">
         <img
           src={getThumbnailUrl(article.imageKeywords)}
@@ -41,16 +43,21 @@ export default function ArticleCard({ article, onDifficultySelect }) {
           loading="lazy"
         />
       </div>
-      <div className="w-2/3 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">{article.title}</h2>
-        <p className="text-gray-600 mb-4">{article.summary}</p>
+      <div className="w-2/3 p-6 flex flex-col">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{article.title}</h2>
+        <p className="text-gray-600 mb-4 line-clamp-3 min-h-[4.5rem]">{article.summary}</p>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-auto">
           {presetDifficulties.map((difficulty) => (
             <button
               key={difficulty.id}
               onClick={() => handlePresetDifficulty(difficulty)}
-              className={`px-4 py-2 rounded-lg transition-colors font-medium ${difficulty.className}`}
+              disabled={disabled}
+              className={`px-4 py-2 rounded-lg transition-colors font-medium ${
+                difficulty.className
+              } ${
+                disabled ? 'cursor-not-allowed' : ''
+              }`}
             >
               {difficulty.label}
             </button>
@@ -60,7 +67,10 @@ export default function ArticleCard({ article, onDifficultySelect }) {
           
           <button
             onClick={() => setShowDifficultyModal(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center font-medium"
+            disabled={disabled}
+            className={`px-4 py-2 bg-indigo-600 text-white rounded-lg transition-colors flex items-center font-medium ${
+              disabled ? 'cursor-not-allowed' : 'hover:bg-indigo-700'
+            }`}
           >
             <BookOpen className="w-4 h-4 mr-2" />
             Custom Level
@@ -71,7 +81,7 @@ export default function ArticleCard({ article, onDifficultySelect }) {
       {showDifficultyModal && (
         <DifficultyModal
           onClose={() => setShowDifficultyModal(false)}
-          onSubmit={(difficulty) => onDifficultySelect(article.id, difficulty)}
+          onSubmit={(difficulty) => onDifficultySelect(article.articleID, difficulty)}
         />
       )}
     </div>

@@ -4,6 +4,7 @@ import { BookOpen, Plus, Loader2 } from 'lucide-react';
 import { useArticles } from '../hooks/useArticles';
 import ArticleCard from './ArticleCard';
 import CustomTopicForm from './CustomTopicForm';
+import SkeletonArticleCard from './SkeletonArticleCard';
 
 export default function ArticleList() {
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -23,24 +24,24 @@ export default function ArticleList() {
     }
   };
 
-  // Show full page loader when initially loading
+  // Replace both loading states with skeleton cards
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading your reading list...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading && articles.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading articles...</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <BookOpen className="w-8 h-8 mr-3 text-indigo-600" />
+                Available Articles
+              </h1>
+            </div>
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <SkeletonArticleCard key={i} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -92,12 +93,17 @@ export default function ArticleList() {
                 </div>
                 
                 {generatingCount > 0 && (
-                  <div className="flex items-center justify-center p-8 bg-white rounded-lg shadow-md">
-                    <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mr-3" />
-                    <p className="text-gray-600">
-                      Generating next article... ({generatingCount} remaining)
-                    </p>
-                  </div>
+                  <>
+                    {[...Array(generatingCount)].map((_, i) => (
+                      <SkeletonArticleCard key={i} />
+                    ))}
+                    <div className="flex items-center justify-center p-8 bg-white rounded-lg shadow-md">
+                      <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mr-3" />
+                      <p className="text-gray-600">
+                        Generating article(s)... ({generatingCount} remaining)
+                      </p>
+                    </div>
+                  </>
                 )}
 
                 {/* Add Load More button */}

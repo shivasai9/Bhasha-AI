@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Plus, Loader2 } from 'lucide-react';
+import { BookOpen, Plus, Loader2, Globe2 } from 'lucide-react';
 import { useArticles } from '../hooks/useArticles';
 import ArticleCard from './ArticleCard';
 import CustomTopicForm from './CustomTopicForm';
 import SkeletonArticleCard from './SkeletonArticleCard';
+import useLanguageSelector from '../hooks/uselanguageSelector';
 
 export default function ArticleList() {
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -15,7 +16,9 @@ export default function ArticleList() {
     generateCustomArticle, 
     generatingCount, 
     generateMoreArticles,
-    isCustomArticle  // Add this
+    isCustomArticle,
+    language, 
+    loadArticles  
   } = useArticles();
   const navigate = useNavigate();
 
@@ -31,6 +34,19 @@ export default function ArticleList() {
       setShowCustomForm(false);
     }
   };
+
+  const { handleLanguageSelect } = useLanguageSelector((newLanguage) => {
+    // Clear articles and show loading state before changing language
+    setLoading(true);
+    setInitialLoading(true);
+    loadArticles(); // Will be triggered by language change in useEffect
+  });
+
+  const languages = [
+    { code: "en", name: "English", flag: "🇬🇧" },
+    { code: "es", name: "Spanish", flag: "🇪🇸" },
+    { code: "fr", name: "French", flag: "🇫🇷" },
+  ];
 
   // Replace both loading states with skeleton cards
   if (initialLoading) {
@@ -62,20 +78,37 @@ export default function ArticleList() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
               <BookOpen className="w-8 h-8 mr-3 text-indigo-600" />
-              Available Articles
+              {loading ? 'Loading Articles...' : 'Available Articles'}
             </h1>
-            <button
-              onClick={() => setShowCustomForm(!showCustomForm)}
-              disabled={loading || generatingCount > 0}
-              className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg transition-colors ${
-                loading || generatingCount > 0 
-                  ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:bg-indigo-700'
-              }`}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Custom Topic
-            </button>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <select
+                  onChange={(e) => handleLanguageSelect(e.target.value)}
+                  value={language}
+                  disabled={loading || generatingCount > 0}
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 leading-tight focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                >
+                  {languages.map((lang) => (
+                    <option key={lang.code} value={lang.name}>
+                      {lang.flag} {lang.name}
+                    </option>
+                  ))}
+                </select>
+                <Globe2 className="w-4 h-4 text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+              </div>
+              <button
+                onClick={() => setShowCustomForm(!showCustomForm)}
+                disabled={loading || generatingCount > 0}
+                className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg transition-colors ${
+                  loading || generatingCount > 0 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:bg-indigo-700'
+                }`}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Custom Topic
+              </button>
+            </div>
           </div>
 
           {showCustomForm && (

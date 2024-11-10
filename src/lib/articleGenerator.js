@@ -1,69 +1,85 @@
+// @ts-nocheck
 import { v4 as uuidv4 } from "@lukeed/uuid";
-import { CREATE_RANDOM_ARTICLE } from "./prompts";
 import { aiWrapper } from "./ai";
 import { getArticlesByLanguage, saveArticle } from "./dbUtils";
+import { LANGUAGE_CODES } from "./constants";
 
-// Remove or comment out the fallbackArticles constant
-// const fallbackArticles = { ... }
+async function translateArticle(article, targetLanguage) {
+  try {
+    // Early return if already in target language
+    if (article.language.toLowerCase() === targetLanguage.toLowerCase()) {
+      return article;
+    }
+
+    const langCode = LANGUAGE_CODES[targetLanguage.toLowerCase()];
+    const translator = await translation.createTranslator({
+      sourceLanguage: "en",
+      targetLanguage: langCode,
+    });
+
+    const translatedTitle = await translator.translate(article.title);
+    const translatedSummary = await translator.translate(article.summary);
+
+    return {
+      ...article,
+      articleID: uuidv4(),
+      title: translatedTitle,
+      summary: translatedSummary,
+      language: targetLanguage,
+      originalArticleId: article.articleID,
+      timestamp: Date.now(),
+    };
+  } catch (error) {
+    console.error("Translation failed:", error);
+    throw error;
+  }
+}
 
 export async function generateArticles(language, customTopic = null, count = 3, onProgress = null) {
   try {
-    const existingArticles = await getArticlesByLanguage(language);
-    let articles = [...existingArticles];
+    let articles = await getArticlesByLanguage(language);
     
-    // If we have enough articles from database, return them
-    if (existingArticles.length >= count && !customTopic) {
-      onProgress?.(articles);
-      return articles.slice(0, count);
-    }
-
-    // Calculate how many more articles we need
-    const neededCount = count - articles.length;
-
-    if (neededCount > 0 || customTopic) {
+    if (articles.length < count || customTopic) {
       const isAiAvailable = await aiWrapper.initialize();
       
       if (isAiAvailable) {
         if (customTopic) {
-          try {
-            const articleData = await aiWrapper.generateCustomArticle(customTopic);
-            const article = {
-              articleID: uuidv4(),
-              ...articleData,
-              language,
-              timestamp: Date.now(),
-              isSaved: false
-            };
-            await saveArticle(article);
-            articles.unshift(article); // Add to beginning of array
-            onProgress?.(articles);
-            return articles;
-          } catch (error) {
-            console.error("Custom topic generation failed:", error);
-            return articles;
-          }
+          const articleData = await aiWrapper.generateCustomArticle(customTopic);
+          const article = {
+            articleID: uuidv4(),
+            ...articleData,
+            language: "english",
+            timestamp: Date.now(),
+            isSaved: false
+          };
+          
+          const translatedArticle = language.toLowerCase() !== "english" 
+            ? await translateArticle(article, language)
+            : article;
+            
+          await saveArticle(translatedArticle);
+          articles = [translatedArticle, ...articles];
+          onProgress?.(articles);
         } else {
-          for (let i = 0; i < neededCount; i++) {
-            try {
-              const articleData = await aiWrapper.generateArticle();
-              const article = {
-                articleID: uuidv4(),
-                ...articleData,
-                language,
-                timestamp: Date.now(),
-                isSaved: false
-              };
-              await saveArticle(article);
-              articles.push(article);
-              onProgress?.(articles); // Notify progress after each article
-              
-              // Add small delay between generations
-              await new Promise(resolve => setTimeout(resolve, 500));
-            } catch (error) {
-              console.error(`Failed to generate article ${i + 1}:`, error);
-              break;
-            }
-          }
+          // Generate only one article at a time
+          const articleData = await aiWrapper.generateArticle();
+          const article = {
+            articleID: uuidv4(),
+            ...articleData,
+            language: "english",
+            timestamp: Date.now(),
+            isSaved: false
+          };
+          
+          const translatedArticle = language.toLowerCase() !== "english"
+            ? await translateArticle(article, language)
+            : article;
+            
+          await saveArticle(translatedArticle);
+          
+          // Return array with single new article
+          onProgress?.([translatedArticle]);
+          return [...articles, translatedArticle];
         }
       }
     }
@@ -71,7 +87,7 @@ export async function generateArticles(language, customTopic = null, count = 3, 
     return articles;
   } catch (error) {
     console.error("Article generation failed:", error);
-    return []; // Return empty array instead of fallback articles
+    return [];
   } finally {
     aiWrapper.destroy();
   }

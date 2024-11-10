@@ -8,4 +8,11 @@ export const STORES = {
     ARTICLES_CONTENT: "articlesContent",
     QUIZ: "quiz",
     SUMMARY_CHALLENGE: "summaryChallenge",
-}
+    TRANSLATIONS: "translations",
+};
+
+export const LANGUAGE_CODES = {
+  english: "en",
+  spanish: "es",
+  french: "fr",
+};

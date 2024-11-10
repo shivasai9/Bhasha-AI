@@ -30,30 +30,42 @@ export function useArticles() {
   }, []);
 
   const loadArticles = async () => {
-    setInitialLoading(true); // Set initial loading
+    setInitialLoading(true);
     setLoading(true);
     try {
-      const existingArticles = await getArticlesByLanguage(language);
-      setArticles(existingArticles);
-      setInitialLoading(false); // Clear initial loading after first fetch
+      setArticles([]);
+      let availableArticles = await getArticlesByLanguage(language);
       
-      // Always try to generate articles if we have less than 3
-      if (existingArticles.length < 3) {
-        const needed = 3 - existingArticles.length;
-        setGeneratingCount(needed);
+      // Show existing articles first
+      if (availableArticles.length > 0) {
+        setArticles(availableArticles);
+      }
+      
+      if (availableArticles.length < 3) {
+        const remaining = 3 - availableArticles.length;
+        setGeneratingCount(remaining);
         
-        await generateArticles(language, null, 3, (updatedArticles) => {
-          if (updatedArticles.length > 0) {
-            setArticles(updatedArticles);
-            setGeneratingCount(3 - updatedArticles.length);
+        // Generate one article at a time
+        for (let i = 0; i < remaining; i++) {
+          const newArticle = await generateArticles(language, null, 1, (articles) => {
+            if (articles.length > 0) {
+              setArticles(prev => [...prev, articles[0]]);
+              setGeneratingCount(prev => prev - 1);
+            }
+          });
+          
+          // Add delay between generations
+          if (i < remaining - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
           }
-        });
+        }
       }
     } catch (error) {
       console.error('Error loading articles:', error);
-      setArticles([]); // Set empty array on error
+      setArticles([]);
     } finally {
       setLoading(false);
+      setInitialLoading(false);
       setGeneratingCount(0);
     }
   };
@@ -85,11 +97,20 @@ export function useArticles() {
     setLoading(true);
     setGeneratingCount(3);
     try {
-      const targetCount = articles.length + 3; // Calculate target count dynamically
-      await generateArticles(language, null, targetCount, (updatedArticles) => {
-        setArticles(prev => [...prev, ...updatedArticles.slice(prev.length)]);
-        setGeneratingCount(targetCount - updatedArticles.length);
-      });
+      // Generate one article at a time
+      for (let i = 0; i < 3; i++) {
+        const newArticle = await generateArticles(language, null, 1, (articles) => {
+          if (articles.length > 0) {
+            setArticles(prev => [...prev, articles[0]]);
+            setGeneratingCount(prev => prev - 1);
+          }
+        });
+        
+        // Add delay between generations
+        if (i < 2) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+      }
     } catch (error) {
       console.error('Error generating more articles:', error);
     } finally {
@@ -100,7 +121,9 @@ export function useArticles() {
 
   // Update useEffect to depend on language state
   useEffect(() => {
-    loadArticles();
+    if (language) {
+      loadArticles();
+    }
   }, [language]); // Re-run when language changes
 
   return {

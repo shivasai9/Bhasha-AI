@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { saveLanguage } from "../lib/languageStorage";
 
-const useLanguageSelector = () => {
+const useLanguageSelector = (onLanguageChange = null) => {
   const navigate = useNavigate();
 
   const handleLanguageSelect = async (langCode) => {
     try {
       saveLanguage(langCode);
-      navigate("/articles");
+      if (onLanguageChange) {
+        onLanguageChange(langCode);
+      } else {
+        navigate("/articles");
+      }
     } catch (error) {
       console.error("Error updating language:", error);
     }

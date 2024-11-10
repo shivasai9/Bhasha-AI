@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DifficultyModal from './DifficultyModal';
 import { BookOpen } from 'lucide-react';
+import PlaceholderImage from './PlaceholderImage';
 
 const presetDifficulties = [
   { 
@@ -36,12 +37,16 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
       disabled ? 'opacity-70' : ''
     }`}>
       <div className="w-1/3 relative">
-        <img
-          src={getThumbnailUrl(article.imageKeywords)}
-          alt={article.title}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
+        {article.imageUrl ? (
+          <img
+            src={article.imageUrl}
+            alt={article.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <PlaceholderImage />
+        )}
       </div>
       <div className="w-2/3 p-6 flex flex-col">
         <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{article.title}</h2>

@@ -26,20 +26,21 @@ export async function generateArticles(language, customTopic = null, count = 3, 
       if (isAiAvailable) {
         if (customTopic) {
           try {
-            const articleData = await aiWrapper.generateArticle();
+            const articleData = await aiWrapper.generateCustomArticle(customTopic);
             const article = {
               articleID: uuidv4(),
               ...articleData,
-              title: `${customTopic}: ${articleData.title}`,
               language,
               timestamp: Date.now(),
               isSaved: false
             };
             await saveArticle(article);
-            return [article];
+            articles.unshift(article); // Add to beginning of array
+            onProgress?.(articles);
+            return articles;
           } catch (error) {
             console.error("Custom topic generation failed:", error);
-            return [];
+            return articles;
           }
         } else {
           for (let i = 0; i < neededCount; i++) {

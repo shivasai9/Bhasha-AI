@@ -1,15 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { upsertRecord } from "../lib/dbUtils";
-import { STORES } from "../lib/constants";
+import { saveLanguage } from "../lib/languageStorage";
 
 const useLanguageSelector = () => {
   const navigate = useNavigate();
 
   const handleLanguageSelect = async (langCode) => {
     try {
-      await upsertRecord(STORES.SETTINGS, null, {
-        langName: langCode,
-      });
+      saveLanguage(langCode);
       navigate("/articles");
     } catch (error) {
       console.error("Error updating language:", error);

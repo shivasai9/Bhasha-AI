@@ -130,16 +130,6 @@ const openDB = () => {
           unique: false,
         });
       }
-
-      // Create languages store if it doesn't exist
-      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-        db.createObjectStore(STORES.SETTINGS, {
-          keyPath: "userId",
-          autoIncrement: true,
-        });
-        // - langCode: Unique identifier for each language (e.g., "en", "es")
-        // - language: Full name of the language (e.g., "English", "Spanish")
-      }
     };
   });
 };

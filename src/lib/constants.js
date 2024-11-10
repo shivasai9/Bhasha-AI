@@ -8,5 +8,4 @@ export const STORES = {
     ARTICLES_CONTENT: "articlesContent",
     QUIZ: "quiz",
     SUMMARY_CHALLENGE: "summaryChallenge",
-    SETTINGS: "settings",
 }

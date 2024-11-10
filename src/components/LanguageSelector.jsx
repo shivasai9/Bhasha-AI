@@ -2,9 +2,9 @@ import { Globe2, BookOpen, Sparkles } from "lucide-react";
 import useLanguageSelector from "../hooks/uselanguageSelector";
 
 const languages = [
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "en", name: "english", flag: "🇬🇧" },
+  { code: "es", name: "spanish", flag: "🇪🇸" },
+  { code: "fr", name: "french", flag: "🇫🇷" },
 ];
 
 export default function LanguageSelector() {

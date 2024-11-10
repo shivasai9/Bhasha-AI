@@ -8,7 +8,15 @@ import SkeletonArticleCard from './SkeletonArticleCard';
 
 export default function ArticleList() {
   const [showCustomForm, setShowCustomForm] = useState(false);
-  const { articles, loading, initialLoading, generateCustomArticle, generatingCount, generateMoreArticles } = useArticles();
+  const { 
+    articles, 
+    loading, 
+    initialLoading, 
+    generateCustomArticle, 
+    generatingCount, 
+    generateMoreArticles,
+    isCustomArticle  // Add this
+  } = useArticles();
   const navigate = useNavigate();
 
   const handleDifficultySelect = (articleId, difficulty) => {
@@ -75,48 +83,56 @@ export default function ArticleList() {
           )}
 
           <div className="space-y-6">
-            {articles.length === 0 && !generatingCount ? (
-              <div className="text-center p-8 bg-white rounded-lg shadow-md">
-                <p className="text-gray-600">No articles available. Try generating some!</p>
+            {/* Custom article skeleton at top */}
+            {isCustomArticle && generatingCount > 0 && (
+              <SkeletonArticleCard />
+            )}
+            {/* Custom article loading message */}
+            {isCustomArticle && generatingCount > 0 && (
+              <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
+                <p className="text-gray-600">Generating custom article...</p>
               </div>
-            ) : (
-              <>
-                <div className={`space-y-6 ${loading || generatingCount > 0 ? 'pointer-events-none' : ''}`}>
-                  {articles.map((article) => (
-                    <ArticleCard
-                      key={article.articleID}
-                      article={article}
-                      onDifficultySelect={handleDifficultySelect}
-                      disabled={false}
-                    />
-                  ))}
-                </div>
-                
-                {generatingCount > 0 && (
-                  <>
-                    {[...Array(generatingCount)].map((_, i) => (
-                      <SkeletonArticleCard key={i} />
-                    ))}
-                    <div className="flex items-center justify-center p-8 bg-white rounded-lg shadow-md">
-                      <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mr-3" />
-                      <p className="text-gray-600">
-                        Generating article(s)... ({generatingCount} remaining)
-                      </p>
-                    </div>
-                  </>
-                )}
+            )}
+            {/* Existing articles */}
+            <div className={`space-y-6`}>
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.articleID}
+                  article={article}
+                  onDifficultySelect={handleDifficultySelect}
+                  disabled={false} 
+                  // Lets enable all the click actions on the cards while other articles are loading
+                />
+              ))}
+            </div>
+            {/* Load more skeletons - show only when loading more articles */}
+            {!isCustomArticle && generatingCount > 0 && (
+              <div className="space-y-6">
+                {[...Array(generatingCount)].map((_, i) => (
+                  <SkeletonArticleCard key={`load-more-${i}`} />
+                ))}
+              </div>
+            )}
+            {/* Custom article loading message */}
+            {!isCustomArticle && generatingCount > 0 && (
+              <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
+                <p className="text-gray-600">
+                  Generating article(s)... ({generatingCount} remaining)
+                </p>
+              </div>
+            )}
 
-                {/* Add Load More button */}
-                {!loading && generatingCount === 0 && articles.length > 0 && (
-                  <button
-                    onClick={generateMoreArticles}
-                    className="w-full py-4 bg-white hover:bg-gray-50 text-indigo-600 font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Load More Articles
-                  </button>
-                )}
-              </>
+            {/* Add Load More button */}
+            {!loading && generatingCount === 0 && articles.length > 0 && (
+              <button
+                onClick={generateMoreArticles}
+                className="w-full py-4 bg-white hover:bg-gray-50 text-indigo-600 font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Load More Articles
+              </button>
             )}
           </div>
         </div>

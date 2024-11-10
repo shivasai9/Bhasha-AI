@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { generateArticles } from '../lib/articleGenerator';
 import { getArticlesByLanguage } from '../lib/dbUtils';
+import { aiWrapper } from '../lib/ai';
+
+// Add a function to generate unique IDs
+const generateUniqueId = () => `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export function useArticles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true); // Add this state
+  const [isCustomArticle, setIsCustomArticle] = useState(false);  // Add this state
   const language = localStorage.getItem('selectedLanguage') || 'en';
 
   const loadArticles = async () => {
@@ -41,15 +46,25 @@ export function useArticles() {
 
   const generateCustomArticle = async (topic) => {
     setLoading(true);
+    setGeneratingCount(1);
+    setIsCustomArticle(true);  // Set custom article flag
     try {
-      const newArticle = await generateArticles(language, topic, 1);
-      setArticles(prev => [...prev, ...newArticle]);
-      return newArticle[0];
+      const customArticle = await aiWrapper.generateCustomArticle(topic);
+      // Add unique ID to custom article
+      const articleWithId = {
+        ...customArticle,
+        articleID: generateUniqueId()
+      };
+      // Add the new article at the beginning of the array
+      setArticles(prev => [articleWithId, ...prev]);
+      return articleWithId;
     } catch (error) {
       console.error('Error generating custom article:', error);
       return null;
     } finally {
       setLoading(false);
+      setGeneratingCount(0);
+      setIsCustomArticle(false);  // Reset custom article flag
     }
   };
 
@@ -83,5 +98,6 @@ export function useArticles() {
     generatingCount,
     generateCustomArticle,
     generateMoreArticles,
+    isCustomArticle,  // Add this to return value
   };
 }

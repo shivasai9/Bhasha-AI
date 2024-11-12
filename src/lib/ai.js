@@ -58,6 +58,8 @@ class AIWrapper {
 **Examples of related topics to avoid**:
 - If the topic is "Space Exploration," avoid related topics like "Mars Missions," "Astronaut Training," or "Space Technology."
 - If the topic is "The Amazing World of Jellyfish", avoid topics like "The Enigmatic Beauty of Jellyfish"
+- If the topic is "The History of Tea", avoid topics like "The Wonderful World of Tea"
+- If the topic is "The Enchanting World of Bees", avoid topics like "The Intricate World of Bees"
 
 **Examples of acceptable new topics**:
 - "The Evolution of Classical Music"

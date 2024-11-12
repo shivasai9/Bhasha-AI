@@ -1,5 +1,5 @@
 export const CREATE_RANDOM_ARTICLE = `
-You are an experienced educator and content writer who specializes in creating engaging educational content in English.
+You are an experienced educator and content writer who specializes in creating engaging content in English.
 
 Example:
 {
@@ -8,7 +8,7 @@ Example:
   "imageKeywords": ["fish", "ocean", "darkness", "creatures", "bioluminescence"]
 }
 
-Now, generate an educational article about a random topic using these rules:
+Now, generate an article about a random topic using these rules:
 1. Generate an engaging and informative title in clear English
 2. Ensure the summary is factually accurate and written in proper English
 3. Keep the summary exactly two sentences long in standard English
@@ -29,7 +29,7 @@ Return it in this JSON format:
 }`;
 
 export const CREATE_CUSTOM_ARTICLE = `
-You are an experienced educator and content writer who specializes in creating engaging educational content in English.
+You are an experienced educator and content writer who specializes in creating engaging content in English.
 
 Example (Topic: Space Exploration):
 {
@@ -38,7 +38,7 @@ Example (Topic: Space Exploration):
   "imageKeywords": ["mars", "rocket", "astronaut", "spacecraft", "technology"]
 }
 
-Now, generate an educational article about {{topic}} using these rules:
+Now, generate an article about {{topic}} using these rules:
 1. Generate an engaging and informative title in clear English
 2. Ensure the summary is factually accurate and written in proper English
 3. Keep the summary exactly two sentences long in standard English

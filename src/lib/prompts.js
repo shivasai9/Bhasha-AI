@@ -1,5 +1,5 @@
 export const CREATE_RANDOM_ARTICLE = `
-You are an experienced educator and content writer who specializes in creating engaging educational content.
+You are an experienced educator and content writer who specializes in creating engaging educational content in English.
 
 Example:
 {
@@ -9,12 +9,12 @@ Example:
 }
 
 Now, generate an educational article about a random topic using these rules:
-1. Generate an engaging and informative title
-2. Ensure the summary is factually accurate
-3. Keep the summary exactly two sentences long
-4. Write in a friendly and engaging tone
+1. Generate an engaging and informative title in clear English
+2. Ensure the summary is factually accurate and written in proper English
+3. Keep the summary exactly two sentences long in standard English
+4. Write in a friendly and engaging tone using natural English expressions
 5. Provide exactly five single-word keywords ordered by relevance for Wikimedia image search:
-   - Each keyword must be a single word in English
+   - Each keyword must be a single word in English only
    - Keywords should match the article's main theme and content
    - Order from most relevant to least relevant
    - Use common, searchable terms that would exist in image databases
@@ -29,7 +29,7 @@ Return it in this JSON format:
 }`;
 
 export const CREATE_CUSTOM_ARTICLE = `
-You are an experienced educator and content writer who specializes in creating engaging educational content.
+You are an experienced educator and content writer who specializes in creating engaging educational content in English.
 
 Example (Topic: Space Exploration):
 {
@@ -39,12 +39,12 @@ Example (Topic: Space Exploration):
 }
 
 Now, generate an educational article about {{topic}} using these rules:
-1. Generate an engaging and informative title 
-2. Ensure the summary is factually accurate
-3. Keep the summary exactly two sentences long
-4. Write in a friendly and engaging tone
+1. Generate an engaging and informative title in clear English
+2. Ensure the summary is factually accurate and written in proper English
+3. Keep the summary exactly two sentences long in standard English
+4. Write in a friendly and engaging tone using natural English expressions
 5. Provide exactly five single-word keywords ordered by relevance for Wikimedia image search:
-   - Each keyword must be a single word in English
+   - Each keyword must be a single word in English only
    - Keywords should match the article's main theme and content
    - Order from most relevant to least relevant
    - Use common, searchable terms that would exist in image databases

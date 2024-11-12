@@ -30,7 +30,6 @@ export async function generateArticle(customTopic = null) {
       isSaved: false,
       imagesData,
     };
-    console.log("Generated article:", article);
     await saveArticle(article);
     return article;
   } catch (error) {

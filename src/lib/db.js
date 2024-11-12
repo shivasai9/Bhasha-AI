@@ -52,10 +52,13 @@ const openDB = () => {
         // - title: Title of the article
         // - summary: Brief summary of the article
         // - imageKeyWords: Array of keywords to fetch images (e.g., ["space", "stars"])
-        // - imageURL: URL of the image fetched from Wikimedia
         // - isSaved: Boolean flag to track if the article is saved by the user
         // - timestamp: When the article was saved
-        // - imagesData: Array of image URLs, reference URLs and sources used in the article
+        // - imagesData: Array of image objects with the following structure:
+        //      - url: URL of the image
+        //      - alt: Image keyword/description
+        //      - source: Image source (e.g., "wiki")
+        //      - refUrl: Reference URL for the image (attribution URL)
         // - originalArticleId: Reference to the original English article (null for English articles)
         articleMetadataStore.createIndex("languageIndex", "language", {
           unique: false,

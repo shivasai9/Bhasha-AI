@@ -24,23 +24,23 @@ const presetDifficulties = [
 export default function ArticleCard({ article, onDifficultySelect, disabled }) {
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
-  const getThumbnailUrl = (keywords) => {
-    return "https://www.levelify.me/_next/image?url=https%3A%2F%2Fik.imagekit.io%2Fko3vczxvh%2Ftr%3Aw-auto%2Cfo-auto%2FheroImage.png&w=1920&q=75";
-  };
-
   const handlePresetDifficulty = (difficulty) => {
     onDifficultySelect(article.articleID, difficulty);
   };
+
+  const { imagesData = [] } = article;
+  const imageUrl = imagesData.length ? imagesData[0].url : null;
+  const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
 
   return (
     <div className={`bg-white rounded-lg shadow-md overflow-hidden flex h-[240px] ${
       disabled ? 'opacity-70' : ''
     }`}>
       <div className="w-1/3 relative">
-        {article.imageUrl ? (
+        {imageUrl ? (
           <img
-            src={article.imageUrl}
-            alt={article.title}
+            src={imageUrl}
+            alt={imageAlt}
             className="w-full h-full object-cover"
             loading="lazy"
           />

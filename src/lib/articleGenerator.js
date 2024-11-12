@@ -3,6 +3,7 @@ import { CREATE_RANDOM_ARTICLE } from "./prompts";
 import { aiWrapper } from "./ai";
 import { getArticlesByLanguage, saveArticle } from "./dbUtils";
 import { getLanguage } from "./languageStorage";
+import { fetchImagesData } from "./utils";
 
 // Helper function to fetch existing articles by language
 async function fetchExistingArticles(language) {
@@ -19,13 +20,17 @@ export async function generateArticle(customTopic = null) {
   const language = getLanguage();
   try {
     const articleData = await aiWrapper.generateArticle(customTopic);
+    const mostRelevantKeyword = articleData.imageKeywords[0];
+    const imagesData = await fetchImagesData(mostRelevantKeyword);
     const article = {
       articleID: uuidv4(),
       ...articleData,
       language,
       timestamp: Date.now(),
       isSaved: false,
+      imagesData,
     };
+    console.log("Generated article:", article);
     await saveArticle(article);
     return article;
   } catch (error) {

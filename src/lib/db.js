@@ -55,6 +55,7 @@ const openDB = () => {
         // - imageURL: URL of the image fetched from Wikimedia
         // - isSaved: Boolean flag to track if the article is saved by the user
         // - timestamp: When the article was saved
+        // - imagesData: Array of image URLs, reference URLs and sources used in the article
         // - originalArticleId: Reference to the original English article (null for English articles)
         articleMetadataStore.createIndex("languageIndex", "language", {
           unique: false,
@@ -83,6 +84,7 @@ const openDB = () => {
         // - articleID: Identifier linking to the article in `articlesMetadata`
         // - level: Difficulty level of the content (e.g., "easy", "medium", "hard")
         // - content: Full text of the article for this specific level
+ 
         articleContentsStore.createIndex("articleIDIndex", "articleID", {
           unique: false,
         });

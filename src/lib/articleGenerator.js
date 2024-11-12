@@ -43,15 +43,17 @@ export async function generateMultipleArticles(count, onProgress) {
   const articles = [];
   for (let i = 0; i < count; i++) {
     try {
-      const article = await generateArticle();
+      // This await makes execution sequential - next iteration won't start
+      // until either success or all retries are exhausted
+      const article = await generateArticle();  
       articles.push(article);
-      onProgress?.(articles); // Notify progress after each article
+      onProgress?.(articles);
 
-      // Add a small delay between generations
+      // This delay is also sequential
       await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
       console.error(`Failed to generate article ${i + 1}:`, error);
-      break;
+      break; // Stops the loop on failure
     }
   }
   return articles;

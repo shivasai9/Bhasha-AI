@@ -7,8 +7,8 @@ export function useArticles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
-  const [initialLoading, setInitialLoading] = useState(true); // Add this state
-  const [isCustomArticle, setIsCustomArticle] = useState(false); // Add this state
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [isCustomArticle, setIsCustomArticle] = useState(false);
   const language = getLanguage();
 
   const loadArticles = async () => {
@@ -27,7 +27,7 @@ export function useArticles() {
 
         await generateArticles(3, (updatedArticles) => {
           if (updatedArticles.length > 0) {
-            setArticles(updatedArticles);
+            setArticles((prev) => [...prev, ...updatedArticles.slice(-1)]);
             setGeneratingCount(3 - updatedArticles.length);
           }
         });
@@ -78,8 +78,9 @@ export function useArticles() {
   };
 
   useEffect(() => {
+    console.log("**********************loadartcilehook**********************", language);
     loadArticles();
-  }, [language]);
+  }, []);
 
   return {
     articles,

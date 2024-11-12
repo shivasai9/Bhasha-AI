@@ -1,14 +1,22 @@
 import { WIKI_IMAGE_URL } from "./constants";
 
 /**
- * Retry wrapper for async functions
+ * Retry wrapper for async functions with exponential backoff and jitter
  * @template T
  * @param {() => Promise<T>} fn - Function to retry
- * @param {number} maxAttempts - Maximum number of retry attempts
- * @param {number} delayMs - Delay between retries in milliseconds
+ * @param {number} maxAttempts - Maximum number of retry attempts (1-10)
+ * @param {number} baseDelayMs - Base delay between retries in milliseconds
  * @returns {Promise<T>}
  */
-export async function withRetry(fn, maxAttempts = 5, delayMs = 1000) {
+export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
+  if (typeof fn !== 'function') throw new Error('First argument must be a function');
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 10) {
+    throw new Error('maxAttempts must be an integer between 1 and 10');
+  }
+  if (!Number.isInteger(baseDelayMs) || baseDelayMs < 100) {
+    throw new Error('baseDelayMs must be an integer >= 100');
+  }
+
   let lastError;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -19,7 +27,12 @@ export async function withRetry(fn, maxAttempts = 5, delayMs = 1000) {
       console.warn(`Attempt ${attempt} failed:`, error);
 
       if (attempt < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        // Calculate delay with exponential backoff and jitter
+        const exponentialDelay = baseDelayMs * Math.pow(2, attempt - 1);
+        const jitter = Math.random() * 0.3 * exponentialDelay;
+        const delay = Math.min(exponentialDelay + jitter, 30000);
+        
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }

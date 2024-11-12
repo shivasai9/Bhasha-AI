@@ -1,7 +1,8 @@
 const LANGUAGE_KEY = 'selected_basha';
 
 export const saveLanguage = (language) => {
-  localStorage.setItem(LANGUAGE_KEY, language);
+  const lowerCasedLanguage = language.toLowerCase();
+  localStorage.setItem(LANGUAGE_KEY, lowerCasedLanguage);
 };
 
 export const getLanguage = () => {

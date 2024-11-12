@@ -38,7 +38,6 @@ const openDB = () => {
         wordStore.createIndex("timestampIndex", "timestamp", { unique: false });
       }
 
-      // Create articles store if it doesn't exist
       if (!db.objectStoreNames.contains(STORES.ARTICLES)) {
         // `articles` schema to store unique articles with metadata
         const articleMetadataStore = db.createObjectStore(
@@ -56,6 +55,7 @@ const openDB = () => {
         // - imageURL: URL of the image fetched from Wikimedia
         // - isSaved: Boolean flag to track if the article is saved by the user
         // - timestamp: When the article was saved
+        // - originalArticleId: Reference to the original English article (null for English articles)
         articleMetadataStore.createIndex("languageIndex", "language", {
           unique: false,
         });
@@ -129,16 +129,6 @@ const openDB = () => {
         summaryStore.createIndex("timestampIndex", "timestamp", {
           unique: false,
         });
-      }
-
-      // Create languages store if it doesn't exist
-      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-        db.createObjectStore(STORES.SETTINGS, {
-          keyPath: "userId",
-          autoIncrement: true,
-        });
-        // - langCode: Unique identifier for each language (e.g., "en", "es")
-        // - language: Full name of the language (e.g., "English", "Spanish")
       }
     };
   });

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { withRetry } from './utils';
-import { CREATE_RANDOM_ARTICLE, CREATE_CUSTOM_ARTICLE, generateArticleCreationPrompt } from './prompts';
+import { CREATE_RANDOM_ARTICLE, CREATE_CUSTOM_ARTICLE, CREATE_ARTICLE_QUESTIONS, generateArticleCreationPrompt } from './prompts';
 import { getArticlesByLanguage } from './dbUtils';
 
 class AIWrapper {
@@ -71,6 +71,40 @@ class AIWrapper {
     }
   }
 
+  async generateQuiz(title) {
+    try {
+      const start = Date.now();
+      const initialized = await this.initialize();
+      if (!initialized) throw new Error("Could not initialize AI");
+
+      const customPrompt = CREATE_ARTICLE_QUESTIONS.replace("{{title}}", title);
+      const result = await this.session.prompt(customPrompt);
+      const parsed = JSON.parse(result.trim());
+      const end = Date.now();
+      const diff = (end - start) / 1000;
+      console.log(`Quiz generated in ${diff} seconds`);
+
+
+      // Destroy session after use
+      this.destroy();
+
+      // Add default fields if missing
+      return parsed.map((field, index) => {
+        return {
+          question: field.question || "Untitled Question",
+          options: field.options || "No Options",
+          answer: field.answer || "No Answer",
+          explanation: field.explanation || "No Explanation",
+        };
+      });
+    } catch (error) {
+      console.error("Quiz generation failed:", error);
+      this.destroy(); // Ensure session is destroyed even on error
+      throw error;
+    }
+  }
+
+  // Only destroy when explicitly called
   destroy() {
     if (this.session) {
       this.session.destroy();

@@ -26,9 +26,11 @@ export default function ArticleList() {
   };
 
   const handleCustomTopic = async (topic) => {
-    const newArticle = await generateCustomArticle(topic);
-    if (newArticle) {
+    try {
+      await generateCustomArticle(topic);
       setShowCustomForm(false);
+    } catch (error) {
+      console.error('Error generating custom article:', error);      
     }
   };
 

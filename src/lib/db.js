@@ -38,7 +38,6 @@ const openDB = () => {
         wordStore.createIndex("timestampIndex", "timestamp", { unique: false });
       }
 
-      // Create articles store if it doesn't exist
       if (!db.objectStoreNames.contains(STORES.ARTICLES)) {
         // `articles` schema to store unique articles with metadata
         const articleMetadataStore = db.createObjectStore(
@@ -53,9 +52,14 @@ const openDB = () => {
         // - title: Title of the article
         // - summary: Brief summary of the article
         // - imageKeyWords: Array of keywords to fetch images (e.g., ["space", "stars"])
-        // - imageURL: URL of the image fetched from Wikimedia
         // - isSaved: Boolean flag to track if the article is saved by the user
         // - timestamp: When the article was saved
+        // - imagesData: Array of image objects with the following structure:
+        //      - url: URL of the image
+        //      - alt: Image keyword/description
+        //      - source: Image source (e.g., "wiki")
+        //      - refUrl: Reference URL for the image (attribution URL)
+        // - originalArticleId: Reference to the original English article (null for English articles)
         articleMetadataStore.createIndex("languageIndex", "language", {
           unique: false,
         });
@@ -83,6 +87,7 @@ const openDB = () => {
         // - articleID: Identifier linking to the article in `articlesMetadata`
         // - level: Difficulty level of the content (e.g., "easy", "medium", "hard")
         // - content: Full text of the article for this specific level
+ 
         articleContentsStore.createIndex("articleIDIndex", "articleID", {
           unique: false,
         });
@@ -129,16 +134,6 @@ const openDB = () => {
         summaryStore.createIndex("timestampIndex", "timestamp", {
           unique: false,
         });
-      }
-
-      // Create languages store if it doesn't exist
-      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-        db.createObjectStore(STORES.SETTINGS, {
-          keyPath: "userId",
-          autoIncrement: true,
-        });
-        // - langCode: Unique identifier for each language (e.g., "en", "es")
-        // - language: Full name of the language (e.g., "English", "Spanish")
       }
     };
   });

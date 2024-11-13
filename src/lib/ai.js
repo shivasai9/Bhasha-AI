@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { withRetry } from './utils';
-import { CREATE_RANDOM_ARTICLE, CREATE_CUSTOM_ARTICLE, CREATE_ARTICLE_QUESTIONS } from './prompts';
+import { CREATE_RANDOM_ARTICLE, CREATE_CUSTOM_ARTICLE, CREATE_ARTICLE_QUESTIONS, generateArticleCreationPrompt } from './prompts';
+import { getArticlesByLanguage } from './dbUtils';
 
 class AIWrapper {
   constructor() {
@@ -24,7 +25,7 @@ class AIWrapper {
       }
 
       this.session = await window.ai.languageModel.create({
-        systemPrompt: "You are an educational content generator."
+        systemPrompt: "You are a professional English content writer who creates engaging articles on interesting topics, maintaining factual accuracy without bias or vulgarity."
       });
       return true;
     } catch (error) {
@@ -33,60 +34,39 @@ class AIWrapper {
     }
   }
 
-  async generateArticle() {
+  async generateArticle(customTopic = null) {
     try {
       const start = Date.now();
       const initialized = await this.initialize();
       if (!initialized) throw new Error("Could not initialize AI");
 
-      const result = await this.session.prompt(CREATE_RANDOM_ARTICLE);
-      const parsed = JSON.parse(result.trim());
+      const prompt = await generateArticleCreationPrompt(customTopic);
+      const generateWithRetry = async () => {
+        if (!this.session) {
+          throw new Error("Session is not initialized");
+        }
+        const result = await this.session.prompt(prompt);
+        return JSON.parse(result.trim());
+      };
+
+      const parsed = await withRetry(generateWithRetry, 5, 1000);
       const end = Date.now();
-      const diff = (end - start)/1000;
-      console.log(`Article generated in ${diff} seconds`);
+      console.log(`Article generated in ${(end - start)/1000} seconds`);
 
-      // Destroy session after use
-      this.destroy();
-
-      // Add default fields if missing
-      return {
+      const response = {
         title: parsed.title || "Untitled Article",
         summary: parsed.summary || "No summary available.",
-        text: parsed.text || "No content available.",
-        imageKeywords: Array.isArray(parsed.imageKeywords) ? parsed.imageKeywords : ["article", "education"],
+        imageKeywords: Array.isArray(parsed.imageKeywords) ? parsed.imageKeywords : [],
       };
+      
+      this.destroy();
+      new Promise((resolve) => setTimeout(resolve, 500));
+      // Just add a delay to finish up destroying the session
+      return response;
+
     } catch (error) {
       console.error("Article generation failed:", error);
-      this.destroy(); // Ensure session is destroyed even on error
-      throw error;
-    }
-  }
-
-  async generateCustomArticle(topic) {
-    try {
-      const start = Date.now();
-      const initialized = await this.initialize();
-      if (!initialized) throw new Error("Could not initialize AI");
-
-      const customPrompt = CREATE_CUSTOM_ARTICLE.replace('{{topic}}', topic);
-      const result = await this.session.prompt(customPrompt);
-      const parsed = JSON.parse(result.trim());
-      const end = Date.now();
-      const diff = (end - start)/1000;
-      console.log(`Custom article generated in ${diff} seconds`);
-
-      // Destroy session after use
       this.destroy();
-
-      return {
-        title: parsed.title || topic,
-        summary: parsed.summary || "No summary available.",
-        text: parsed.text || "No content available.",
-        imageKeywords: Array.isArray(parsed.imageKeywords) ? parsed.imageKeywords : ["article", "education"],
-      };
-    } catch (error) {
-      console.error("Custom article generation failed:", error);
-      this.destroy(); // Ensure session is destroyed even on error
       throw error;
     }
   }

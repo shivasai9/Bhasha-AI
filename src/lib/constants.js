@@ -7,6 +7,13 @@ export const STORES = {
     ARTICLES: "articles",
     ARTICLES_CONTENT: "articlesContent",
     QUIZ: "quiz",
-    SUMMARY_CHALLENGE: "summaryChallenge",
-    SETTINGS: "settings",
-}
+    SUMMARY_CHALLENGE: "summaryChallenge"
+};
+
+export const LANGUAGE_CODES = {
+  english: "en",
+  spanish: "es",
+  french: "fr",
+};
+
+export const WIKI_IMAGE_URL = "https://www.levelify.me/api/getwikimediaimages?srsearch=";

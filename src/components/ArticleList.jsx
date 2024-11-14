@@ -11,7 +11,6 @@ export default function ArticleList() {
   const { 
     articles, 
     loading, 
-    initialLoading, 
     generateCustomArticle, 
     generatingCount, 
     generateMoreArticles,
@@ -33,29 +32,6 @@ export default function ArticleList() {
       console.error('Error generating custom article:', error);      
     }
   };
-
-  // Replace both loading states with skeleton cards
-  if (initialLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <BookOpen className="w-8 h-8 mr-3 text-indigo-600" />
-                Available Articles
-              </h1>
-            </div>
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <SkeletonArticleCard key={i} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

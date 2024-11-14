@@ -2,23 +2,67 @@ import { useState, useEffect } from "react";
 import { generateArticle, generateArticles } from "../lib/articleGenerator";
 import { getArticlesByLanguage } from "../lib/dbUtils";
 import { getLanguage } from "../lib/languageStorage";
+import { translateAndSaveArticle } from "../lib/utils";
 
 export function useArticles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [isCustomArticle, setIsCustomArticle] = useState(false);
-  const language = getLanguage();
-
+  const [language, setLanguage] = useState(getLanguage());
+  console.log("==generated articles==", generatingCount);
   const loadArticles = async () => {
-    setInitialLoading(true); // Set initial loading
     setLoading(true);
     try {
-      // Load existing articles first
       const existingArticles = await getArticlesByLanguage(language);
+      let englishArticles = existingArticles;
+      if (language.toLowerCase() !== "english") {
+        englishArticles = await getArticlesByLanguage("english");
+      }
       setArticles(existingArticles);
-      setInitialLoading(false); // Clear initial loading after first fetch
+
+      if (
+        language.toLowerCase() !== "english" &&
+        englishArticles.length > 0 &&
+        existingArticles.length === 0
+      ) {
+        setGeneratingCount(englishArticles.length);
+        for (let i = 0; i < englishArticles.length; i++) {
+          const translatedArticle = await translateAndSaveArticle(
+            englishArticles[i],
+            language
+          );
+          setArticles((prev) => [...prev, translatedArticle]); // Add translations one by one
+          setGeneratingCount(englishArticles.length - i - 1);
+        }
+        return;
+      }
+
+      if (
+        language.toLowerCase() !== "english" &&
+        englishArticles.length > 0 &&
+        existingArticles.length > 0 &&
+        existingArticles.length < englishArticles.length
+      ) {
+        const missedArticles = englishArticles.filter(
+          (article) =>
+            !existingArticles.find(
+              (a) => a.originalArticleId === article.articleID
+            )
+        );
+        if (missedArticles.length > 0) {
+          setGeneratingCount(missedArticles.length);
+          for (let i = 0; i < missedArticles.length; i++) {
+            const translatedArticle = await translateAndSaveArticle(
+              missedArticles[i],
+              language
+            );
+            setArticles((prev) => [...prev, translatedArticle]); // Add each article progressively
+            setGeneratingCount(missedArticles.length - i - 1);
+          }
+        }
+        return;
+      }
 
       // Always try to generate articles if we have less than 3
       if (existingArticles.length < 3) {
@@ -28,13 +72,15 @@ export function useArticles() {
         await generateArticles(3, (updatedArticles) => {
           if (updatedArticles.length > 0) {
             setArticles((prev) => [...prev, ...updatedArticles.slice(-1)]);
-            setGeneratingCount(3 - updatedArticles.length);
+            setGeneratingCount(needed - updatedArticles.length);
           }
         });
       }
     } catch (error) {
       console.error("Error loading articles:", error);
-      setArticles([]); // Set empty array on error
+      // TODO: Show Try Again Button -> It should refresh the page
+      setArticles([]);
+      setGeneratingCount(0);
     } finally {
       setLoading(false);
       setGeneratingCount(0);
@@ -64,7 +110,7 @@ export function useArticles() {
     setLoading(true);
     setGeneratingCount(3);
     try {
-      const targetCount = articles.length + 3; // Calculate target count dynamically
+      const targetCount = articles.length + 3;
       await generateArticles(targetCount, (updatedArticles) => {
         setArticles((prev) => [...prev, ...updatedArticles.slice(-1)]);
         setGeneratingCount(3 - updatedArticles.length);
@@ -78,17 +124,15 @@ export function useArticles() {
   };
 
   useEffect(() => {
-    console.log("**********************loadartcilehook**********************", language);
     loadArticles();
   }, []);
 
   return {
     articles,
     loading,
-    initialLoading, // Add this to return
     generatingCount,
     generateCustomArticle,
     generateMoreArticles,
-    isCustomArticle, // Add this to return value
+    isCustomArticle,
   };
 }

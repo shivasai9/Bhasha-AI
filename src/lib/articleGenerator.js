@@ -4,6 +4,7 @@ import { aiWrapper } from "./ai";
 import { getArticlesByLanguage, saveArticle } from "./dbUtils";
 import { getLanguage } from "./languageStorage";
 import { fetchImagesData } from "./utils";
+import { translateArticle } from "./translation.service";
 
 // Helper function to fetch existing articles by language
 async function fetchExistingArticles(language) {
@@ -15,27 +16,40 @@ async function initializeAI() {
   return await aiWrapper.initialize();
 }
 
-// Helper function to generate a single article
-export async function generateArticle(customTopic = null) {
-  const language = getLanguage();
+async function generateAndSaveArticle(customTopic = null, language) {
   try {
     const articleData = await aiWrapper.generateArticle(customTopic);
     const mostRelevantKeyword = articleData.imageKeywords[0];
     const imagesData = await fetchImagesData(mostRelevantKeyword);
-    const article = {
+    
+    const englishArticle = {
       articleID: uuidv4(),
       ...articleData,
-      language,
+      language: 'english',
       timestamp: Date.now(),
       isSaved: false,
       imagesData,
     };
-    await saveArticle(article);
-    return article;
+
+    await saveArticle(englishArticle);
+
+    let translatedArticle = null;
+    if (language.toLowerCase() !== 'english') {
+      translatedArticle = await translateArticle(englishArticle, language);
+      await saveArticle(translatedArticle);
+    }
+
+    return translatedArticle || englishArticle;
   } catch (error) {
     console.error("Article generation failed:", error);
     throw error;
   }
+}
+
+// Helper function to generate a single article
+export async function generateArticle(customTopic = null) {
+  const language = getLanguage();
+  return await generateAndSaveArticle(customTopic, language);
 }
 
 // Helper function to generate multiple articles

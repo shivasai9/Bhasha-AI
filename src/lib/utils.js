@@ -1,4 +1,6 @@
 import { WIKI_IMAGE_URL } from "./constants";
+import { saveArticle } from "./dbUtils";
+import { translateArticle } from "./translation.service";
 
 /**
  * Retry wrapper for async functions with exponential backoff and jitter
@@ -65,5 +67,16 @@ export async function fetchImagesData(keyword) {
   } catch (error) {
     console.error("Error fetching image:", error);
     return null;
+  }
+}
+
+export async function translateAndSaveArticle(article, targetLanguage) {
+  try {
+    const translatedArticle = await translateArticle(article, targetLanguage);
+    await saveArticle(translatedArticle);
+    return translatedArticle;
+  } catch (error) {
+    console.error("Translation and save failed:", error);
+    throw error;
   }
 }

@@ -1,6 +1,6 @@
-import { CREATE_RANDOM_ARTICLE } from "./prompts";
+import { GENERATE_ARTICLE_CONTENT } from "./prompts";
 import { aiWrapper } from "./ai";
-import { getArticlesByLanguage, saveArticle } from "./dbUtils";
+import { getArticlesByLanguage, saveArticle, saveArticleContent } from "./dbUtils";
 import { getLanguage } from "./languageStorage";
 import { fetchImagesData, getUniqueId } from "./utils";
 import { translateArticle } from "./translation.service";
@@ -92,5 +92,29 @@ export async function generateArticles(
     return [];
   } finally {
     aiWrapper.destroy();
+  }
+}
+
+export async function generateArticleContent(articleId, level, title, summary) {
+  try {
+    const prompt = GENERATE_ARTICLE_CONTENT
+      .replace('{{level}}', level)
+      .replace('{{title}}', title)
+      .replace('{{summary}}', summary);
+
+    const content = await aiWrapper.generateContent(prompt);
+    
+    const articleContent = {
+      articleID: articleId,
+      level,
+      content,
+      timestamp: Date.now()
+    };
+
+    await saveArticleContent(articleContent);
+    return content;
+  } catch (error) {
+    console.error('Error generating article content:', error);
+    throw error;
   }
 }

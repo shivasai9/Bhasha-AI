@@ -92,6 +92,27 @@ Generate 5 questions from the article "{{title}}" with 4 options and answer. Ret
 Please provide exactly five questions. Do not include any markdown or code formatting, only the pure array of JSON object.
 `;
 
+export const GENERATE_ARTICLE_CONTENT = `
+Generate a detailed article content in 2 paragraphs based on the following title and summary. Keep the language level at {{level}} (beginner/intermediate/advanced).
+
+Title: {{title}}
+Summary: {{summary}}
+
+Guidelines:
+1. Write 2 well-structured paragraphs
+2. Use language appropriate for {{level}} level:
+   - Beginner: Simple vocabulary and sentence structure
+   - Intermediate: Moderate complexity with some advanced terms
+   - Advanced: Complex sentence structures and advanced vocabulary
+3. Keep the content informative and engaging
+4. Maintain factual accuracy
+5. Return the content as plain text without any formatting
+
+Example output:
+First paragraph discussing the main topic and its importance...
+Second paragraph elaborating on specific details and conclusions...
+`;
+
 export async function generateArticleCreationPrompt(customTopic = null) {
   const existingArticles = await getArticlesByLanguage("english");
   const existingTopics = existingArticles.map((article) => {

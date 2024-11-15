@@ -3,7 +3,7 @@ import { useArticleContent } from '../../hooks/useArticleContent';
 import { ExternalLink } from 'lucide-react';
 import PlaceholderImage from '../PlaceholderImage';
 
-export default function ArticleContent({ article, onWordClick }) {
+export default function ArticleContent({ article, content, onWordClick }) {
   const { getClickableText, tooltipElement } = useArticleContent();
   console.log("==== ArticleContent ====", article);
 
@@ -58,7 +58,7 @@ export default function ArticleContent({ article, onWordClick }) {
 
           <div className="prose prose-lg max-w-none">
             <div className="text-gray-800 leading-relaxed space-y-6">
-              {article.content.split('\n').map((paragraph, index) => (
+              {content.split('\n').map((paragraph, index) => (
                 <p key={index} className="text-lg">
                   {getClickableText(paragraph)}
                 </p>

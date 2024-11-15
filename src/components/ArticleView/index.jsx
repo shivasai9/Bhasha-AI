@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BookOpen, FileText, BrainCircuit, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useArticleView } from '../../hooks/useArticleView';
 import ArticleContent from './ArticleContent';
 import WordInteractionModal from './WordInteractionModal';
@@ -30,37 +29,40 @@ const tabs = [
 ];
 
 export default function ArticleView() {
-  const navigate = useNavigate();
   const {
     article,
+    articleContent,
+    contentLoading,
     selectedWord,
     isWordModalOpen,
-    loading,
     activeTab,
     setActiveTab,
     handleWordClick,
     closeWordModal,
     handleSaveWord,
+    navigate
   } = useArticleView();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
 
   const renderContent = () => {
     switch (activeTab) {
       case 'read':
+        if (contentLoading) {
+          return (
+            <div className="flex justify-center items-center p-8">
+              <div className="animate-pulse text-gray-600">
+                Generating article content...
+              </div>
+            </div>
+          );
+        }
         return (
           <>
             <ArticleContent
               article={article}
+              content={articleContent}
               onWordClick={handleWordClick}
             />
-            <AudioPlayer text={article?.content} />
+            <AudioPlayer text={articleContent} />
           </>
         );
       case 'summarize':

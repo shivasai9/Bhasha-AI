@@ -77,6 +77,7 @@ class AIWrapper {
       const initialized = await this.initialize();
       if (!initialized) throw new Error("Could not initialize AI");
 
+      // TODO: Add retry logic
       const customPrompt = CREATE_ARTICLE_QUESTIONS.replace("{{title}}", title);
       const result = await this.session.prompt(customPrompt);
       const parsed = JSON.parse(result.trim());
@@ -100,6 +101,36 @@ class AIWrapper {
     } catch (error) {
       console.error("Quiz generation failed:", error);
       this.destroy(); // Ensure session is destroyed even on error
+      throw error;
+    }
+  }
+
+  async generateContent(prompt) {
+    try {
+      const start = Date.now();
+      const initialized = await this.initialize();
+      if (!initialized) throw new Error("Could not initialize AI");
+
+      const generateWithRetry = async () => {
+        if (!this.session) {
+          throw new Error("Session is not initialized");
+        }
+        const result = await this.session.prompt(prompt);
+        return result.trim();
+      };
+
+      const content = await withRetry(generateWithRetry, 5, 1000);
+      const end = Date.now();
+      console.log(`Content generated in ${(end - start)/1000} seconds`);
+
+      this.destroy();
+      // Small delay to ensure session cleanup
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      return content;
+    } catch (error) {
+      console.error("Content generation failed:", error);
+      this.destroy();
       throw error;
     }
   }

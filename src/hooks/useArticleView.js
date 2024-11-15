@@ -1,32 +1,44 @@
 import { useState, useEffect } from 'react';
-import { getArticleById, saveWord } from '../lib/dbUtils';
-import { useParams } from 'react-router-dom';
+import { getArticleById, saveWord, getArticleContent } from '../lib/dbUtils';
+import { useParams, useNavigate } from 'react-router-dom';
+import { generateArticleContent } from '../lib/articleGenerator';
 
 export function useArticleView() {
   const [article, setArticle] = useState(null);
+  const [articleContent, setArticleContent] = useState(null);
   const [selectedWord, setSelectedWord] = useState(null);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { id: articleId, difficulty, title } = useParams();
+  const [contentLoading, setContentLoading] = useState(true);
+  const { id: articleId, difficulty = 'beginner', title } = useParams();
   const [activeTab, setActiveTab] = useState('read');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadArticle = async () => {
+    const loadArticleAndContent = async () => {
       try {
         const articleData = await getArticleById(articleId);
-        // Add the text content from the article
-        setArticle({
-          ...articleData,
-          content: articleData.text || "No content available"
-        });
+        setArticle(articleData);
+
+        const content = await getArticleContent(articleId, difficulty);
+        if (content) {
+          setArticleContent(content.content);
+        } else {
+          const generatedContent = await generateArticleContent(
+            articleId,
+            difficulty,
+            articleData.title,
+            articleData.summary
+          );
+          setArticleContent(generatedContent);
+        }
       } catch (error) {
-        console.error('Error loading article:', error);
+        console.error('Error loading article or content:', error);
       } finally {
-        setLoading(false);
+        setContentLoading(false);
       }
     };
 
-    loadArticle();
+    loadArticleAndContent();
   }, [articleId, difficulty]);
 
   const handleWordClick = (word) => {
@@ -50,13 +62,15 @@ export function useArticleView() {
 
   return {
     article,
+    articleContent,
+    contentLoading,
     selectedWord,
     isWordModalOpen,
-    loading,
     activeTab,
     setActiveTab,
     handleWordClick,
     closeWordModal,
     handleSaveWord,
+    navigate,
   };
 }

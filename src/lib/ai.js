@@ -111,25 +111,60 @@ class AIWrapper {
       const initialized = await this.initialize();
       if (!initialized) throw new Error("Could not initialize AI");
 
+      // Count input tokens
+      const inputTokens = await this.session.countPromptTokens(prompt);
+      console.log(`Input tokens: ${inputTokens}`);
+
       const generateWithRetry = async () => {
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
         const result = await this.session.prompt(prompt);
-        return result.trim();
+        const cleaned = result
+          .trim()
+          .replace(/[^\w\s.,\n]/g, '')   // Keep words, spaces, dots, commas, newlines
+          .replace(/[ \t]+/g, ' ')        // Replace multiple spaces/tabs with single space
+          .replace(/,\s*\./g, '.')        // Replace ", ." with just "."
+          .replace(/\s+\./g, '.')         // Remove spaces before dots
+          .replace(/\.+/g, '.')           // Replace multiple dots with single dot
+          .replace(/\n\s+/g, '\n')        // Remove spaces after newlines
+          .replace(/\n{3,}/g, '\n\n')     // Replace 3+ newlines with double newline
+          .trim();
+
+        return cleaned;
       };
 
       const content = await withRetry(generateWithRetry, 5, 1000);
+      console.log("*****raw content*****", content);
+      
+      // Log token usage stats
+      console.log(`Total tokens used so far: ${this.session.tokensSoFar}`);
+      console.log(`Tokens left in context: ${this.session.tokensLeft}`);
+      console.log(`Max tokens allowed: ${this.session.maxTokens}`);
+
       const end = Date.now();
       console.log(`Content generated in ${(end - start)/1000} seconds`);
 
       this.destroy();
-      // Small delay to ensure session cleanup
       await new Promise((resolve) => setTimeout(resolve, 500));
       
       return content;
     } catch (error) {
       console.error("Content generation failed:", error);
+      this.destroy();
+      throw error;
+    }
+  }
+
+  async generateContentStreaming(prompt) {
+    try {
+      const initialized = await this.initialize();
+      if (!initialized) throw new Error("Could not initialize AI");
+
+      const stream = this.session.promptStreaming(prompt);
+      return stream;
+    } catch (error) {
+      console.error("Content streaming failed:", error);
       this.destroy();
       throw error;
     }

@@ -95,24 +95,45 @@ export async function generateArticles(
   }
 }
 
-export async function generateArticleContent(articleId, level, title, summary) {
+export async function generateArticleContent(articleId, level, title, summary, useStreaming = false, onProgress) {
   try {
     const prompt = GENERATE_ARTICLE_CONTENT
       .replace('{{level}}', level)
       .replace('{{title}}', title)
       .replace('{{summary}}', summary);
 
-    const content = await aiWrapper.generateContent(prompt);
-    
-    const articleContent = {
-      articleID: articleId,
-      level,
-      content,
-      timestamp: Date.now()
-    };
+    if (useStreaming) {
+      const stream = await aiWrapper.generateContentStreaming(prompt);
+      let content = '';
 
-    await saveArticleContent(articleContent);
-    return content;
+      for await (const chunk of stream) {
+        content = chunk;
+        if (onProgress) {
+          onProgress(content);
+        }
+      }
+
+      const articleContent = {
+        articleID: articleId,
+        level,
+        content,
+        timestamp: Date.now()
+      };
+
+      await saveArticleContent(articleContent);
+      return content;
+    } else {
+      const content = await aiWrapper.generateContent(prompt);
+      const articleContent = {
+        articleID: articleId,
+        level,
+        content,
+        timestamp: Date.now()
+      };
+
+      await saveArticleContent(articleContent);
+      return content;
+    }
   } catch (error) {
     console.error('Error generating article content:', error);
     throw error;

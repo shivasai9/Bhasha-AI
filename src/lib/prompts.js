@@ -93,24 +93,45 @@ Please provide exactly five questions. Do not include any markdown or code forma
 `;
 
 export const GENERATE_ARTICLE_CONTENT = `
-Generate a detailed article content in 2 paragraphs based on the following title and summary. Keep the language level at {{level}} (beginner/intermediate/advanced).
+Generate an article content based on the following title and summary, adhering to the specified tone and length requirements.
 
 Title: {{title}}
 Summary: {{summary}}
+Tone: {{level}}
 
 Guidelines:
-1. Write 2 well-structured paragraphs
-2. Use language appropriate for {{level}} level:
-   - Beginner: Simple vocabulary and sentence structure
-   - Intermediate: Moderate complexity with some advanced terms
-   - Advanced: Complex sentence structures and advanced vocabulary
-3. Keep the content informative and engaging
-4. Maintain factual accuracy
-5. Return the content as plain text without any formatting
+1. Total length: 120-160 words total, split into 2 paragraphs
+2. Output Format: Return two paragraphs separated by "\n"
+3. Adapt the writing style based on the tone:
+   - easy/beginner: Simple words, short sentences, basic concepts
+   - medium/intermediate: Moderate vocabulary, varied sentence structure
+   - hard/advanced: Complex vocabulary, sophisticated expressions
+   - children: Simple, fun, engaging for kids under 5
+   - technical: Industry-specific terms, formal tone
+   - creative: Descriptive, vivid, engaging language
+   - conversational: Casual, friendly, using everyday language
+   - academic: Scholarly, research-focused language
+   - journalistic: Clear, concise, news-style writing
+   
+   If the specified tone is not listed above:
+   - Analyze the tone name and context
+   - Apply appropriate writing style that best matches the intended audience
+   - Maintain clear and coherent structure
+   - Focus on readability and engagement
+   - Keep factual accuracy and professional quality
 
-Example output:
-First paragraph discussing the main topic and its importance...
-Second paragraph elaborating on specific details and conclusions...
+4. Keep content factually accurate and engaging
+5. Return plain text only, using "\n" for paragraph separation
+
+Example outputs:
+
+For beginner:
+The sun is very important for life on Earth. It gives us light and heat every day, helping plants grow and keeping us warm. The bright yellow star in the sky is like a giant lamp that never stops shining.\n Scientists have studied the sun for many years and learned amazing things about it. They found out that it is actually a huge ball of very hot gas, much bigger than our planet Earth. Even though it looks small from here, it's actually enormous!
+
+For custom tone (storytelling):
+Deep beneath the ocean's surface lies a world of wonder and mystery, where creatures of all shapes and sizes dance in the eternal darkness. Like tiny stars in a midnight sea, bioluminescent organisms create their own light, turning the deep waters into a natural light show that defies imagination.\n Among these remarkable inhabitants, the anglerfish dangles its glowing lure like a skilled fisherman, while transparent jellies pulse through the water like living glass sculptures. This hidden realm, untouched by sunlight, showcases nature's incredible ability to adapt and thrive in the most challenging environments.
+
+6. Return the content without any additional formatting or metadata
 `;
 
 export async function generateArticleCreationPrompt(customTopic = null) {

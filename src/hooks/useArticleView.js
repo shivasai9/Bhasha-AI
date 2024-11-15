@@ -5,7 +5,7 @@ import { generateArticleContent } from '../lib/articleGenerator';
 
 export function useArticleView() {
   const [article, setArticle] = useState(null);
-  const [articleContent, setArticleContent] = useState(null);
+  const [articleContent, setArticleContent] = useState("");
   const [selectedWord, setSelectedWord] = useState(null);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [contentLoading, setContentLoading] = useState(true);
@@ -19,22 +19,28 @@ export function useArticleView() {
         const articleData = await getArticleById(articleId);
         setArticle(articleData);
 
-        const content = await getArticleContent(articleId, difficulty);
+        const articleContentData = await getArticleContent(articleId, difficulty);
+        const content = articleContentData?.content || "";
         if (content) {
-          setArticleContent(content.content);
+          setArticleContent(content);
+          setContentLoading(false);
         } else {
-          const generatedContent = await generateArticleContent(
+          await generateArticleContent(
             articleId,
             difficulty,
             articleData.title,
-            articleData.summary
+            articleData.summary,
+            true,
+            (partialContent) => {
+              setArticleContent(partialContent);
+              if(contentLoading) {
+                setContentLoading(false);
+              }
+            }
           );
-          setArticleContent(generatedContent);
         }
       } catch (error) {
         console.error('Error loading article or content:', error);
-      } finally {
-        setContentLoading(false);
       }
     };
 
@@ -59,6 +65,8 @@ export function useArticleView() {
       console.error('Error saving word:', error);
     }
   };
+
+  console.log("===content====", articleContent);
 
   return {
     article,

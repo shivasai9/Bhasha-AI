@@ -1,15 +1,16 @@
 import React from 'react';
 import { useArticleContent } from '../../hooks/useArticleContent';
 import { ExternalLink } from 'lucide-react';
+import PlaceholderImage from '../PlaceholderImage';
 
 export default function ArticleContent({ article, onWordClick }) {
   const { getClickableText, tooltipElement } = useArticleContent();
+  console.log("==== ArticleContent ====", article);
 
   if (!article) return null;
-
-  const getThumbnailUrl = (keywords) => {
-    return "https://www.levelify.me/_next/image?url=https%3A%2F%2Fik.imagekit.io%2Fko3vczxvh%2Ftr%3Aw-auto%2Cfo-auto%2FheroImage.png&w=1920&q=75";
-  };
+  const { imagesData = [] } = article;
+  const imageUrl = imagesData.length ? imagesData[0].url : null;
+  const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
 
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
@@ -28,13 +29,19 @@ export default function ArticleContent({ article, onWordClick }) {
           <div className="float-right ml-8 mb-6 w-2/5">
             <div className="sticky top-8">
               <div className="rounded-lg overflow-hidden shadow-lg mb-2">
-                <img
-                  src={getThumbnailUrl(article.imageKeywords)}
-                  alt=""
-                  className="w-full h-auto"
-                />
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt={imageAlt}
+                    className="w-full h-auto"
+                  />
+                ) : (
+                  <div className="h-[250px]">
+                    <PlaceholderImage />
+                  </div>
+                )}
               </div>
-              <div className="text-center">
+              {imageUrl && imageUrl.length > 0 && <div className="text-center">
                 <a 
                   href="https://en.wikipedia.org/wiki/Coffee_preparation" 
                   target="_blank" 
@@ -44,11 +51,10 @@ export default function ArticleContent({ article, onWordClick }) {
                   <ExternalLink className="w-4 h-4" />
                   <span>Source: Wikipedia</span>
                 </a>
-              </div>
+              </div>}
             </div>
           </div>
 
-          {/* Article Text */}
           <div className="prose prose-lg max-w-none">
             <div className="text-gray-800 leading-relaxed space-y-6">
               {article.content.split('\n').map((paragraph, index) => (

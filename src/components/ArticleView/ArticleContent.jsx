@@ -11,6 +11,7 @@ export default function ArticleContent({ article, onWordClick }) {
   const { imagesData = [] } = article;
   const imageUrl = imagesData.length ? imagesData[0].url : null;
   const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
+  const refUrl = imagesData.length ? imagesData[0].refUrl : null;
 
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
@@ -43,7 +44,7 @@ export default function ArticleContent({ article, onWordClick }) {
               </div>
               {imageUrl && imageUrl.length > 0 && <div className="text-center">
                 <a 
-                  href="https://en.wikipedia.org/wiki/Coffee_preparation" 
+                  href={refUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600 transition-colors"

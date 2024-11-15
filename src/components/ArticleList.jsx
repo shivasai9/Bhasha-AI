@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Plus, Loader2 } from 'lucide-react';
+import { BookOpen, Plus, Loader2, ArrowLeft } from 'lucide-react';
 import { useArticles } from '../hooks/useArticles';
 import ArticleCard from './ArticleCard';
 import CustomTopicForm from './CustomTopicForm';
@@ -38,10 +38,19 @@ export default function ArticleList() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <BookOpen className="w-8 h-8 mr-3 text-indigo-600" />
-              Available Articles
-            </h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-6 h-6 text-gray-600" />
+              </button>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <BookOpen className="w-8 h-8 mr-3 text-indigo-600" />
+                Available Articles
+              </h1>
+            </div>
             <button
               onClick={() => setShowCustomForm(!showCustomForm)}
               disabled={loading || generatingCount > 0}

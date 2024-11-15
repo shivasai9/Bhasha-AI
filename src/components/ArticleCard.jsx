@@ -30,6 +30,16 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
     onDifficultySelect(article.articleID, kebabCaseTitle, difficulty);
   };
 
+  const handleDifficultyClick = (e, difficulty) => {
+    e.preventDefault();
+    if (e.metaKey || e.ctrlKey) {
+      // Open in new tab
+      window.open(`/article/${article.articleID}/${kebabCaseTitle}/${difficulty.id}`, '_blank');
+    } else {
+      handlePresetDifficulty(difficulty);
+    }
+  };
+
   const { imagesData = [] } = article;
   const imageUrl = imagesData.length ? imagesData[0].url : null;
   const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
@@ -56,10 +66,10 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
         
         <div className="flex items-center gap-3 mt-auto">
           {presetDifficulties.map((difficulty) => (
-            <button
+            <a
               key={difficulty.id}
-              onClick={() => handlePresetDifficulty(difficulty)}
-              disabled={disabled}
+              href={`/article/${article.articleID}/${kebabCaseTitle}/${difficulty.id}`}
+              onClick={(e) => handleDifficultyClick(e, difficulty)}
               className={`px-4 py-2 rounded-lg transition-colors font-medium ${
                 difficulty.className
               } ${
@@ -67,7 +77,7 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
               }`}
             >
               {difficulty.label}
-            </button>
+            </a>
           ))}
           
           <span className="text-sm text-gray-500">or</span>

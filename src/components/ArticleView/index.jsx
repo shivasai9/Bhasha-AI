@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BookOpen, FileText, BrainCircuit } from 'lucide-react';
+import { BookOpen, FileText, BrainCircuit, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useArticleView } from '../../hooks/useArticleView';
 import ArticleContent from './ArticleContent';
 import WordInteractionModal from './WordInteractionModal';
@@ -29,6 +30,7 @@ const tabs = [
 ];
 
 export default function ArticleView() {
+  const navigate = useNavigate();
   const {
     article,
     selectedWord,
@@ -75,6 +77,14 @@ export default function ArticleView() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 mb-4 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back</span>
+        </button>
+
         {/* Tab Navigation */}
         <div className="bg-white rounded-lg shadow-md mb-6">
           <div className="flex border-b">

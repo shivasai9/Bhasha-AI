@@ -1,9 +1,8 @@
-import { v4 as uuidv4 } from "@lukeed/uuid";
 import { CREATE_RANDOM_ARTICLE } from "./prompts";
 import { aiWrapper } from "./ai";
 import { getArticlesByLanguage, saveArticle } from "./dbUtils";
 import { getLanguage } from "./languageStorage";
-import { fetchImagesData } from "./utils";
+import { fetchImagesData, getUniqueId } from "./utils";
 import { translateArticle } from "./translation.service";
 
 // Helper function to fetch existing articles by language
@@ -23,7 +22,7 @@ async function generateAndSaveArticle(customTopic = null, language) {
     const imagesData = await fetchImagesData(mostRelevantKeyword);
     
     const englishArticle = {
-      articleID: uuidv4(),
+      articleID: getUniqueId(),
       ...articleData,
       language: 'english',
       timestamp: Date.now(),

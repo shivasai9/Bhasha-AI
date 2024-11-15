@@ -11,12 +11,13 @@ import { translateArticle } from "./translation.service";
  * @returns {Promise<T>}
  */
 export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
-  if (typeof fn !== 'function') throw new Error('First argument must be a function');
+  if (typeof fn !== "function")
+    throw new Error("First argument must be a function");
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 10) {
-    throw new Error('maxAttempts must be an integer between 1 and 10');
+    throw new Error("maxAttempts must be an integer between 1 and 10");
   }
   if (!Number.isInteger(baseDelayMs) || baseDelayMs < 100) {
-    throw new Error('baseDelayMs must be an integer >= 100');
+    throw new Error("baseDelayMs must be an integer >= 100");
   }
 
   let lastError;
@@ -33,7 +34,7 @@ export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
         const exponentialDelay = baseDelayMs * Math.pow(2, attempt - 1);
         const jitter = Math.random() * 0.3 * exponentialDelay;
         const delay = Math.min(exponentialDelay + jitter, 30000);
-        
+
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
@@ -79,4 +80,21 @@ export async function translateAndSaveArticle(article, targetLanguage) {
     console.error("Translation and save failed:", error);
     throw error;
   }
+}
+
+export function convertToKebabCase(str) {
+  return str.toLowerCase().split(" ").join("-");
+}
+
+export function convertFromKebabCase(str) {
+  return str
+    .split("-")
+    .map((word, index) =>
+      index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+    )
+    .join(" ");
+}
+
+export function getUniqueId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }

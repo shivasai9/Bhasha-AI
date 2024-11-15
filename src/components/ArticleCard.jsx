@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DifficultyModal from './DifficultyModal';
 import { BookOpen } from 'lucide-react';
 import PlaceholderImage from './PlaceholderImage';
+import { convertToKebabCase } from '../lib/utils';
 
 const presetDifficulties = [
   { 
@@ -23,9 +24,10 @@ const presetDifficulties = [
 
 export default function ArticleCard({ article, onDifficultySelect, disabled }) {
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
+  const kebabCaseTitle = convertToKebabCase(article.title);
 
   const handlePresetDifficulty = (difficulty) => {
-    onDifficultySelect(article.articleID, difficulty);
+    onDifficultySelect(article.articleID, kebabCaseTitle, difficulty);
   };
 
   const { imagesData = [] } = article;

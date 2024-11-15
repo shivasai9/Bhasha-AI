@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LanguageSelector />} />
         <Route path="/articles" element={<ArticleList />} />
-        <Route path="/article/:id" element={<ArticleView />} />
+        <Route path="/article/:id/:title/:difficulty" element={<ArticleView />} />
         <Route path="*" element={<LanguageSelector />} />
       </Routes>
     </Router>

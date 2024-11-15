@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { v4 as uuidv4 } from "@lukeed/uuid";
 import { LANGUAGE_CODES } from "./constants";
+import { getUniqueId } from "./utils";
 
 export async function translateArticle(article, targetLanguage) {
   try {
@@ -19,7 +19,7 @@ export async function translateArticle(article, targetLanguage) {
 
     return {
       ...article,
-      articleID: uuidv4(),
+      articleID: getUniqueId(),
       title: translatedTitle,
       summary: translatedSummary,
       language: targetLanguage,

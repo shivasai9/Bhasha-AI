@@ -18,10 +18,10 @@ export default function ArticleList() {
   } = useArticles();
   const navigate = useNavigate();
 
-  const handleDifficultySelect = (articleId, difficulty) => {
+  const handleDifficultySelect = (articleId, title, difficulty) => {
     // Prevent interaction while loading
     if (loading || generatingCount > 0) return;
-    navigate(`/article/${articleId}?difficulty=${difficulty.id}`);
+    navigate(`/article/${articleId}/${title}/${difficulty.id}`);
   };
 
   const handleCustomTopic = async (topic) => {

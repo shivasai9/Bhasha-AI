@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getArticleById, saveWord } from '../lib/dbUtils';
+import { useParams } from 'react-router-dom';
 
-export function useArticleView(articleId, difficulty) {
+export function useArticleView() {
   const [article, setArticle] = useState(null);
   const [selectedWord, setSelectedWord] = useState(null);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { id: articleId, difficulty, title } = useParams();
+  const [activeTab, setActiveTab] = useState('read');
 
   useEffect(() => {
     const loadArticle = async () => {
@@ -50,6 +53,8 @@ export function useArticleView(articleId, difficulty) {
     selectedWord,
     isWordModalOpen,
     loading,
+    activeTab,
+    setActiveTab,
     handleWordClick,
     closeWordModal,
     handleSaveWord,

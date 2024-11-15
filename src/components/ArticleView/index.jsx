@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
 import { BookOpen, FileText, BrainCircuit } from 'lucide-react';
 import { useArticleView } from '../../hooks/useArticleView';
 import ArticleContent from './ArticleContent';
@@ -30,20 +29,17 @@ const tabs = [
 ];
 
 export default function ArticleView() {
-  const { id } = useParams();
-  const [searchParams] = useSearchParams();
-  const difficulty = searchParams.get('difficulty');
-  const [activeTab, setActiveTab] = useState('read');
-  
   const {
     article,
     selectedWord,
     isWordModalOpen,
     loading,
+    activeTab,
+    setActiveTab,
     handleWordClick,
     closeWordModal,
     handleSaveWord,
-  } = useArticleView(id, difficulty);
+  } = useArticleView();
 
   if (loading) {
     return (

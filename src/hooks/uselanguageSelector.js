@@ -8,7 +8,8 @@ const useLanguageSelector = (onLanguageChange = null) => {
     try {
       saveLanguage(langCode);
       if (onLanguageChange) {
-        onLanguageChange(langCode);
+        const lang = langCode.toLowerCase();
+        onLanguageChange(lang);
       } else {
         navigate("/articles");
       }

@@ -1,11 +1,6 @@
 import { Globe2, BookOpen, Sparkles } from "lucide-react";
 import useLanguageSelector from "../hooks/uselanguageSelector";
-
-const languages = [
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "es", name: "Spanish", flag: "🇪🇸" },
-  { code: "fr", name: "French", flag: "🇫🇷" },
-];
+import { LANGUAGES } from "../lib/constants";
 
 export default function LanguageSelector() {
   const { handleLanguageSelect } = useLanguageSelector();
@@ -29,7 +24,7 @@ export default function LanguageSelector() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                {languages.map((lang) => (
+                {LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => handleLanguageSelect(lang.name)}

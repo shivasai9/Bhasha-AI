@@ -125,7 +125,7 @@ export function useArticles() {
 
   useEffect(() => {
     loadArticles();
-  }, []);
+  }, [language]);
 
   return {
     articles,
@@ -134,5 +134,7 @@ export function useArticles() {
     generateCustomArticle,
     generateMoreArticles,
     isCustomArticle,
+    setLanguage,
+    language,
   };
 }

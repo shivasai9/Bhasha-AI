@@ -17,3 +17,9 @@ export const LANGUAGE_CODES = {
 };
 
 export const WIKI_IMAGE_URL = "https://www.levelify.me/api/getwikimediaimages?srsearch=";
+
+export const LANGUAGES = [
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "es", name: "Spanish", flag: "🇪🇸" },
+  { code: "fr", name: "French", flag: "🇫🇷" },
+];

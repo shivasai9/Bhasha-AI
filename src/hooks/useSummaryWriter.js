@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { getLanguage } from "../lib/languageStorage";
 
 export function useSummaryWriter() {
-  const [summary, setSummary] = useState('');
-  const [feedback, setFeedback] = useState({ errors: [], corrected: '' });
+  const [summary, setSummary] = useState("");
+  const [feedback, setFeedback] = useState({ errors: [], corrected: "" });
   const [loading, setLoading] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [isEnglish, setIsEnglish] = useState(true);
 
+  useEffect(() => {
+    const currentLanguage = getLanguage();
+    setIsEnglish(currentLanguage === "english");
+  }, []);
   const handleSummaryChange = (e) => {
     setSummary(e.target.value);
   };
@@ -19,15 +25,15 @@ export function useSummaryWriter() {
       setFeedback({
         errors: [
           {
-            original: 'Sample error sentence',
-            correction: 'Corrected sample sentence'
-          }
+            original: "Sample error sentence",
+            correction: "Corrected sample sentence",
+          },
         ],
-        corrected: 'Sample corrected summary'
+        corrected: "Sample corrected summary",
       });
       setShowFeedback(true);
     } catch (error) {
-      console.error('Error analyzing summary:', error);
+      console.error("Error analyzing summary:", error);
     } finally {
       setLoading(false);
     }
@@ -44,6 +50,7 @@ export function useSummaryWriter() {
     showFeedback,
     handleSummaryChange,
     handleSubmit,
-    closeFeedback
+    closeFeedback,
+    isEnglish,
   };
 }

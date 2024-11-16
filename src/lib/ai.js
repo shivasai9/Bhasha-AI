@@ -5,7 +5,8 @@ import {
   CREATE_CUSTOM_ARTICLE, 
   CREATE_ARTICLE_QUESTIONS, 
   GENERATE_ARTICLE_CONTENT,
-  GENERATE_WORD_INFO 
+  GENERATE_WORD_INFO,
+  generateArticleCreationPrompt
 } from './prompts';
 import { getArticlesByLanguage } from './dbUtils';
 

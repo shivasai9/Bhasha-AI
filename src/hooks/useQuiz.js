@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { aiWrapper } from '../lib/ai';
 
-export function useQuiz(article) {
+export function useQuiz(article, content) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showResult, setShowResult] = useState(false);
@@ -14,7 +15,7 @@ export function useQuiz(article) {
     if (article) {
       // fetching questions based on the article content
       try {
-        const quizQuestions = await aiWrapper.generateQuiz(article.title);
+        const quizQuestions = await aiWrapper.generateQuiz(article.title, content);
         setQuestions(quizQuestions.map(field=>{
           return({
             question: field.question,
@@ -43,6 +44,7 @@ export function useQuiz(article) {
     if (questions[currentQuestionIndex].isCorrect(answer)) {
       setCorrectAnswers(prev => prev + 1);
     }
+    setAnsweredQuestions(prev => prev + 1);
   };
 
   const handleNextQuestion = () => {
@@ -61,11 +63,13 @@ export function useQuiz(article) {
     setShowResult(false);
     setScore(0);
     setCorrectAnswers(0);
+    setAnsweredQuestions(0);
   };
 
   return {
     questions,
     currentQuestion: questions[currentQuestionIndex],
+    answeredQuestions,
     selectedAnswer,
     showResult,
     score,

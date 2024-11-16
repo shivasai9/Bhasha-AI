@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuiz } from '../../hooks/useQuiz';
 import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from 'lucide-react';
+import QuizSkeleton from './QuizSkeleton';
 
 export default function QuizSection({ article }) {
   const {
@@ -13,9 +14,11 @@ export default function QuizSection({ article }) {
     totalQuestions,
     handleAnswerSelect,
     handleNextQuestion,
-    restartQuiz
+    restartQuiz,
+    loading,
   } = useQuiz(article);
 
+  if (loading) return <QuizSkeleton />;
   if (!questions.length) return null;
 
   if (showResult) {

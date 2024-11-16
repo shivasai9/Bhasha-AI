@@ -28,7 +28,7 @@ export function useQuiz(article) {
         console.error('Error generating custom article:', error);
         return null;
       } finally {
-        setLoading(false);  // Reset custom article flag
+        setLoading(false);
       }
     }
   };
@@ -73,6 +73,7 @@ export function useQuiz(article) {
     totalQuestions: questions.length,
     handleAnswerSelect,
     handleNextQuestion,
-    restartQuiz
+    restartQuiz,
+    loading,
   };
 }

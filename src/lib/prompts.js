@@ -66,7 +66,7 @@ Generate 5 questions from the below article description with 4 options and answe
 Article: "{{title}}"
 Description: "{{content}}"
 
-Return it in the following JSON format:
+Return it in the following Array of JSON Objects format:
 [
 {"question":"question from the article",
     "options": ["A. Option1", "B. Option2", "C. Option3", "D. Option4"],
@@ -94,7 +94,7 @@ Return it in the following JSON format:
     "explanation" : "1 line explanation about the answer",
 }
 ]
-Please provide exactly five questions. Do not include any markdown or code formatting, only the pure array of JSON object.
+Please provide exactly five questions. Do not include any markdown or code formatting, only the pure array of JSON objects.
 `;
 
 export const GENERATE_ARTICLE_CONTENT = `
@@ -138,6 +138,28 @@ Deep beneath the ocean's surface lies a world of wonder and mystery, where creat
 
 6. Return the content without any additional formatting or metadata
 `;
+
+export const GENERATE_WORD_INFO = `
+You are an experienced English educator who specializes in clear and simple explanations.
+
+Generate comprehensive word information using these rules:
+1. Provide a clear, concise definition suitable for learners
+2. Include exactly 5 synonyms as a single string separated by " | "
+3. Include exactly 5 antonyms as a single string separated by " | "
+4. Create a simple example sentence that clearly demonstrates word usage
+5. Use proper English and natural expressions
+6. Return pure JSON without any markdown or code formatting
+
+Example:
+{
+  "word": "happy",
+  "meaning": "feeling or showing pleasure and contentment",
+  "synonyms": "joyful | cheerful | delighted | content | pleased",
+  "antonyms": "sad | unhappy | miserable | gloomy | depressed",
+  "exampleSentence": "The children were happy to play in the park."
+}
+
+Now generate information for the word: {{word}}`;
 
 export async function generateArticleCreationPrompt(customTopic = null) {
   const existingArticles = await getArticlesByLanguage("english");

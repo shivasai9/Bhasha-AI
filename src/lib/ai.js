@@ -1,6 +1,12 @@
 // @ts-nocheck
 import { withRetry } from './utils';
-import { CREATE_RANDOM_ARTICLE, CREATE_CUSTOM_ARTICLE, CREATE_ARTICLE_QUESTIONS, generateArticleCreationPrompt } from './prompts';
+import { 
+  CREATE_RANDOM_ARTICLE, 
+  CREATE_CUSTOM_ARTICLE, 
+  CREATE_ARTICLE_QUESTIONS, 
+  GENERATE_ARTICLE_CONTENT,
+  GENERATE_WORD_INFO 
+} from './prompts';
 import { getArticlesByLanguage } from './dbUtils';
 
 class AIWrapper {
@@ -177,6 +183,48 @@ class AIWrapper {
       return stream;
     } catch (error) {
       console.error("Content streaming failed:", error);
+      this.destroy();
+      throw error;
+    }
+  }
+
+  async generateWordInfo(word) {
+    try {
+      const start = Date.now();
+      
+      const generateWithRetry = async () => {
+        // Destroy existing session if any
+        this.destroy();
+        
+        // Initialize new session
+        const initialized = await this.initialize();
+        if (!initialized) {
+          throw new Error("Could not initialize AI");
+        }
+
+        const prompt = GENERATE_WORD_INFO.replace("{{word}}", word);
+        const result = await this.session.prompt(prompt);
+        return JSON.parse(result.trim());
+      };
+
+      const wordInfo = await withRetry(generateWithRetry, 5, 1000);
+      const end = Date.now();
+      console.log(`Word info generated in ${(end - start)/1000} seconds`);
+
+      const response = {
+        word: wordInfo.word || word,
+        meaning: wordInfo.meaning || "No definition available",
+        synonyms: wordInfo.synonyms || "",
+        antonyms: wordInfo.antonyms || "",
+        exampleSentence: wordInfo.exampleSentence || `Example with "${word}" not available.`
+      };
+      
+      this.destroy();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      return response;
+    } catch (error) {
+      console.error("Word info generation failed:", error);
       this.destroy();
       throw error;
     }

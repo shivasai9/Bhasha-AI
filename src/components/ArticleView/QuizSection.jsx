@@ -3,10 +3,11 @@ import { useQuiz } from '../../hooks/useQuiz';
 import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from 'lucide-react';
 import QuizSkeleton from './QuizSkeleton';
 
-export default function QuizSection({ article }) {
+export default function QuizSection({ article, content }) {
   const {
     questions,
     currentQuestion,
+    answeredQuestions,
     selectedAnswer,
     showResult,
     score,
@@ -16,7 +17,7 @@ export default function QuizSection({ article }) {
     handleNextQuestion,
     restartQuiz,
     loading,
-  } = useQuiz(article);
+  } = useQuiz(article, content);
 
   if (loading) return <QuizSkeleton />;
   if (!questions.length) return null;
@@ -56,7 +57,7 @@ export default function QuizSection({ article }) {
       <div className="h-2 bg-gray-100">
         <div 
           className="h-full bg-indigo-600 transition-all duration-300"
-          style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+          style={{ width: `${((answeredQuestions) / totalQuestions) * 100}%` }}
         />
       </div>
 
@@ -67,7 +68,7 @@ export default function QuizSection({ article }) {
             Question {currentQuestionIndex + 1} of {totalQuestions}
           </h3>
           <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-            {Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
+            {Math.round(((answeredQuestions) / totalQuestions) * 100)}% Complete
           </span>
         </div>
 

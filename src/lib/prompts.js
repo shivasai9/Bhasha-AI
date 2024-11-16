@@ -61,7 +61,12 @@ Return it in this JSON format:
 }`;
 
 export const CREATE_ARTICLE_QUESTIONS = `
-Generate 5 questions from the article "{{title}}" with 4 options and answer. Return it in the following JSON format:
+Generate 5 questions from the below article description with 4 options and answer. 
+
+Article: "{{title}}"
+Description: "{{content}}"
+
+Return it in the following JSON format:
 [
 {"question":"question from the article",
     "options": ["A. Option1", "B. Option2", "C. Option3", "D. Option4"],

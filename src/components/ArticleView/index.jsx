@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, FileText, BrainCircuit, ArrowLeft } from 'lucide-react';
+import { BookOpen, FileText, BrainCircuit, ArrowLeft, Gauge } from 'lucide-react';
 import { useArticleView } from '../../hooks/useArticleView';
 import ArticleContent from './ArticleContent';
 import WordInteractionModal from './WordInteractionModal';
@@ -41,7 +41,9 @@ export default function ArticleView() {
     handleWordClick,
     closeWordModal,
     handleSaveWord,
-    navigate
+    navigate,
+    selectedDifficulty,
+    handleDifficultyChange,
   } = useArticleView();
 
   const renderContent = () => {
@@ -63,6 +65,8 @@ export default function ArticleView() {
               content={articleContent}
               onWordClick={handleWordClick}
               contentLoading={contentLoading}
+              selectedDifficulty={selectedDifficulty}
+              onDifficultyChange={handleDifficultyChange}
             />
             <AudioPlayer text={articleContent} />
           </>

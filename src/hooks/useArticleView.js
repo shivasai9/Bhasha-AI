@@ -21,6 +21,7 @@ export function useArticleView() {
   const [activeTab, setActiveTab] = useState("read");
   const [language, setLanguage] = useState(getLanguage());
   const navigate = useNavigate();
+  const [selectedDifficulty, setSelectedDifficulty] = useState(difficulty);
 
   useEffect(() => {
     const loadArticleAndContent = async () => {
@@ -126,6 +127,10 @@ export function useArticleView() {
     }
   };
 
+  const handleDifficultyChange = (newDifficulty) => {
+    navigate(`/article/${articleId}/${title}/${newDifficulty}`);
+  };
+
   console.log("===content====", articleContent);
 
   return {
@@ -141,5 +146,7 @@ export function useArticleView() {
     closeWordModal,
     handleSaveWord,
     navigate,
+    selectedDifficulty,
+    handleDifficultyChange,
   };
 }

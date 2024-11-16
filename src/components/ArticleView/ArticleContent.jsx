@@ -1,16 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { useArticleContent } from "../../hooks/useArticleContent";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Gauge } from "lucide-react";
 import PlaceholderImage from "../PlaceholderImage";
 import { filterImageUrls } from "../../lib/utils";
+import DifficultyLevelModal from './DifficultyLevelModal.jsx';
+
+const difficultyThemes = {
+  easy: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+  medium: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+  hard: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100',
+  default: 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100'
+};
 
 export default function ArticleContent({
   article,
   content,
   onWordClick,
   contentLoading,
+  selectedDifficulty,
+  onDifficultyChange,
 }) {
   const { getClickableText, tooltipElement } = useArticleContent();
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   console.log("==== ArticleContent ====", article);
 
   if (!article) return null;
@@ -20,13 +31,38 @@ export default function ArticleContent({
   const imageAlt = filteredImageData.length ? filteredImageData[0].alt : article.title;
   const refUrl = filteredImageData.length ? filteredImageData[0].refUrl : null;
 
+  // Helper function to get formatted difficulty label
+  const getDifficultyLabel = () => {
+    const label = selectedDifficulty
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    
+    // If label is too long, truncate it
+    return label.length > 12 ? `${label.slice(0, 12)}...` : label;
+  };
+
+  const getButtonTheme = () => {
+    return difficultyThemes[selectedDifficulty] || difficultyThemes.default;
+  };
+
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
       <div className="p-8 max-w-4xl mx-auto">
-        {/* Title Section */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">
-          {article.title}
-        </h1>
+        <div className="flex flex-wrap items-start gap-4 mb-6">
+          <h1 className="text-4xl font-bold text-gray-900 flex-1">
+            {article.title}
+          </h1>
+          <button
+            onClick={() => setShowDifficultyModal(true)}
+            className={`flex-shrink-0 flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-colors ${getButtonTheme()}`}
+            title={selectedDifficulty.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          >
+            <Gauge className="w-3.5 h-3.5" />
+            <span className="font-medium max-w-[100px] truncate">{getDifficultyLabel()}</span>
+            <span className="text-[10px] opacity-75 border-l border-current pl-2 ml-1">Change</span>
+          </button>
+        </div>
 
         {/* Summary Section */}
         <div className="text-xl text-gray-600 font-medium italic mb-8 border-l-4 border-indigo-500 pl-6">
@@ -91,6 +127,14 @@ export default function ArticleContent({
       </div>
 
       {tooltipElement}
+
+      {showDifficultyModal && (
+        <DifficultyLevelModal
+          selectedDifficulty={selectedDifficulty}
+          onDifficultyChange={onDifficultyChange}
+          onClose={() => setShowDifficultyModal(false)}
+        />
+      )}
     </article>
   );
 }

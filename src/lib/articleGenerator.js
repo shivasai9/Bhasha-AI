@@ -1,6 +1,10 @@
 import { GENERATE_ARTICLE_CONTENT } from "./prompts";
 import { aiWrapper } from "./ai";
-import { getArticlesByLanguage, saveArticle, saveArticleContent } from "./dbUtils";
+import {
+  getArticlesByLanguage,
+  saveArticle,
+  saveArticleContent,
+} from "./dbUtils";
 import { getLanguage } from "./languageStorage";
 import { fetchImagesData, getUniqueId } from "./utils";
 import { translateArticle } from "./translation.service";
@@ -20,11 +24,11 @@ async function generateAndSaveArticle(customTopic = null, language) {
     const articleData = await aiWrapper.generateArticle(customTopic);
     const mostRelevantKeyword = articleData.imageKeywords[0];
     const imagesData = await fetchImagesData(mostRelevantKeyword);
-    
+
     const englishArticle = {
       articleID: getUniqueId(),
       ...articleData,
-      language: 'english',
+      language: "english",
       timestamp: Date.now(),
       isSaved: false,
       imagesData,
@@ -33,7 +37,7 @@ async function generateAndSaveArticle(customTopic = null, language) {
     await saveArticle(englishArticle);
 
     let translatedArticle = null;
-    if (language.toLowerCase() !== 'english') {
+    if (language.toLowerCase() !== "english") {
       translatedArticle = await translateArticle(englishArticle, language);
       await saveArticle(translatedArticle);
     }
@@ -58,7 +62,7 @@ export async function generateMultipleArticles(count, onProgress) {
     try {
       // This await makes execution sequential - next iteration won't start
       // until either success or all retries are exhausted
-      const article = await generateArticle();  
+      const article = await generateArticle();
       articles.push(article);
       onProgress?.(articles);
 
@@ -72,10 +76,7 @@ export async function generateMultipleArticles(count, onProgress) {
   return articles;
 }
 
-export async function generateArticles(
-  count = 3,
-  onProgress = null
-) {
+export async function generateArticles(count = 3, onProgress = null) {
   const language = getLanguage();
   let articles = [];
   try {
@@ -95,16 +96,22 @@ export async function generateArticles(
   }
 }
 
-export async function generateArticleContent(articleId, level, title, summary, useStreaming = false, onProgress) {
+export async function generateArticleContent(
+  articleId,
+  level,
+  title,
+  summary,
+  useStreaming = false,
+  onProgress
+) {
   try {
-    const prompt = GENERATE_ARTICLE_CONTENT
-      .replace('{{level}}', level)
-      .replace('{{title}}', title)
-      .replace('{{summary}}', summary);
+    const prompt = GENERATE_ARTICLE_CONTENT.replace("{{level}}", level)
+      .replace("{{title}}", title)
+      .replace("{{summary}}", summary);
 
     if (useStreaming) {
       const stream = await aiWrapper.generateContentStreaming(prompt);
-      let content = '';
+      let content = "";
 
       for await (const chunk of stream) {
         content = chunk;
@@ -117,7 +124,7 @@ export async function generateArticleContent(articleId, level, title, summary, u
         articleID: articleId,
         level,
         content,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       await saveArticleContent(articleContent);
@@ -128,14 +135,14 @@ export async function generateArticleContent(articleId, level, title, summary, u
         articleID: articleId,
         level,
         content,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       await saveArticleContent(articleContent);
       return content;
     }
   } catch (error) {
-    console.error('Error generating article content:', error);
+    console.error("Error generating article content:", error);
     throw error;
   }
 }

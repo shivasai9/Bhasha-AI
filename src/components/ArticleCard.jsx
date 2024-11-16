@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DifficultyModal from './DifficultyModal';
 import { BookOpen } from 'lucide-react';
 import PlaceholderImage from './PlaceholderImage';
-import { convertToKebabCase } from '../lib/utils';
+import { convertToKebabCase, filterImageUrls } from '../lib/utils';
 
 const presetDifficulties = [
   { 
@@ -41,8 +41,9 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
   };
 
   const { imagesData = [] } = article;
-  const imageUrl = imagesData.length ? imagesData[0].url : null;
-  const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
+  const filteredImageData = filterImageUrls(imagesData);
+  const imageUrl = filteredImageData.length ? filteredImageData[0].url : null;
+  const imageAlt = filteredImageData.length ? filteredImageData[0].alt : article.title;
 
   return (
     <div className={`bg-white rounded-lg shadow-md overflow-hidden flex h-[240px] ${

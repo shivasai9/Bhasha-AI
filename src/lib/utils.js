@@ -98,3 +98,15 @@ export function convertFromKebabCase(str) {
 export function getUniqueId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
+
+export const filterImageUrls = (imagesData) => {
+  const filteredImages = imagesData.filter((image) =>
+    image.url
+      .split(".")
+      .pop()
+      .toLowerCase()
+      .match(/jpg|jpeg|png|gif|svg|webp|bmp|tiff/i)
+  );
+
+  return filteredImages;
+};

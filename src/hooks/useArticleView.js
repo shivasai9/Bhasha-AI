@@ -9,6 +9,7 @@ export function useArticleView() {
   const [selectedWord, setSelectedWord] = useState(null);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [contentLoading, setContentLoading] = useState(true);
+  const [articleDataLoading, setArticleDataLoading] = useState(true);
   const { id: articleId, difficulty = 'beginner', title } = useParams();
   const [activeTab, setActiveTab] = useState('read');
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export function useArticleView() {
       try {
         const articleData = await getArticleById(articleId);
         setArticle(articleData);
+        setArticleDataLoading(false);
 
         const articleContentData = await getArticleContent(articleId, difficulty);
         const content = articleContentData?.content || "";
@@ -75,6 +77,7 @@ export function useArticleView() {
     selectedWord,
     isWordModalOpen,
     activeTab,
+    articleDataLoading,
     setActiveTab,
     handleWordClick,
     closeWordModal,

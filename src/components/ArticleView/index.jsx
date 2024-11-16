@@ -36,6 +36,7 @@ export default function ArticleView() {
     selectedWord,
     isWordModalOpen,
     activeTab,
+    articleDataLoading,
     setActiveTab,
     handleWordClick,
     closeWordModal,
@@ -46,6 +47,15 @@ export default function ArticleView() {
   const renderContent = () => {
     switch (activeTab) {
       case 'read':
+        if (articleDataLoading) {
+          return (
+            <div className="flex justify-center items-center p-8">
+              <div className="animate-pulse text-gray-600">
+                Generating article content...
+              </div>
+            </div>
+          );
+        }
         return (
           <>
             <ArticleContent

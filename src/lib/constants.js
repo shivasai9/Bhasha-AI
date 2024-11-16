@@ -23,3 +23,5 @@ export const LANGUAGES = [
   { code: "es", name: "Spanish", flag: "🇪🇸" },
   { code: "fr", name: "French", flag: "🇫🇷" },
 ];
+
+export const IMAGE_EXTENTIONS = ["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "tiff"];

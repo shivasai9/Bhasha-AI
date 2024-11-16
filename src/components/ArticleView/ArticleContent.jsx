@@ -2,6 +2,7 @@ import React from "react";
 import { useArticleContent } from "../../hooks/useArticleContent";
 import { ExternalLink } from "lucide-react";
 import PlaceholderImage from "../PlaceholderImage";
+import { filterImageUrls } from "../../lib/utils";
 
 export default function ArticleContent({
   article,
@@ -14,9 +15,10 @@ export default function ArticleContent({
 
   if (!article) return null;
   const { imagesData = [] } = article;
-  const imageUrl = imagesData.length ? imagesData[0].url : null;
-  const imageAlt = imagesData.length ? imagesData[0].alt : article.title;
-  const refUrl = imagesData.length ? imagesData[0].refUrl : null;
+  const filteredImageData = filterImageUrls(imagesData);
+  const imageUrl = filteredImageData.length ? filteredImageData[0].url : null;
+  const imageAlt = filteredImageData.length ? filteredImageData[0].alt : article.title;
+  const refUrl = filteredImageData.length ? filteredImageData[0].refUrl : null;
 
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden mb-8">

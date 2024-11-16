@@ -31,14 +31,12 @@ export default function ArticleContent({
   const imageAlt = filteredImageData.length ? filteredImageData[0].alt : article.title;
   const refUrl = filteredImageData.length ? filteredImageData[0].refUrl : null;
 
-  // Helper function to get formatted difficulty label
   const getDifficultyLabel = () => {
     const label = selectedDifficulty
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
     
-    // If label is too long, truncate it
     return label.length > 12 ? `${label.slice(0, 12)}...` : label;
   };
 
@@ -104,9 +102,15 @@ export default function ArticleContent({
           </div>
 
           {contentLoading ? (
-            <div className="flex justify-center items-center p-8">
-              <div className="animate-pulse text-gray-600">
-                Generating article content...
+            <div className="space-y-6 w-[57%]">
+              <div className="h-4 bg-gray-200 rounded-full animate-pulse w-3/4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded-full animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded-full animate-pulse w-5/6"></div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded-full animate-pulse w-11/12"></div>
+                <div className="h-4 bg-gray-200 rounded-full animate-pulse w-4/5"></div>
               </div>
             </div>
           ) : (

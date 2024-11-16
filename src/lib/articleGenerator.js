@@ -124,6 +124,7 @@ export async function generateArticleContent(
         articleID: articleId,
         level,
         content,
+        language: "english",
         timestamp: Date.now(),
       };
 
@@ -135,10 +136,12 @@ export async function generateArticleContent(
         articleID: articleId,
         level,
         content,
+        language: "english",
         timestamp: Date.now(),
       };
 
       await saveArticleContent(articleContent);
+      onProgress?.(content);
       return content;
     }
   } catch (error) {

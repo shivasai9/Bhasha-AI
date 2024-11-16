@@ -31,3 +31,27 @@ export async function translateArticle(article, targetLanguage) {
     throw error;
   }
 }
+
+export const translateContent = async (content, sourceLanguage, targetLanguage) => {
+  try {
+    if (sourceLanguage.toLowerCase() === targetLanguage.toLowerCase()) {
+      return content;
+    }
+
+    const langCode = LANGUAGE_CODES[targetLanguage.toLowerCase()];
+    const sourceLangCode = LANGUAGE_CODES[sourceLanguage.toLowerCase()];
+    const translator = await translation.createTranslator({
+      sourceLanguage: sourceLangCode,
+      targetLanguage: langCode,
+    });
+
+    const lines = content.split('\n');
+    const translatedLines = await Promise.all(
+      lines.map(line => line.trim() ? translator.translate(line) : line)
+    );
+    return translatedLines.join('\n');
+  } catch (error) {
+    console.error("Translation failed:", error);
+    throw error;
+  }
+};

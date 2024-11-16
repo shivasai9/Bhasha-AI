@@ -48,7 +48,7 @@ const openDB = () => {
         );
         // Fields:
         // - articleID: Unique identifier for each article
-        // - language: Language of the article (e.g., "English")
+        // - language: Language of the article (e.g., "english")
         // - title: Title of the article
         // - summary: Brief summary of the article
         // - imageKeyWords: Array of keywords to fetch images (e.g., ["space", "stars"])
@@ -80,12 +80,13 @@ const openDB = () => {
         const articleContentsStore = db.createObjectStore(
           STORES.ARTICLES_CONTENT,
           {
-            keyPath: ["articleID", "level"],
+            keyPath: ["articleID", "level", "language"],
           }
         );
         // Fields:
-        // - articleID: Identifier linking to the article in `articlesMetadata`
+        // - articleID: Identifier linking to the article in `articles`
         // - level: Difficulty level of the content (e.g., "easy", "medium", "hard")
+        // - language: Language of the article (e.g., "english")
         // - content: Full text of the article for this specific level
  
         articleContentsStore.createIndex("articleIDIndex", "articleID", {

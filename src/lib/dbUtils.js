@@ -68,9 +68,9 @@ export const saveArticleContent = (articleContent) =>
     store.put(articleContent)
   );
 
-export const getArticleContent = (articleId, level) =>
+export const getArticleContent = (articleId, level, language) =>
   performTransaction(STORES.ARTICLES_CONTENT, "readonly", (store) =>
-    store.get([articleId, level])
+    store.get([articleId, level, language])
   );
 
 export const getAllArticleContent = (articleId) =>

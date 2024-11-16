@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
-import { X, Lightbulb } from 'lucide-react';
+import React, { useState } from "react";
+import { X, Lightbulb } from "lucide-react";
+import { convertToKebabCase } from "../lib/utils";
 
 const suggestionPresets = [
-  { label: 'Creative Writing', description: 'Focus on imaginative expression and storytelling' },
-  { label: 'For Children Below 5', description: 'Simple vocabulary and basic concepts' },
-  { label: 'Technical', description: 'Advanced terminology and complex concepts' },
-  { label: 'Conversational', description: 'Focus on daily dialogue and common phrases' }
+  {
+    label: "Creative Writing",
+    description: "Focus on imaginative expression and storytelling",
+  },
+  {
+    label: "For Children Below 5",
+    description: "Simple vocabulary and basic concepts",
+  },
+  {
+    label: "Technical",
+    description: "Advanced terminology and complex concepts",
+  },
+  {
+    label: "Conversational",
+    description: "Focus on daily dialogue and common phrases",
+  },
 ];
 
 export default function DifficultyModal({ onClose, onSubmit }) {
-  const [customLevel, setCustomLevel] = useState('');
+  const [customLevel, setCustomLevel] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (customLevel.trim()) {
-      onSubmit({
-        id: customLevel.toLowerCase().replace(/\s+/g, '-'),
-        label: customLevel
-      });
+      const kebabCaseLevel = convertToKebabCase(customLevel);
+      onSubmit({ id: kebabCaseLevel });
     }
   };
 
@@ -51,7 +62,9 @@ export default function DifficultyModal({ onClose, onSubmit }) {
                 className="p-3 text-left border rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
               >
                 <div className="text-sm font-medium">{preset.label}</div>
-                <div className="text-xs text-gray-500 mt-1">{preset.description}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {preset.description}
+                </div>
               </button>
             ))}
           </div>
@@ -75,8 +88,8 @@ export default function DifficultyModal({ onClose, onSubmit }) {
             disabled={!customLevel.trim()}
             className={`w-full py-2 px-4 rounded-md transition-colors ${
               customLevel.trim()
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
           >
             Proceed

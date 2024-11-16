@@ -17,96 +17,103 @@ export function useArticleView() {
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [contentLoading, setContentLoading] = useState(true);
   const [articleDataLoading, setArticleDataLoading] = useState(true);
-  const { id: articleId, difficulty = "beginner", title } = useParams();
+  const { id: articleId, difficulty = "easy", title } = useParams();
   const [activeTab, setActiveTab] = useState("read");
   const [language, setLanguage] = useState(getLanguage());
   const navigate = useNavigate();
   const [selectedDifficulty, setSelectedDifficulty] = useState(difficulty);
 
-  useEffect(() => {
-    const loadArticleAndContent = async () => {
-      try {
-        const articleData = await getArticleById(articleId);
-        setArticle(articleData);
-        setArticleDataLoading(false);
+  const handleDifficultyChange = (newDifficulty) => {
+    setSelectedDifficulty(newDifficulty);
+    const newUrl = `/article/${articleId}/${title}/${newDifficulty}`;
+    window.history.pushState({}, '', newUrl);
+    setContentLoading(true);
+  };
 
-        let articleContentData = await getArticleContent(
-          articleId,
-          difficulty,
+  const loadArticleAndContent = async () => {
+    try {
+      const articleData = await getArticleById(articleId);
+      setArticle(articleData);
+      setArticleDataLoading(false);
+
+      let articleContentData = await getArticleContent(
+        articleId,
+        selectedDifficulty,
+        language
+      );
+      let content = articleContentData?.content;
+
+      if (content) {
+        setArticleContent(content);
+        setContentLoading(false);
+        return;
+      }
+
+      const englishArticleId = articleData.originalArticleId || articleId;
+
+      const englishArticleContentData = await getArticleContent(
+        englishArticleId,
+        selectedDifficulty,
+        "english"
+      );
+      const englishContent = englishArticleContentData?.content;
+
+      if (englishContent) {
+        // non english language selected if english content exists case
+        const translatedContent = await translateContent(
+          englishContent,
+          "english",
           language
         );
-        let content = articleContentData?.content;
-
-        if (content) {
-          setArticleContent(content);
-          setContentLoading(false);
-          return;
+        setArticleContent(translatedContent);
+        setContentLoading(false);
+        const contentToSave = {
+          articleID: articleId,
+          content: translatedContent,
+          level: selectedDifficulty,
+          language,
+          timestamp: Date.now(),
         }
-
-        const englishArticleId = articleData.originalArticleId || articleId;
-
-        const englishArticleContentData = await getArticleContent(
+        await saveArticleContent(contentToSave);
+      } else {
+        // Generate content if English content doesn't exist
+        const englishArticleData = await getArticleById(englishArticleId);
+        await generateArticleContent(
           englishArticleId,
-          difficulty,
-          "english"
-        );
-        const englishContent = englishArticleContentData?.content;
-
-        if (englishContent) {
-          // non english language selected if english content exists case
-          const translatedContent = await translateContent(
-            englishContent,
-            "english",
-            language
-          );
-          setArticleContent(translatedContent);
-          setContentLoading(false);
-          const contentToSave = {
-            articleID: articleId,
-            content: translatedContent,
-            level: difficulty,
-            language,
-            timestamp: Date.now(),
-          }
-          await saveArticleContent(contentToSave);
-        } else {
-          // Generate content if English content doesn't exist
-          const englishArticleData = await getArticleById(englishArticleId);
-          await generateArticleContent(
-            englishArticleId,
-            difficulty,
-            englishArticleData.title,
-            englishArticleData.summary,
-            true,
-            async (partialContent) => {
-              const contentToSet =
-                language === "english"
-                  ? partialContent
-                  : await translateContent(partialContent, "english", language);
-              setArticleContent(contentToSet);
-              if (contentLoading) {
-                setContentLoading(false);
-              }
-              if (language !== "english") {
-                const contentToSave = {
-                  articleID: articleId,
-                  content: contentToSet,
-                  level: difficulty,
-                  language,
-                  timestamp: Date.now(),
-                }
-                await saveArticleContent(contentToSave);
-              }
+          selectedDifficulty,
+          englishArticleData.title,
+          englishArticleData.summary,
+          true,
+          async (partialContent) => {
+            const contentToSet =
+              language === "english"
+                ? partialContent
+                : await translateContent(partialContent, "english", language);
+            setArticleContent(contentToSet);
+            if (contentLoading) {
+              setContentLoading(false);
             }
-          );
-        }
-      } catch (error) {
-        console.error("Error loading article or content:", error);
+            if (language !== "english") {
+              const contentToSave = {
+                articleID: articleId,
+                content: contentToSet,
+                level: selectedDifficulty,
+                language,
+                timestamp: Date.now(),
+              }
+              await saveArticleContent(contentToSave);
+            }
+          }
+        );
       }
-    };
+    } catch (error) {
+      console.error("Error loading article or content:", error);
+    }
+  };
 
+  useEffect(() => {
     loadArticleAndContent();
-  }, [articleId, difficulty]);
+  }, [articleId, selectedDifficulty]);
 
   const handleWordClick = (word) => {
     setSelectedWord(word);
@@ -125,10 +132,6 @@ export function useArticleView() {
     } catch (error) {
       console.error("Error saving word:", error);
     }
-  };
-
-  const handleDifficultyChange = (newDifficulty) => {
-    navigate(`/article/${articleId}/${title}/${newDifficulty}`);
   };
 
   console.log("===content====", articleContent);

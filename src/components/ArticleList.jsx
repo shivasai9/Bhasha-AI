@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BookOpen, Plus, Loader2, ArrowLeft, Globe2, Check, ChevronDown } from 'lucide-react';
-import { useArticles } from '../hooks/useArticles';
-import useLanguageSelector from '../hooks/uselanguageSelector';
-import ArticleCard from './ArticleCard';
-import CustomTopicForm from './CustomTopicForm';
-import SkeletonArticleCard from './SkeletonArticleCard';
-import { LANGUAGES } from '../lib/constants';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  BookOpen,
+  Plus,
+  Loader2,
+  ArrowLeft,
+  Globe2,
+  Check,
+  ChevronDown,
+} from "lucide-react";
+import { useArticles } from "../hooks/useArticles";
+import useLanguageSelector from "../hooks/uselanguageSelector";
+import ArticleCard from "./ArticleCard";
+import CustomTopicForm from "./CustomTopicForm";
+import SkeletonArticleCard from "./SkeletonArticleCard";
+import { LANGUAGES } from "../lib/constants";
 
 export default function ArticleList() {
   const [showCustomForm, setShowCustomForm] = useState(false);
-  const { 
-    articles, 
-    loading, 
-    generateCustomArticle, 
-    generatingCount, 
+  const {
+    articles,
+    loading,
+    generateCustomArticle,
+    generatingCount,
     generateMoreArticles,
     isCustomArticle,
     setLanguage,
@@ -26,14 +34,16 @@ export default function ArticleList() {
     setLanguage(newLang);
   });
   const [isOpen, setIsOpen] = useState(false);
-  const currentLanguage = LANGUAGES.find(lang => 
-    lang.name.toLowerCase() === language.toLowerCase()
-  ) || LANGUAGES[0];
+  const currentLanguage =
+    LANGUAGES.find(
+      (lang) => lang.name.toLowerCase() === language.toLowerCase()
+    ) || LANGUAGES[0];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleDifficultySelect = (articleId, title, difficulty) => {
     // Prevent interaction while loading
+    // TODO: Make it better
     if (loading || generatingCount > 0) return;
     navigate(`/article/${articleId}/${title}/${difficulty.id}`);
   };
@@ -43,7 +53,7 @@ export default function ArticleList() {
       await generateCustomArticle(topic);
       setShowCustomForm(false);
     } catch (error) {
-      console.error('Error generating custom article:', error);      
+      console.error("Error generating custom article:", error);
     }
   };
 
@@ -54,7 +64,7 @@ export default function ArticleList() {
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Go back"
               >
@@ -74,7 +84,11 @@ export default function ArticleList() {
                 >
                   <span className="text-xl">{currentLanguage.flag}</span>
                   <span className="font-medium">{currentLanguage.name}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {isOpen && (
@@ -103,9 +117,9 @@ export default function ArticleList() {
                 onClick={() => setShowCustomForm(!showCustomForm)}
                 disabled={loading || generatingCount > 0}
                 className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg transition-colors ${
-                  loading || generatingCount > 0 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-indigo-700'
+                  loading || generatingCount > 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-indigo-700"
                 }`}
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -114,15 +128,11 @@ export default function ArticleList() {
             </div>
           </div>
 
-          {showCustomForm && (
-            <CustomTopicForm onSubmit={handleCustomTopic} />
-          )}
+          {showCustomForm && <CustomTopicForm onSubmit={handleCustomTopic} />}
 
           <div className="space-y-6">
             {/* Custom article skeleton at top */}
-            {isCustomArticle && generatingCount > 0 && (
-              <SkeletonArticleCard />
-            )}
+            {isCustomArticle && generatingCount > 0 && <SkeletonArticleCard />}
             {/* Custom article loading message */}
             {isCustomArticle && generatingCount > 0 && (
               <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
@@ -137,7 +147,7 @@ export default function ArticleList() {
                   key={article.articleID}
                   article={article}
                   onDifficultySelect={handleDifficultySelect}
-                  disabled={false} 
+                  disabled={false}
                   // Lets enable all the click actions on the cards while other articles are loading
                 />
               ))}

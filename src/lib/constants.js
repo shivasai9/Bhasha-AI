@@ -29,14 +29,14 @@ export const IMAGE_EXTENTIONS = ["jpg", "jpeg", "png", "gif", "svg", "webp", "bm
 export const SPEECH_VOICE_CONFIG = {
   english: {
     lang: "en-US",
-    voicePattern: /en.*US|en.*GB/i
+    voicePattern: /^en/i
   },
   spanish: {
     lang: "es-ES",
-    voicePattern: /es.*ES|es.*MX/i
+    voicePattern: /^es/i
   },
   french: {
     lang: "fr-FR",
-    voicePattern: /fr.*FR/i
+    voicePattern: /^fr/i
   }
 };

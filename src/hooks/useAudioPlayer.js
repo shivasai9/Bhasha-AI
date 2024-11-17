@@ -1,35 +1,67 @@
 import { useState, useEffect, useRef } from 'react';
+import { SPEECH_VOICE_CONFIG } from '../lib/constants';
+import { getLanguage } from '../lib/languageStorage';
 
 export function useAudioPlayer(text) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [volume, setVolume] = useState(1);
   const speechRef = useRef(null);
   const utteranceRef = useRef(null);
   const currentPositionRef = useRef(0);
   const textRef = useRef(text);
   const wordPositionsRef = useRef([]);
+  const [pausedPosition, setPausedPosition] = useState(0);
+
+  const cancelSpeech = () => {
+    if (speechRef.current) {
+      setPausedPosition(currentPositionRef.current);
+      speechRef.current.cancel();
+      setIsPlaying(false);
+    }
+  };
 
   useEffect(() => {
     if ('speechSynthesis' in window) {
       speechRef.current = window.speechSynthesis;
-      return () => {
-        if (speechRef.current) {
-          currentPositionRef.current = 0;
-          speechRef.current.cancel();
+      
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          cancelSpeech();
         }
+      };
+
+      const handleBeforeUnload = () => {
+        cancelSpeech();
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        cancelSpeech();
       };
     }
   }, []);
 
   useEffect(() => {
-    textRef.current = text;
-    if (text) {
-      let position = 0;
-      wordPositionsRef.current = text.split(/\s+/).map(word => {
-        const wordStart = position;
-        position += word.length + 1;
-        return wordStart;
-      });
+    if (text !== textRef.current) {
+      cancelSpeech();
+      currentPositionRef.current = 0;
+      textRef.current = text;
+      
+      if (text) {
+        let position = 0;
+        wordPositionsRef.current = text.split(/\s+/).map(word => {
+          const wordStart = position;
+          position += word.length + 1;
+          return wordStart;
+        });
+      } else {
+        wordPositionsRef.current = [];
+      }
     }
   }, [text]);
 
@@ -40,58 +72,80 @@ export function useAudioPlayer(text) {
   };
 
   const setupUtterance = (startPosition = 0) => {
-    if (!textRef.current) return null;
+    if (!textRef.current?.trim()) return null;
 
-    const wordPosition = findNearestWordPosition(startPosition);
-    const remainingText = textRef.current.slice(wordPosition);
-    
-    const utterance = new SpeechSynthesisUtterance(remainingText);
-    utterance.rate = speed;
+    try {
+      const wordPosition = findNearestWordPosition(startPosition);
+      const remainingText = textRef.current.slice(wordPosition);
+      
+      const utterance = new SpeechSynthesisUtterance(remainingText);
+      utterance.rate = speed;
+      utterance.volume = volume;
 
-    utterance.onboundary = (event) => {
-      currentPositionRef.current = wordPosition + event.charIndex;
-    };
+      const currentLanguage = getLanguage();
+      const voiceConfig = SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG['english'];
+      utterance.lang = voiceConfig.lang;
 
-    utterance.onend = () => {
-      setIsPlaying(false);
-    };
-
-    utterance.onerror = (event) => {
-      if (event.error !== 'interrupted') {
-        console.error('Speech synthesis error:', event);
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => voiceConfig.voicePattern.test(v.lang));
+      if (voice) {
+        utterance.voice = voice;
       }
-      setIsPlaying(false);
-    };
 
-    return { utterance, position: wordPosition };
+      utterance.onboundary = (event) => {
+        if (event?.charIndex != null) {
+          currentPositionRef.current = wordPosition + event.charIndex;
+        }
+      };
+
+      utterance.onend = () => {
+        setIsPlaying(false);
+        currentPositionRef.current = 0;
+      };
+
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
+        setIsPlaying(false);
+        currentPositionRef.current = 0;
+      };
+
+      return { utterance, position: wordPosition };
+    } catch (error) {
+      console.error('Error setting up utterance:', error);
+      return null;
+    }
   };
 
   const startPlayback = (position = 0) => {
-    if (!speechRef.current || !textRef.current) return;
+    if (!speechRef.current || !textRef.current?.trim()) return;
 
-    // Cancel any ongoing speech
-    speechRef.current.cancel();
+    try {
+      speechRef.current.cancel();
+      setIsPlaying(false);
 
-    // Setup new utterance
-    const setup = setupUtterance(position);
-    if (!setup) return;
+      const setup = setupUtterance(position);
+      if (!setup) return;
 
-    utteranceRef.current = setup.utterance;
-    currentPositionRef.current = setup.position;
+      utteranceRef.current = setup.utterance;
+      currentPositionRef.current = setup.position;
 
-    // Start speaking
-    speechRef.current.speak(utteranceRef.current);
-    setIsPlaying(true);
+      setTimeout(() => {
+        speechRef.current.speak(utteranceRef.current);
+        setIsPlaying(true);
+      }, 50);
+    } catch (error) {
+      console.error('Error starting playback:', error);
+      setIsPlaying(false);
+    }
   };
 
   const togglePlay = () => {
     if (!speechRef.current || !textRef.current) return;
 
     if (isPlaying) {
-      speechRef.current.cancel();
-      setIsPlaying(false);
+      cancelSpeech();
     } else {
-      startPlayback(currentPositionRef.current);
+      startPlayback(pausedPosition);
     }
   };
 
@@ -101,15 +155,19 @@ export function useAudioPlayer(text) {
     const currentWord = findNearestWordPosition(currentPositionRef.current);
     const wordIndex = wordPositionsRef.current.indexOf(currentWord);
     const targetWordIndex = Math.max(0, wordIndex - 5);
-    const newPosition = wordPositionsRef.current[targetWordIndex];
+    const newPosition = wordPositionsRef.current[targetWordIndex] || 0;
     
+    cancelSpeech();
+    setPausedPosition(newPosition);
     startPlayback(newPosition);
   };
 
   const resetToStart = () => {
     if (!speechRef.current || !textRef.current) return;
     
+    cancelSpeech();
     currentPositionRef.current = 0;
+    setPausedPosition(0);
     startPlayback(0);
   };
 
@@ -121,12 +179,22 @@ export function useAudioPlayer(text) {
     }
   };
 
+  const updateVolume = (newVolume) => {
+    setVolume(newVolume);
+    if (utteranceRef.current && isPlaying) {
+      const currentPos = currentPositionRef.current;
+      startPlayback(currentPos);
+    }
+  };
+
   return {
     isPlaying,
     speed,
+    volume,
     togglePlay,
     resetPlayback,
     resetToStart,
-    updateSpeed
+    updateSpeed,
+    updateVolume
   };
 }

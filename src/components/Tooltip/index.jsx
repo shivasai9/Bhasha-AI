@@ -32,24 +32,35 @@ export default function Tooltip({
     handleSaveWord,
     isSaved,
   } = useWordInteraction(word);
-
+  
   const handleSpeak = () => {
     const utterance = new SpeechSynthesisUtterance(word);
     const currentLanguage = getLanguage();
-    const voiceConfig = SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG['english'];
-    
+    const voiceConfig =
+      SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG["english"];
+  
     utterance.lang = voiceConfig.lang;
-    
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find(v => voiceConfig.voicePattern.test(v.lang));
-    
-    if (voice) {
-      utterance.voice = voice;
+  
+    const speak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find((v) => voiceConfig.voicePattern.test(v.lang));
+  
+      if (voice) {
+        utterance.voice = voice;
+      } else {
+        console.log("No voice found for", voiceConfig.voicePattern);
+      }
+  
+      window.speechSynthesis.speak(utterance);
+    };
+  
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.addEventListener("voiceschanged", speak);
+    } else {
+      speak();
     }
-
-    window.speechSynthesis.speak(utterance);
   };
-
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (tooltipRef.current && !tooltipRef.current.contains(event.target) && 

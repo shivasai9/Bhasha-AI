@@ -20,22 +20,25 @@ const openDB = () => {
       if (!db.objectStoreNames.contains(STORES.WORDS)) {
         // `wordsStore` schema to store saved words and related details
         const wordStore = db.createObjectStore(STORES.WORDS, {
-          keyPath: "wordID",
+          keyPath: "wordId",
           autoIncrement: true,
         });
         // Fields:
-        // - wordID (auto-incremented): Unique identifier for each saved word
+        // - wordId (auto-incremented): Unique identifier for each saved word
         // - word: The word itself (e.g., "cosmology")
         // - meaning: Definition of the word
         // - synonyms: Array of synonyms (e.g., ["astrophysics", "astronomy"])
         // - antonyms: Array of antonyms, format same as synonyms
         // - exampleSentence: Example sentence using the word
-        // - translations: Object with language codes and translations (e.g., { "es": "cosmología" })
+        // - translations: Object with language name and translations (e.g., { "english": "cosmología" })
         // - articleID: ID of the article where the word was encountered
         // - timestamp: When the word was saved
+        // - isSaved: Boolean flag to track if the word is saved by the user
+        // - language: Language of the word (e.g., "english")
         wordStore.createIndex("wordIndex", "word", { unique: false });
         wordStore.createIndex("articleIDIndex", "articleID", { unique: false });
         wordStore.createIndex("timestampIndex", "timestamp", { unique: false });
+        wordStore.createIndex("isSavedIndex", "isSaved", { unique: false });
       }
 
       if (!db.objectStoreNames.contains(STORES.ARTICLES)) {

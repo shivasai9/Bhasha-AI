@@ -15,22 +15,22 @@ export default function AllView({
 }) {
   return (
     <div className="space-y-2">
-      <div className="border-b pb-2">
-        <MeaningView definition={wordDetails.definition} />
+      <div className="border-b">
+        <MeaningView definition={wordDetails.meaning} />
       </div>
       {wordDetails.synonyms?.length > 0 && (
-        <div className="border-b pb-2">
+        <div className="border-b">
           <SynonymsView synonyms={wordDetails.synonyms} />
         </div>
       )}
       {wordDetails.antonyms?.length > 0 && (
-        <div className="border-b pb-2">
+        <div className="border-b">
           <AntonymsView antonyms={wordDetails.antonyms} />
         </div>
       )}
-      {wordDetails.example && (
-        <div className="border-b pb-2">
-          <ExampleView example={wordDetails.example} />
+      {wordDetails.exampleSentence && (
+        <div className="border-b">
+          <ExampleView example={wordDetails.exampleSentence} />
         </div>
       )}
       <div>

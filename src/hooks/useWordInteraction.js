@@ -1,43 +1,29 @@
 import { useState, useEffect } from 'react';
-import { saveWord, getWordById } from '../lib/dbUtils';
+import { saveWord, getWordInfoByWord } from '../lib/dbUtils';
+import { generateAndSaveWordInfo } from '../lib/wordInfoGenerator';
+import { useParams } from 'react-router-dom';
 
 export function useWordInteraction(word) {
   const [wordDetails, setWordDetails] = useState(null);
   const [translation, setTranslation] = useState('');
   const [loading, setLoading] = useState(true);
-  const [targetLanguage, setTargetLanguage] = useState('es');
+  const [targetLanguage, setTargetLanguage] = useState('es'); // Here initial language should not be current language
   const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    const checkIfWordIsSaved = async () => {
-      try {
-        const savedWord = await getWordById(word);
-        setIsSaved(!!savedWord);
-      } catch (error) {
-        console.error('Error checking if word is saved:', error);
-      }
-    };
-
-    if (word) {
-      checkIfWordIsSaved();
-    }
-  }, [word]);
+  const { id: articleId } = useParams();
 
   useEffect(() => {
     const fetchWordDetails = async () => {
       if (!word) return;
-      
-      setLoading(true);
       try {
-        // Simulated API call - replace with actual Chrome AI API implementation
-        const details = {
-          definition: `Sample definition for "${word}"`,
-          synonyms: ['similar1', 'similar2', 'similar3'],
-          antonyms: ['opposite1', 'opposite2', 'opposite3'],
-          example: `Here's a sample sentence using "${word}" in context.`
-        };
+        setLoading(true);
+        let wordInfo = await getWordInfoByWord(word) || {};
+        const { isSaved = false } = wordInfo || {};
+        if(!(wordInfo && Object.keys(wordInfo).length > 0)) {
+          wordInfo = await generateAndSaveWordInfo(word, articleId);
+        }
         
-        setWordDetails(details);
+        setIsSaved(isSaved);
+        setWordDetails(wordInfo);
       } catch (error) {
         console.error('Error fetching word details:', error);
         setWordDetails(null);
@@ -71,9 +57,10 @@ export function useWordInteraction(word) {
       await saveWord({
         word,
         ...wordDetails,
-        savedAt: new Date().toISOString()
+        isSaved: !isSaved,
+        updatedAt: Date.now(),
       });
-      setIsSaved(true);
+      setIsSaved((prev) => !prev);
       return true;
     } catch (error) {
       console.error('Error saving word:', error);

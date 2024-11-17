@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Heart } from 'lucide-react';
+import { X, Heart, Volume2, ArrowLeft } from 'lucide-react';
 import { useTooltip } from '../../hooks/useTooltip';
 import { useWordInteraction } from '../../hooks/useWordInteraction';
 import TooltipOptions from './TooltipOptions';
@@ -10,15 +10,6 @@ import ExampleView from './views/ExampleView';
 import TranslateView from './views/TranslateView';
 import AllView from './views/AllView';
 import './Tooltip.css';
-
-const options = [
-  'meaning',
-  'synonyms',
-  'antonyms',
-  'example',
-  'translate',
-  'all'
-];
 
 export default function Tooltip({ 
   word = '', 
@@ -40,6 +31,11 @@ export default function Tooltip({
     isSaved,
   } = useWordInteraction(word);
 
+  const handleSpeak = () => {
+    const utterance = new SpeechSynthesisUtterance(word);
+    window.speechSynthesis.speak(utterance);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (tooltipRef.current && !tooltipRef.current.contains(event.target) && 
@@ -59,10 +55,40 @@ export default function Tooltip({
         className="tooltip show"
         style={tooltipStyle}
       >
-        <div className="p-4 text-center">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        <div className="tooltip-header">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">{word}</h3>
+            <button
+              onClick={handleSpeak}
+              className="tooltip-icon-button text-gray-400 hover:text-gray-600"
+              aria-label="Speak word"
+            >
+              <Volume2 className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="tooltip-actions">
+            <button
+              onClick={handleSaveWord}
+              className="tooltip-icon-button text-gray-400"
+              disabled
+            >
+              <Heart className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onClose}
+              className="tooltip-icon-button text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <div className="tooltip-content p-4">
+          <div className="grid grid-cols-2 gap-2">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={item} className="animate-pulse">
+                <div className="h-10 bg-gray-200 rounded-lg"></div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -76,13 +102,13 @@ export default function Tooltip({
 
     switch (selectedOption) {
       case 'meaning':
-        return <MeaningView definition={wordDetails.definition} />;
+        return <MeaningView definition={wordDetails.meaning} />;
       case 'synonyms':
         return <SynonymsView synonyms={wordDetails.synonyms} />;
       case 'antonyms':
         return <AntonymsView antonyms={wordDetails.antonyms} />;
       case 'example':
-        return <ExampleView example={wordDetails.example} />;
+        return <ExampleView example={wordDetails.exampleSentence} />;
       case 'translate':
         return (
           <TranslateView
@@ -116,13 +142,23 @@ export default function Tooltip({
       style={tooltipStyle}
     >
       <div className="tooltip-header">
-        <h3 className="text-lg font-semibold">{word}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">{word}</h3>
+          <button
+            onClick={handleSpeak}
+            className="tooltip-icon-button text-gray-400 hover:text-gray-600"
+            aria-label="Speak word"
+          >
+            <Volume2 className="w-5 h-5" />
+          </button>
+        </div>
         <div className="tooltip-actions">
           {selectedOption && (
             <button
               onClick={() => setSelectedOption(null)}
-              className="tooltip-icon-button text-gray-400 hover:text-gray-600"
+              className="tooltip-icon-button text-gray-400 hover:text-gray-600 flex items-center gap-1"
             >
+              <ArrowLeft className="w-4 h-4" />
               Back
             </button>
           )}

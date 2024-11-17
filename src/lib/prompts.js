@@ -140,26 +140,46 @@ Deep beneath the ocean's surface lies a world of wonder and mystery, where creat
 `;
 
 export const GENERATE_WORD_INFO = `
+===== CRITICAL INSTRUCTIONS =====
+1. THE INPUT "{{word}}" IS AN ENGLISH WORD
+2. DO NOT TRANSLATE OR INTERPRET IT AS A WORD FROM ANY OTHER LANGUAGE
+3. ALWAYS PROVIDE ENGLISH DEFINITIONS AND ENGLISH RESPONSES
+==============================
+
 You are an experienced English educator who specializes in clear and simple explanations.
 
-Generate comprehensive word information using these rules:
-1. Provide a clear, concise definition suitable for learners
-2. Include exactly 5 synonyms as a single string separated by " | "
-3. Include exactly 5 antonyms as a single string separated by " | "
-4. Create a simple example sentence that clearly demonstrates word usage
-5. Use proper English and natural expressions
-6. Return pure JSON without any markdown or code formatting
+Task: Generate comprehensive information for the English word: {{word}}
 
-Example:
+Rules:
+1. For any word, no matter how short, always provide a valid English definition
+2. For short words (3 letters or less):
+   - Focus on the most common meaning in English
+   - Use simple, clear definitions
+   - Example for "tip": "the pointed or rounded end of something"
+3. Provide a clear, concise definition suitable for learners
+4. Include exactly 5 synonyms as a single string separated by " | "
+5. Include exactly 5 antonyms as a single string separated by " | "
+   - For words that lack direct antonyms, use conceptually opposite words
+6. Create a simple example sentence that clearly demonstrates word usage
+7. Use proper English and natural expressions
+8. Return pure JSON without any markdown or code formatting
+
+Examples:
 {
-  "word": "happy",
-  "meaning": "feeling or showing pleasure and contentment",
-  "synonyms": "joyful | cheerful | delighted | content | pleased",
-  "antonyms": "sad | unhappy | miserable | gloomy | depressed",
-  "exampleSentence": "The children were happy to play in the park."
+  "word": "tiny",
+  "meaning": "extremely small in size or amount",
+  "synonyms": "minuscule | microscopic | miniature | minute | little",
+  "antonyms": "huge | enormous | gigantic | massive | large",
+  "exampleSentence": "The tiny ant carried a crumb of bread."
 }
 
-Now generate information for the word: {{word}}`;
+{
+  "word": "up",
+  "meaning": "toward a higher position or level",
+  "synonyms": "upward | aloft | skyward | overhead | above",
+  "antonyms": "down | below | downward | beneath | under",
+  "exampleSentence": "The balloon floated up into the sky."
+}`;
 
 export async function generateArticleCreationPrompt(customTopic = null) {
   const existingArticles = await getArticlesByLanguage("english");

@@ -25,3 +25,18 @@ export const LANGUAGES = [
 ];
 
 export const IMAGE_EXTENTIONS = ["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "tiff"];
+
+export const SPEECH_VOICE_CONFIG = {
+  english: {
+    lang: "en-US",
+    voicePattern: /en.*US|en.*GB/i
+  },
+  spanish: {
+    lang: "es-ES",
+    voicePattern: /es.*ES|es.*MX/i
+  },
+  french: {
+    lang: "fr-FR",
+    voicePattern: /fr.*FR/i
+  }
+};

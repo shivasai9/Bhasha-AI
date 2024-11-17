@@ -3,7 +3,7 @@ import { useQuiz } from '../../hooks/useQuiz';
 import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from 'lucide-react';
 import QuizSkeleton from './QuizSkeleton';
 
-export default function QuizSection({ article, content }) {
+export default function QuizSection({ article,selectedDifficulty }) {
   const {
     questions,
     currentQuestion,
@@ -17,7 +17,7 @@ export default function QuizSection({ article, content }) {
     handleNextQuestion,
     restartQuiz,
     loading,
-  } = useQuiz(article, content);
+  } = useQuiz(article,selectedDifficulty);
 
   if (loading) return <QuizSkeleton />;
   if (!questions.length) return null;
@@ -130,7 +130,8 @@ export default function QuizSection({ article, content }) {
                 ? 'text-green-800'
                 : 'text-red-800'
             }`}>
-              {currentQuestion.explanation}
+              <p>{"Correct Answer: "+currentQuestion.answer}</p>
+              <p>{currentQuestion.explanation}</p>
             </p>
           </div>
         )}

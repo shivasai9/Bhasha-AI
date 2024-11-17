@@ -102,8 +102,7 @@ const openDB = () => {
       if (!db.objectStoreNames.contains(STORES.QUIZ)) {
         // `quizStore` schema to store quizzes related to each article
         const quizStore = db.createObjectStore(STORES.QUIZ, {
-          keyPath: "quizID",
-          autoIncrement: true,
+          keyPath: ["articleID", "level", "language"],
         });
         // Fields:
         // - quizID (auto-incremented): Unique identifier for each quiz

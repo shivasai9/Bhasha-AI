@@ -26,11 +26,13 @@ const performTransaction = async (storeName, mode, operation) => {
 
 // Words Store Operations
 export const saveWord = (wordData) =>
-  performTransaction(STORES.WORDS, "readwrite", (store) => store.put({
-    ...wordData,
-    isSaved: wordData.isSaved ?? false,
-    timestamp: wordData.timestamp || new Date().toISOString()
-  }));
+  performTransaction(STORES.WORDS, "readwrite", (store) =>
+    store.put({
+      ...wordData,
+      isSaved: wordData.isSaved ?? false,
+      timestamp: wordData.timestamp || new Date().toISOString(),
+    })
+  );
 
 export const getWordById = (wordId) =>
   performTransaction(STORES.WORDS, "readonly", (store) => store.get(wordId));
@@ -46,73 +48,82 @@ export const getRecentWords = (limit = 10) =>
   );
 
 export const getSavedWords = () =>
-  performTransaction(STORES.WORDS, "readonly", (store) =>
-    new Promise((resolve, reject) => {
-      const cursor = store.index("isSavedIndex").openCursor(1);
-      const words = [];
+  performTransaction(
+    STORES.WORDS,
+    "readonly",
+    (store) =>
+      new Promise((resolve, reject) => {
+        const cursor = store.index("isSavedIndex").openCursor(1);
+        const words = [];
 
-      cursor.onerror = () => reject(cursor.error);
-      cursor.onsuccess = function(event) {
-        const cursor = (/** @type {IDBRequest} */ (event.target)).result;
-        if (cursor) {
-          words.push(cursor.value);
-          cursor.continue();
-        } else {
-          resolve(words);
-        }
-      };
-    })
+        cursor.onerror = () => reject(cursor.error);
+        cursor.onsuccess = function (event) {
+          const cursor = /** @type {IDBRequest} */ (event.target).result;
+          if (cursor) {
+            words.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(words);
+          }
+        };
+      })
   );
 
 export const updateWordStatus = (wordId, isSaved) =>
   performTransaction(STORES.WORDS, "readwrite", async (store) => {
     const word = await store.get(wordId);
-    if (!word) throw new Error('Word not found');
-    
+    if (!word) throw new Error("Word not found");
+
     const updatedWord = {
       ...word,
       isSaved,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     return store.put(updatedWord);
   });
 
 export const updateWordTranslations = (wordId, translations) =>
-  performTransaction(STORES.WORDS, "readwrite", async (store) =>
-    new Promise((resolve, reject) => {
-      const getRequest = store.get(wordId);
-      
-      getRequest.onerror = () => reject(getRequest.error);
-      getRequest.onsuccess = () => {
-        const word = getRequest.result;
-        if (!word) {
-          reject(new Error('Word not found'));
-          return;
-        }
+  performTransaction(
+    STORES.WORDS,
+    "readwrite",
+    async (store) =>
+      new Promise((resolve, reject) => {
+        const getRequest = store.get(wordId);
 
-        const updatedWord = {
-          ...word,
-          translations: { ...word.translations, ...translations },
-          timestamp: new Date().toISOString()
+        getRequest.onerror = () => reject(getRequest.error);
+        getRequest.onsuccess = () => {
+          const word = getRequest.result;
+          if (!word) {
+            reject(new Error("Word not found"));
+            return;
+          }
+
+          const updatedWord = {
+            ...word,
+            translations: { ...word.translations, ...translations },
+            timestamp: new Date().toISOString(),
+          };
+
+          const putRequest = store.put(updatedWord);
+          putRequest.onerror = () => reject(putRequest.error);
+          putRequest.onsuccess = () => resolve(putRequest.result);
         };
-
-        const putRequest = store.put(updatedWord);
-        putRequest.onerror = () => reject(putRequest.error);
-        putRequest.onsuccess = () => resolve(putRequest.result);
-      };
-    })
+      })
   );
 
 export const getWordInfoByWord = (word) =>
-  performTransaction(STORES.WORDS, "readonly", (store) =>
-    new Promise((resolve, reject) => {
-      const request = store.index("wordIndex").get(word);
-      
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        resolve(request.result || null);
-      };
-    })
+  performTransaction(
+    STORES.WORDS,
+    "readonly",
+    (store) =>
+      new Promise((resolve, reject) => {
+        const request = store.index("wordIndex").get(word);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          resolve(request.result || null);
+        };
+      })
   );
 
 // Articles Store Operations
@@ -153,11 +164,13 @@ export const getAllArticleContent = (articleId) =>
   );
 
 // Quiz Operations
-export const saveQuiz = (quizData) =>
+export const saveQuizQuestions = (quizData) =>
   performTransaction(STORES.QUIZ, "readwrite", (store) => store.put(quizData));
 
-export const getQuizById = (quizId) =>
-  performTransaction(STORES.QUIZ, "readonly", (store) => store.get(quizId));
+export const getQuizQuestions = (articleId, level, language) =>
+  performTransaction(STORES.QUIZ, "readonly", (store) =>
+    store.get([articleId, level, language])
+  );
 
 export const getQuizzesByArticle = (articleId) =>
   performTransaction(STORES.QUIZ, "readonly", (store) =>
@@ -216,9 +229,7 @@ export const upsertRecord = (storeName, key, data) =>
     let updatedData;
     if (key !== undefined && key !== null) {
       const existingData = await store.get(key);
-      updatedData = existingData
-        ? { ...existingData, ...data }
-        : { ...data };
+      updatedData = existingData ? { ...existingData, ...data } : { ...data };
     } else {
       updatedData = { ...data };
     }

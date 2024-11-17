@@ -32,7 +32,11 @@ export async function translateArticle(article, targetLanguage) {
   }
 }
 
-export const translateContent = async (content, sourceLanguage, targetLanguage) => {
+export const translateContent = async (
+  content,
+  sourceLanguage,
+  targetLanguage
+) => {
   try {
     if (sourceLanguage.toLowerCase() === targetLanguage.toLowerCase()) {
       return content;
@@ -45,11 +49,51 @@ export const translateContent = async (content, sourceLanguage, targetLanguage) 
       targetLanguage: langCode,
     });
 
-    const lines = content.split('\n');
+    const lines = content.split("\n");
     const translatedLines = await Promise.all(
-      lines.map(line => line.trim() ? translator.translate(line) : line)
+      lines.map((line) => (line.trim() ? translator.translate(line) : line))
     );
-    return translatedLines.join('\n');
+    return translatedLines.join("\n");
+  } catch (error) {
+    console.error("Translation failed:", error);
+    throw error;
+  }
+};
+
+export const translateQuestions = async (
+  questions,
+  sourceLanguage,
+  targetLanguage
+) => {
+  try {
+    if (sourceLanguage.toLowerCase() === targetLanguage.toLowerCase()) {
+      return questions;
+    }
+
+    const langCode = LANGUAGE_CODES[targetLanguage.toLowerCase()];
+    const sourceLangCode = LANGUAGE_CODES[sourceLanguage.toLowerCase()];
+    const translator = await translation.createTranslator({
+      sourceLanguage: sourceLangCode,
+      targetLanguage: langCode,
+    });
+    const translateQuestionsFunction = async (question) => {
+      const translatedQuestion = {
+        question: await translator.translate(question.question),
+        options: await Promise.all(
+          question.options.map((option) => translator.translate(option))
+        ),
+        answer: await translator.translate(question.answer),
+        explanation: await translator.translate(question.explanation),
+      };
+      return translatedQuestion;
+    };
+    const translatedQuestions = await Promise.all(
+      questions.map((question) => {
+        return translateQuestionsFunction(question);
+      })
+    );
+    console.log(translatedQuestions);
+    return translatedQuestions;
   } catch (error) {
     console.error("Translation failed:", error);
     throw error;

@@ -1,46 +1,77 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import Tooltip from '../components/Tooltip';
+import { generateAndSaveSummary } from "../lib/summaryGenerator";
+import { filterImageUrls } from "../lib/utils";
 
-export function useArticleContent() {
+export function useArticleContent(article, content, selectedDifficulty) {
   const [tooltipData, setTooltipData] = useState(null);
   const [highlightedWord, setHighlightedWord] = useState(null);
+  const [triggerElBoundingClientRect, setTriggerElBoundingClientRect] = useState(null);
   const triggerRef = useRef(null);
+
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+
+  const articleData = useMemo(() => {
+    if (!article?.imagesData) return {};
+    const filteredImageData = filterImageUrls(article.imagesData);
+    const firstImage = filteredImageData[0] || {};
+    
+    return {
+      imageUrl: firstImage.url || null,
+      imageAlt: firstImage.alt || article.title,
+      refUrl: firstImage.refUrl || null,
+    };
+  }, [article]);
 
   const handleWordClick = useCallback((word, event) => {
     event.preventDefault();
     const cleanWord = word.replace(/[.,!?]$/, '');
-    
-    // Store reference to clicked element
     triggerRef.current = event.target;
-    setHighlightedWord(cleanWord);
+    const noundingClients = event.target.getBoundingClientRect();
+    console.log("===noundingClients===", noundingClients);
+    console.log('Word clicked:', cleanWord);
+    console.log("==x==y=", event.clientX, event.clientY);
     setTooltipData({
       word: cleanWord,
-      position: { 
-        x: event.clientX,
-        y: event.clientY
-      },
+      position: { x: event.clientX, y: event.clientY },
       content: {
         definition: `Sample definition for "${cleanWord}"`,
         example: `Here's a sample sentence using "${cleanWord}".`,
-        translation: `Translation of "${cleanWord}" in target language`
-      }
+        translation: `Translation of "${cleanWord}" in target language`,
+      },
     });
+    setTriggerElBoundingClientRect(noundingClients);
+    setHighlightedWord(cleanWord);
   }, []);
 
-  const closeTooltip = useCallback(() => {
-    setTooltipData(null);
-    setHighlightedWord(null);
-    triggerRef.current = null;
-  }, []);
+  const handleSummaryClick = useCallback(async () => {
+    if (!article?.articleID || !content) return;
 
-  const handleSaveWord = useCallback((word, details) => {
-    console.log('Saving word:', word, details);
-  }, []);
+    setShowSummary(!showSummary);
+    if (!summary) {
+      setSummaryLoading(true);
+      try {
+        const newSummary = await generateAndSaveSummary(
+          article.articleID,
+          content,
+          selectedDifficulty
+        );
+        setSummary(newSummary || 'Failed to generate summary. Please try again.');
+      } catch (error) {
+        setSummary('Error generating summary. Please try again.');
+      } finally {
+        setSummaryLoading(false);
+      }
+    }
+  }, [article?.articleID, content, selectedDifficulty, showSummary, summary]);
 
-  const getClickableText = (content) => {
-    if (!content) return null;
+  const getClickableText = useCallback((text) => {
+    if (!text) return null;
 
-    return content.split(' ').map((word, index, array) => {
+    return text.split(' ').map((word, index, array) => {
       const cleanWord = word.replace(/[.,!?]$/, '');
       const isHighlighted = cleanWord === highlightedWord;
       
@@ -49,9 +80,7 @@ export function useArticleContent() {
           <span
             onClick={(e) => handleWordClick(word, e)}
             className={`cursor-pointer inline-block ${
-              isHighlighted 
-                ? 'bg-yellow-200' 
-                : 'hover:bg-yellow-100'
+              isHighlighted ? 'bg-yellow-200' : 'hover:bg-yellow-100'
             }`}
           >
             {word}
@@ -60,21 +89,31 @@ export function useArticleContent() {
         </React.Fragment>
       );
     });
-  };
+  }, [highlightedWord, handleWordClick]);
 
-  const tooltipElement = tooltipData && (
-    <Tooltip
-      word={tooltipData.word}
-      content={tooltipData.content}
-      position={tooltipData.position}
-      onClose={closeTooltip}
-      onSave={handleSaveWord}
-      triggerRef={triggerRef}
-    />
-  );
+  const closeTooltip = useCallback(() => {
+    setTooltipData(null);
+    setHighlightedWord(null);
+    triggerRef.current = null;
+  }, []);
 
-  return { 
+  return {
+    showDifficultyModal,
+    setShowDifficultyModal,
+    showSummary,
+    summary,
+    summaryLoading,
+    articleData,
     getClickableText,
-    tooltipElement
+    handleSummaryClick,
+    tooltipElement: tooltipData && (
+      <Tooltip
+        word={tooltipData.word}
+        position={tooltipData.position}
+        onClose={closeTooltip}
+        triggerRef={triggerRef}
+        triggerElBoundingClientRect={triggerElBoundingClientRect}
+      />
+    ),
   };
 }

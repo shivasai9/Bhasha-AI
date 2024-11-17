@@ -47,6 +47,12 @@ export default function AudioPlayer({ text }) {
     speed: "Change reading speed",
   };
 
+  const resetButtonRef = useRef(null);
+  const skipBackRef = useRef(null);
+  const playPauseRef = useRef(null);
+  const volumeRef = useRef(null);
+  const speedRef = useRef(null);
+
   const handleVolumeClick = () => {
     if (isPlaying) {
       togglePlay(); // Pause the playback
@@ -91,6 +97,7 @@ export default function AudioPlayer({ text }) {
             <div className="flex items-center gap-2">
               <div className="relative">
                 <button
+                  ref={resetButtonRef}
                   onClick={resetToStart}
                   className="p-2 rounded-full hover:bg-white/10 transition-colors"
                   onMouseEnter={() => setActiveTooltip("reset")}
@@ -102,11 +109,13 @@ export default function AudioPlayer({ text }) {
                 <CustomTooltip
                   text={tooltips.reset}
                   visible={activeTooltip === "reset"}
+                  containerRef={resetButtonRef}
                 />
               </div>
 
               <div className="relative">
                 <button
+                  ref={skipBackRef}
                   onClick={resetPlayback}
                   className="p-2 rounded-full hover:bg-white/10 transition-colors"
                   onMouseEnter={() => setActiveTooltip("skipBack")}
@@ -118,11 +127,13 @@ export default function AudioPlayer({ text }) {
                 <CustomTooltip
                   text={tooltips.skipBack}
                   visible={activeTooltip === "skipBack"}
+                  containerRef={skipBackRef}
                 />
               </div>
 
               <div className="relative">
                 <button
+                  ref={playPauseRef}
                   onClick={togglePlay}
                   className="p-2 rounded-full bg-white text-indigo-600 hover:bg-white/90 transition-colors"
                   onMouseEnter={() => setActiveTooltip("playPause")}
@@ -138,6 +149,7 @@ export default function AudioPlayer({ text }) {
                 <CustomTooltip
                   text={tooltips.playPause}
                   visible={activeTooltip === "playPause"}
+                  containerRef={playPauseRef}
                 />
               </div>
             </div>
@@ -145,9 +157,10 @@ export default function AudioPlayer({ text }) {
             <div className="flex items-center gap-2">
               <div className="relative" ref={volumeSliderRef}>
                 <button
+                  ref={volumeRef}
                   onClick={handleVolumeClick}
                   className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                  onMouseEnter={() => setActiveTooltip("volume")}
+                  onMouseEnter={() => !showVolumeSlider && setActiveTooltip("volume")}
                   onMouseLeave={() => setActiveTooltip(null)}
                   title="Adjust volume"
                 >
@@ -156,6 +169,7 @@ export default function AudioPlayer({ text }) {
                 <CustomTooltip
                   text={tooltips.volume}
                   visible={activeTooltip === "volume" && !showVolumeSlider}
+                  containerRef={volumeRef}
                 />
                 {showVolumeSlider && (
                   <div className="absolute left-0 bottom-full mb-2 bg-white rounded-lg shadow-xl divide-y divide-gray-100">
@@ -181,9 +195,10 @@ export default function AudioPlayer({ text }) {
 
               <div className="relative">
                 <button
+                  ref={speedRef}
                   onClick={handleSpeedClick}
                   className="p-2 rounded-full hover:bg-white/10 transition-colors flex items-center gap-2"
-                  onMouseEnter={() => setActiveTooltip("speed")}
+                  onMouseEnter={() => !showSpeedMenu && setActiveTooltip("speed")}
                   onMouseLeave={() => setActiveTooltip(null)}
                   title="Playback speed"
                 >
@@ -193,6 +208,7 @@ export default function AudioPlayer({ text }) {
                 <CustomTooltip
                   text={tooltips.speed}
                   visible={activeTooltip === "speed" && !showSpeedMenu}
+                  containerRef={speedRef}
                 />
                 {showSpeedMenu && (
                   <div className="absolute right-0 bottom-full mb-2 bg-white rounded-lg shadow-xl divide-y divide-gray-100 min-w-[120px]">

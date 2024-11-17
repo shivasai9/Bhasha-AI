@@ -17,11 +17,12 @@ export default function Tooltip({
   word = '', 
   position = { x: 0, y: 0 }, 
   onClose = () => {},
-  triggerRef = null
+  triggerRef = null,
+  triggerElBoundingClientRect = { x: 0, y: 0 },
 }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const tooltipRef = useRef(null);
-  const { tooltipStyle } = useTooltip(position, tooltipRef, triggerRef);
+  const { tooltipStyle, updatePosition } = useTooltip(position, tooltipRef, triggerRef, triggerElBoundingClientRect);
   const {
     wordDetails,
     translation,
@@ -73,6 +74,13 @@ export default function Tooltip({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose, triggerRef]);
 
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+    if (option === 'all') {
+      setTimeout(updatePosition, 50);
+    }
+  };
+
   if (!wordDetails || loading) {
     return (
       <div
@@ -122,7 +130,7 @@ export default function Tooltip({
 
   const renderContent = () => {
     if (!selectedOption) {
-      return <TooltipOptions onSelect={setSelectedOption} />;
+      return <TooltipOptions onSelect={handleOptionSelect} />;
     }
 
     switch (selectedOption) {

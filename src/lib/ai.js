@@ -231,6 +231,43 @@ class AIWrapper {
     }
   }
 
+  async summarizeContent(text) {
+    try {
+      const start = Date.now();
+      
+      const generateWithRetry = async () => {
+        const canSummarize = await window.ai.summarizer.capabilities();
+        if (!canSummarize || canSummarize.available === 'no') {
+          throw new Error('Summarizer not available');
+        }
+
+        const summarizer = await window.ai.summarizer.create();
+
+        if (canSummarize.available !== 'readily') {
+          summarizer.addEventListener('downloadprogress', (e) => {
+            console.log(`Download progress: ${e.loaded}/${e.total}`);
+          });
+          await summarizer.ready;
+        }
+
+        const result = await summarizer.summarize(text);
+        
+        summarizer.destroy();
+        
+        return result;
+      };
+
+      const summary = await withRetry(generateWithRetry, 5, 1000);
+      const end = Date.now();
+      console.log(`Summary generated in ${(end - start)/1000} seconds`);
+      
+      return summary;
+    } catch (error) {
+      console.error('Summarization failed:', error);
+      throw error;
+    }
+  }
+
   // Only destroy when explicitly called
   destroy() {
     if (this.session) {

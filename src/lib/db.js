@@ -91,6 +91,7 @@ const openDB = () => {
         // - level: Difficulty level of the content (e.g., "easy", "medium", "hard")
         // - language: Language of the article (e.g., "english")
         // - content: Full text of the article for this specific level
+        // - summary: Summary of the article where the word was encountered
  
         articleContentsStore.createIndex("articleIDIndex", "articleID", {
           unique: false,

@@ -25,11 +25,7 @@ export default function Tooltip({
   const { tooltipStyle, updatePosition } = useTooltip(position, tooltipRef, triggerRef, triggerElBoundingClientRect);
   const {
     wordDetails,
-    translation,
     loading,
-    targetLanguage,
-    setTargetLanguage,
-    handleTranslate,
     handleSaveWord,
     isSaved,
   } = useWordInteraction(word);
@@ -145,21 +141,14 @@ export default function Tooltip({
       case 'translate':
         return (
           <TranslateView
-            targetLanguage={targetLanguage}
-            onLanguageChange={setTargetLanguage}
-            translation={translation}
-            onTranslate={handleTranslate}
             loading={loading}
+            selectedText={word}
           />
         );
       case 'all':
         return (
           <AllView
             wordDetails={{ ...wordDetails, word }}
-            targetLanguage={targetLanguage}
-            onLanguageChange={setTargetLanguage}
-            translation={translation}
-            onTranslate={handleTranslate}
             loading={loading}
           />
         );

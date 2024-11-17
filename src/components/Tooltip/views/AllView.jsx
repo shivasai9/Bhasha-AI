@@ -7,10 +7,6 @@ import TranslateView from './TranslateView';
 
 export default function AllView({
   wordDetails,
-  targetLanguage,
-  onLanguageChange,
-  translation,
-  onTranslate,
   loading
 }) {
   return (
@@ -35,11 +31,8 @@ export default function AllView({
       )}
       <div>
         <TranslateView
-          targetLanguage={targetLanguage}
-          onLanguageChange={onLanguageChange}
-          translation={translation}
-          onTranslate={onTranslate}
           loading={loading}
+          selectedText={wordDetails.word}
         />
       </div>
     </div>

@@ -72,7 +72,6 @@ export default function ArticleView() {
             <ArticleContent
               article={article}
               content={articleContent}
-              onWordClick={handleWordClick}
               contentLoading={contentLoading}
               selectedDifficulty={selectedDifficulty}
               onDifficultyChange={handleDifficultyChange}

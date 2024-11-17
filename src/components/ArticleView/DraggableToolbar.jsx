@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Gauge, BookOpen, GripHorizontal, Minimize2, Maximize2, X } from 'lucide-react';
 
 export default function DraggableToolbar({ 
@@ -8,7 +8,8 @@ export default function DraggableToolbar({
   difficultyLabel,
   buttonTheme 
 }) {
-  const [position, setPosition] = useState({ x: 200, y: 230 });
+  const toolbarRef = useRef(null);
+  const [position, setPosition] = useState({ x: 50, y: 230 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isMinimized, setIsMinimized] = useState(false);
@@ -37,10 +38,20 @@ export default function DraggableToolbar({
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (isDragging) {
+      if (isDragging && toolbarRef.current) {
+        const toolbarRect = toolbarRef.current.getBoundingClientRect();
+        const newX = Math.min(
+          Math.max(0, e.clientX - dragOffset.x),
+          window.innerWidth - toolbarRect.width
+        );
+        const newY = Math.min(
+          Math.max(0, e.clientY - dragOffset.y),
+          window.innerHeight - toolbarRect.height
+        );
+
         setPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y
+          x: newX,
+          y: newY
         });
       }
     };
@@ -60,6 +71,7 @@ export default function DraggableToolbar({
 
   return (
     <div
+      ref={toolbarRef}
       className={`fixed z-50 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
       style={{ 
         left: `${position.x}px`, 

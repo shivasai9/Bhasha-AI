@@ -6,6 +6,8 @@ export function useAudioPlayer(text) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [volume, setVolume] = useState(1);
+  const [availableVoices, setAvailableVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
   const speechRef = useRef(null);
   const utteranceRef = useRef(null);
   const currentPositionRef = useRef(0);
@@ -37,6 +39,18 @@ export function useAudioPlayer(text) {
 
       document.addEventListener('visibilitychange', handleVisibilityChange);
       window.addEventListener('beforeunload', handleBeforeUnload);
+
+      const loadVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const currentLanguage = getLanguage();
+        const langCode = SPEECH_VOICE_CONFIG[currentLanguage]?.lang || 'en-US';
+        const filteredVoices = voices.filter(voice => voice.lang.startsWith(langCode.split('-')[0]));
+        setAvailableVoices(filteredVoices);
+        setSelectedVoice(filteredVoices[0]);
+      };
+
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      loadVoices();
 
       return () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -86,10 +100,8 @@ export function useAudioPlayer(text) {
       const voiceConfig = SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG['english'];
       utterance.lang = voiceConfig.lang;
 
-      const voices = window.speechSynthesis.getVoices();
-      const voice = voices.find(v => voiceConfig.voicePattern.test(v.lang));
-      if (voice) {
-        utterance.voice = voice;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
       }
 
       utterance.onboundary = (event) => {
@@ -187,14 +199,25 @@ export function useAudioPlayer(text) {
     }
   };
 
+  const selectVoice = (voice) => {
+    setSelectedVoice(voice);
+    if (utteranceRef.current && isPlaying) {
+      const currentPos = currentPositionRef.current;
+      startPlayback(currentPos);
+    }
+  };
+
   return {
     isPlaying,
     speed,
     volume,
+    availableVoices,
+    selectedVoice,
     togglePlay,
     resetPlayback,
     resetToStart,
     updateSpeed,
-    updateVolume
+    updateVolume,
+    selectVoice
   };
 }

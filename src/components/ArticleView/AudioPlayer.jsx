@@ -9,6 +9,7 @@ import {
   SkipBack,
   RotateCcw,
   Gauge,
+  Mic,
 } from "lucide-react";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
 import CustomTooltip from "./CustomTooltip.jsx";
@@ -18,16 +19,20 @@ export default function AudioPlayer({ text }) {
     isPlaying,
     speed,
     volume,
+    availableVoices,
+    selectedVoice,
     togglePlay,
     resetPlayback,
     resetToStart,
     updateSpeed,
     updateVolume,
+    selectVoice,
   } = useAudioPlayer(text);
 
   const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const volumeSliderRef = useRef(null);
   const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -45,6 +50,7 @@ export default function AudioPlayer({ text }) {
     playPause: isPlaying ? "Pause reading" : "Start reading",
     volume: "Adjust volume",
     speed: "Change reading speed",
+    voice: "Select voice",
   };
 
   const resetButtonRef = useRef(null);
@@ -52,6 +58,7 @@ export default function AudioPlayer({ text }) {
   const playPauseRef = useRef(null);
   const volumeRef = useRef(null);
   const speedRef = useRef(null);
+  const voiceRef = useRef(null);
 
   const handleVolumeClick = () => {
     if (isPlaying) {
@@ -65,6 +72,13 @@ export default function AudioPlayer({ text }) {
       togglePlay(); // Pause the playback
     }
     setShowSpeedMenu(!showSpeedMenu);
+  };
+
+  const handleVoiceClick = () => {
+    if (isPlaying) {
+      togglePlay(); // Pause the playback
+    }
+    setShowVoiceMenu(!showVoiceMenu);
   };
 
   // Close volume slider when clicking outside
@@ -94,7 +108,9 @@ export default function AudioPlayer({ text }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="relative z-10">
           <div className="flex items-center gap-4">
+            {/* First controls group */}
             <div className="flex items-center gap-2">
+              {/* Reset, Skip, Play buttons remain unchanged */}
               <div className="relative">
                 <button
                   ref={resetButtonRef}
@@ -154,7 +170,9 @@ export default function AudioPlayer({ text }) {
               </div>
             </div>
 
+            {/* Second controls group */}
             <div className="flex items-center gap-2">
+              {/* Volume control remains unchanged */}
               <div className="relative" ref={volumeSliderRef}>
                 <button
                   ref={volumeRef}
@@ -193,6 +211,7 @@ export default function AudioPlayer({ text }) {
                 )}
               </div>
 
+              {/* Speed control remains unchanged */}
               <div className="relative">
                 <button
                   ref={speedRef}
@@ -226,6 +245,46 @@ export default function AudioPlayer({ text }) {
                         }`}
                       >
                         {s}x Speed
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="relative">
+                <button
+                  ref={voiceRef}
+                  onClick={handleVoiceClick}
+                  className="p-2 rounded-full hover:bg-white/10 transition-colors flex items-center gap-2 min-w-[120px]"
+                  onMouseEnter={() => !showVoiceMenu && setActiveTooltip("voice")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                >
+                  <Mic className="w-5 h-5" />
+                  <span className="text-sm font-medium truncate">
+                    {selectedVoice?.name?.split(' ')[0] || 'Voice'}
+                  </span>
+                </button>
+                <CustomTooltip
+                  text="Change voice settings"
+                  visible={activeTooltip === "voice" && !showVoiceMenu}
+                  containerRef={voiceRef}
+                />
+                {showVoiceMenu && (
+                  <div className="absolute right-0 bottom-full mb-2 bg-white rounded-lg shadow-xl divide-y divide-gray-100 min-w-[200px] max-h-[300px] overflow-y-auto">
+                    {availableVoices.map((voice) => (
+                      <button
+                        key={voice.name}
+                        onClick={() => {
+                          selectVoice(voice);
+                          setShowVoiceMenu(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-sm ${
+                          selectedVoice?.name === voice.name
+                            ? "bg-indigo-50 text-indigo-600 font-medium"
+                            : "text-gray-700"
+                        }`}
+                      >
+                        {voice.name}
                       </button>
                     ))}
                   </div>

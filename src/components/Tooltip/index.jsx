@@ -1,89 +1,89 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Heart, Volume2, ArrowLeft } from 'lucide-react';
-import { useTooltip } from '../../hooks/useTooltip';
-import { useWordInteraction } from '../../hooks/useWordInteraction';
-import TooltipOptions from './TooltipOptions';
-import MeaningView from './views/MeaningView';
-import SynonymsView from './views/SynonymsView';
-import AntonymsView from './views/AntonymsView';
-import ExampleView from './views/ExampleView';
-import TranslateView from './views/TranslateView';
-import AllView from './views/AllView';
-import './Tooltip.css';
-import { SPEECH_VOICE_CONFIG } from '../../lib/constants';
-import { getLanguage } from '../../lib/languageStorage';
+import React, { useState, useEffect, useRef } from "react";
+import { X, Heart, Volume2, ArrowLeft } from "lucide-react";
+import { useTooltip } from "../../hooks/useTooltip";
+import { useWordInteraction } from "../../hooks/useWordInteraction";
+import TooltipOptions from "./TooltipOptions";
+import MeaningView from "./views/MeaningView";
+import SynonymsView from "./views/SynonymsView";
+import AntonymsView from "./views/AntonymsView";
+import ExampleView from "./views/ExampleView";
+import TranslateView from "./views/TranslateView";
+import AllView from "./views/AllView";
+import "./Tooltip.css";
+import { SPEECH_VOICE_CONFIG } from "../../lib/constants";
+import { getLanguage } from "../../lib/languageStorage";
 
-export default function Tooltip({ 
-  word = '', 
-  position = { x: 0, y: 0 }, 
+export default function Tooltip({
+  word = "",
+  position = { x: 0, y: 0 },
   onClose = () => {},
   triggerRef = null,
   triggerElBoundingClientRect = { x: 0, y: 0 },
 }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const tooltipRef = useRef(null);
-  const { tooltipStyle, updatePosition } = useTooltip(position, tooltipRef, triggerRef, triggerElBoundingClientRect);
-  const {
-    wordDetails,
-    loading,
-    handleSaveWord,
-    isSaved,
-  } = useWordInteraction(word);
-  
+  const { tooltipStyle, updatePosition } = useTooltip(
+    position,
+    tooltipRef,
+    triggerRef,
+    triggerElBoundingClientRect
+  );
+  const { wordDetails, loading, handleSaveWord, isSaved } =
+    useWordInteraction(word);
+
   const handleSpeak = () => {
     const utterance = new SpeechSynthesisUtterance(word);
     const currentLanguage = getLanguage();
     const voiceConfig =
       SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG["english"];
-  
+
     utterance.lang = voiceConfig.lang;
-  
+
     const speak = () => {
       const voices = window.speechSynthesis.getVoices();
       const voice = voices.find((v) => voiceConfig.voicePattern.test(v.lang));
-  
+
       if (voice) {
         utterance.voice = voice;
       } else {
         console.log("No voice found for", voiceConfig.voicePattern);
       }
-  
+
       window.speechSynthesis.speak(utterance);
     };
-  
+
     if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.addEventListener("voiceschanged", speak);
     } else {
       speak();
     }
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (tooltipRef.current && !tooltipRef.current.contains(event.target) && 
-          (!triggerRef?.current || !triggerRef.current.contains(event.target))) {
+      if (
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target) &&
+        (!triggerRef?.current || !triggerRef.current.contains(event.target))
+      ) {
         onClose();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose, triggerRef]);
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
-    if (option === 'all') {
+    if (option === "all") {
       setTimeout(updatePosition, 50);
     }
   };
 
   if (!wordDetails || loading) {
     return (
-      <div
-        ref={tooltipRef}
-        className="tooltip show"
-        style={tooltipStyle}
-      >
+      <div ref={tooltipRef} className="tooltip show" style={tooltipStyle}>
         <div className="tooltip-header">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">{word}</h3>
@@ -130,27 +130,19 @@ export default function Tooltip({
     }
 
     switch (selectedOption) {
-      case 'meaning':
+      case "meaning":
         return <MeaningView definition={wordDetails.meaning} />;
-      case 'synonyms':
+      case "synonyms":
         return <SynonymsView synonyms={wordDetails.synonyms} />;
-      case 'antonyms':
+      case "antonyms":
         return <AntonymsView antonyms={wordDetails.antonyms} />;
-      case 'example':
+      case "example":
         return <ExampleView example={wordDetails.exampleSentence} />;
-      case 'translate':
+      case "translate":
+        return <TranslateView loading={loading} selectedText={word} />;
+      case "all":
         return (
-          <TranslateView
-            loading={loading}
-            selectedText={word}
-          />
-        );
-      case 'all':
-        return (
-          <AllView
-            wordDetails={{ ...wordDetails, word }}
-            loading={loading}
-          />
+          <AllView wordDetails={{ ...wordDetails, word }} loading={loading} />
         );
       default:
         return null;
@@ -158,11 +150,7 @@ export default function Tooltip({
   };
 
   return (
-    <div
-      ref={tooltipRef}
-      className="tooltip show"
-      style={tooltipStyle}
-    >
+    <div ref={tooltipRef} className="tooltip show" style={tooltipStyle}>
       <div className="tooltip-header">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">{word}</h3>
@@ -187,11 +175,14 @@ export default function Tooltip({
           <button
             onClick={handleSaveWord}
             className={`tooltip-icon-button ${
-              isSaved ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+              isSaved ? "text-red-500" : "text-gray-400 hover:text-red-500"
             }`}
-            aria-label={isSaved ? 'Saved' : 'Save word'}
+            aria-label={isSaved ? "Saved" : "Save word"}
           >
-            <Heart className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} />
+            <Heart
+              className="w-5 h-5"
+              fill={isSaved ? "currentColor" : "none"}
+            />
           </button>
           <button
             onClick={onClose}
@@ -201,9 +192,7 @@ export default function Tooltip({
           </button>
         </div>
       </div>
-      <div className="tooltip-content">
-        {renderContent()}
-      </div>
+      <div className="tooltip-content">{renderContent()}</div>
     </div>
   );
 }

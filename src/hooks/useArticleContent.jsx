@@ -30,20 +30,21 @@ export function useArticleContent(article, content, selectedDifficulty) {
     event.preventDefault();
     const cleanWord = word.replace(/[.,!?]$/, '');
     triggerRef.current = event.target;
-    const noundingClients = event.target.getBoundingClientRect();
-    console.log("===noundingClients===", noundingClients);
-    console.log('Word clicked:', cleanWord);
-    console.log("==x==y=", event.clientX, event.clientY);
+    const boundingRect = event.target.getBoundingClientRect();
+    
     setTooltipData({
       word: cleanWord,
-      position: { x: event.clientX, y: event.clientY },
+      position: {
+        x: boundingRect.left,
+        y: boundingRect.bottom
+      },
       content: {
         definition: `Sample definition for "${cleanWord}"`,
         example: `Here's a sample sentence using "${cleanWord}".`,
         translation: `Translation of "${cleanWord}" in target language`,
       },
     });
-    setTriggerElBoundingClientRect(noundingClients);
+    setTriggerElBoundingClientRect(boundingRect);
     setHighlightedWord(cleanWord);
   }, []);
 

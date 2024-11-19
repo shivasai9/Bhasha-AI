@@ -18,6 +18,10 @@ export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
     try {
       return await fn();
     } catch (error) {
+      if (error.name === 'AbortError') {
+        throw error;
+      }
+      
       lastError = error;
       console.warn(`Attempt ${attempt} failed:`, error);
 

@@ -45,11 +45,13 @@ class AIWrapper {
   async generateArticle(customTopic = null) {
     try {
       const start = Date.now();
-      const initialized = await this.initialize();
-      if (!initialized) throw new Error("Could not initialize AI");
 
-      const prompt = await generateArticleCreationPrompt(customTopic);
       const generateWithRetry = async () => {
+        this.destroy();
+        const initialized = await this.initialize();
+        if (!initialized) throw new Error("Could not initialize AI");
+
+        const prompt = await generateArticleCreationPrompt(customTopic);
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
@@ -70,8 +72,7 @@ class AIWrapper {
       };
 
       this.destroy();
-      new Promise((resolve) => setTimeout(resolve, 500));
-      // Just add a delay to finish up destroying the session
+      await new Promise((resolve) => setTimeout(resolve, 500));
       return response;
     } catch (error) {
       console.error("Article generation failed:", error);
@@ -83,45 +84,35 @@ class AIWrapper {
   async generateQuiz(title, content) {
     try {
       const start = Date.now();
-
-      // TODO: Add retry logic
       const prompt = CREATE_ARTICLE_QUESTIONS.replace("{{title}}", title);
       const customPrompt = prompt.replace("{{content}}", content);
+
       const generateWithRetry = async () => {
+        this.destroy();
         const initialized = await this.initialize();
         if (!initialized) throw new Error("Could not initialize AI");
 
-        console.log("Quiz execution started.....");
-        console.log(customPrompt);
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
         const result = await this.session.prompt(customPrompt);
-        console.log("Quiz execution finished........");
         return JSON.parse(result.trim());
       };
 
       const parsed = await withRetry(generateWithRetry, 5, 1000);
       const end = Date.now();
-      const diff = (end - start) / 1000;
-      console.log(`Quiz generated in ${diff} seconds`);
-      console.log(parsed);
+      console.log(`Quiz generated in ${(end - start) / 1000} seconds`);
 
-      // Destroy session after use
       this.destroy();
-
-      // Add default fields if missing
-      return parsed.map((field, index) => {
-        return {
-          question: field.question || "Untitled Question",
-          options: field.options || "No Options",
-          answer: field.answer || "No Answer",
-          explanation: field.explanation || "No Explanation",
-        };
-      });
+      return parsed.map((field) => ({
+        question: field.question || "Untitled Question",
+        options: field.options || "No Options",
+        answer: field.answer || "No Answer",
+        explanation: field.explanation || "No Explanation",
+      }));
     } catch (error) {
       console.error("Quiz generation failed:", error);
-      this.destroy(); // Ensure session is destroyed even on error
+      this.destroy();
       throw error;
     }
   }
@@ -129,46 +120,36 @@ class AIWrapper {
   async generateContent(prompt) {
     try {
       const start = Date.now();
-      const initialized = await this.initialize();
-      if (!initialized) throw new Error("Could not initialize AI");
-
-      // Count input tokens
-      const inputTokens = await this.session.countPromptTokens(prompt);
-      console.log(`Input tokens: ${inputTokens}`);
 
       const generateWithRetry = async () => {
+        this.destroy();
+        const initialized = await this.initialize();
+        if (!initialized) throw new Error("Could not initialize AI");
+
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
         const result = await this.session.prompt(prompt);
         const cleaned = result
-          .trim()
-          .replace(/[^\w\s.,\n]/g, "") // Keep words, spaces, dots, commas, newlines
-          .replace(/[ \t]+/g, " ") // Replace multiple spaces/tabs with single space
-          .replace(/,\s*\./g, ".") // Replace ", ." with just "."
-          .replace(/\s+\./g, ".") // Remove spaces before dots
-          .replace(/\.+/g, ".") // Replace multiple dots with single dot
-          .replace(/\n\s+/g, "\n") // Remove spaces after newlines
-          .replace(/\n{3,}/g, "\n\n") // Replace 3+ newlines with double newline
+        .trim()
+        .replace(/[^\w\s.,\n]/g, "") // Keep words, spaces, dots, commas, newlines
+        .replace(/[ \t]+/g, " ") // Replace multiple spaces/tabs with single space
+        .replace(/,\s*\./g, ".") // Replace ", ." with just "."
+        .replace(/\s+\./g, ".") // Remove spaces before dots
+        .replace(/\.+/g, ".") // Replace multiple dots with single dot
+        .replace(/\n\s+/g, "\n") // Remove spaces after newlines
+        .replace(/\n{3,}/g, "\n\n") // Replace 3+ newlines with double newline
           .trim();
 
         return cleaned;
       };
 
       const content = await withRetry(generateWithRetry, 5, 1000);
-      console.log("*****raw content*****", content);
-
-      // Log token usage stats
-      console.log(`Total tokens used so far: ${this.session.tokensSoFar}`);
-      console.log(`Tokens left in context: ${this.session.tokensLeft}`);
-      console.log(`Max tokens allowed: ${this.session.maxTokens}`);
-
       const end = Date.now();
       console.log(`Content generated in ${(end - start) / 1000} seconds`);
 
       this.destroy();
       await new Promise((resolve) => setTimeout(resolve, 500));
-
       return content;
     } catch (error) {
       console.error("Content generation failed:", error);
@@ -179,11 +160,18 @@ class AIWrapper {
 
   async generateContentStreaming(prompt) {
     try {
-      const initialized = await this.initialize();
-      if (!initialized) throw new Error("Could not initialize AI");
+      const generateWithRetry = async () => {
+        this.destroy();
+        const initialized = await this.initialize();
+        if (!initialized) throw new Error("Could not initialize AI");
 
-      const stream = this.session.promptStreaming(prompt);
-      return stream;
+        if (!this.session) {
+          throw new Error("Session is not initialized");
+        }
+        return this.session.promptStreaming(prompt);
+      };
+
+      return await withRetry(generateWithRetry, 5, 1000);
     } catch (error) {
       console.error("Content streaming failed:", error);
       this.destroy();
@@ -197,6 +185,9 @@ class AIWrapper {
 
       const generateWithRetry = async () => {
         // Destroy existing session if any
+        // we are destroying it because if in first try fails most of the cases we are getting
+        // errors in next tries if we use the same session
+        // This just an observation, not sure about the exact reason
         this.destroy();
 
         // Initialize new session
@@ -237,41 +228,40 @@ class AIWrapper {
   async summarizeContent(text) {
     try {
       const start = Date.now();
-      
+
       const generateWithRetry = async () => {
         const canSummarize = await window.ai.summarizer.capabilities();
-        if (!canSummarize || canSummarize.available === 'no') {
-          throw new Error('Summarizer not available');
+        if (!canSummarize || canSummarize.available === "no") {
+          throw new Error("Summarizer not available");
         }
 
         const summarizer = await window.ai.summarizer.create();
 
-        if (canSummarize.available !== 'readily') {
-          summarizer.addEventListener('downloadprogress', (e) => {
+        if (canSummarize.available !== "readily") {
+          summarizer.addEventListener("downloadprogress", (e) => {
             console.log(`Download progress: ${e.loaded}/${e.total}`);
           });
           await summarizer.ready;
         }
 
         const result = await summarizer.summarize(text);
-        
+
         summarizer.destroy();
-        
+
         return result;
       };
 
       const summary = await withRetry(generateWithRetry, 5, 1000);
       const end = Date.now();
-      console.log(`Summary generated in ${(end - start)/1000} seconds`);
-      
+      console.log(`Summary generated in ${(end - start) / 1000} seconds`);
+
       return summary;
     } catch (error) {
-      console.error('Summarization failed:', error);
+      console.error("Summarization failed:", error);
       throw error;
     }
   }
 
-  // Only destroy when explicitly called
   destroy() {
     if (this.session) {
       this.session.destroy();

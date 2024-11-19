@@ -3,6 +3,9 @@ import { saveWord, getWordInfoByWord } from "./dbUtils";
 import { getLanguage } from "./languageStorage";
 import { translateContent } from "./translation.service";
 
+let requestQueue = [];
+let isProcessing = false;
+
 async function translateWordInfo(wordInfo, targetLanguage) {
   try {
     const translatedInfo = {
@@ -86,49 +89,82 @@ async function translateAndSaveWordInfo(
   };
 }
 
-export async function generateAndSaveWordInfo(word, articleID) {
-  try {
-    const currentLanguage = getLanguage();
-    const isEnglish = currentLanguage.toLowerCase() === "english";
-
-    const translatedWord = await translateContent(
-      word,
-      currentLanguage,
-      "english"
-    );
-
-    const existingEnglishWordInfo = await getWordInfoByWord(
-      translatedWord.toLowerCase()
-    );
-
-    if (existingEnglishWordInfo) {
-      return await handleExistingWordInfo(
-        existingEnglishWordInfo,
-        word,
-        currentLanguage,
-        isEnglish
-      );
-    }
-
-    const wordInfo = await aiWrapper.generateWordInfo(translatedWord);
-    let finalWordInfo = prepareWordInfo(wordInfo, translatedWord, articleID);
-    let savedWordId = await saveWord(finalWordInfo);
-
-    if (!isEnglish) {
-      finalWordInfo = await translateAndSaveWordInfo(
-        finalWordInfo,
-        word,
-        currentLanguage
-      );
-      savedWordId = await saveWord(finalWordInfo);
-    }
-
-    return {
-      ...finalWordInfo,
-      wordId: savedWordId,
-    };
-  } catch (error) {
-    console.error("Failed to generate and save word info:", error);
-    throw error;
+function updateQueue(newRequest) {
+  // In queue, only keep the first and last request
+  // discard all the requests in between
+  if (requestQueue.length === 0 || requestQueue.length === 1) {
+    requestQueue.push(newRequest);
+  } else {
+    requestQueue.splice(1, requestQueue.length - 1, newRequest);
   }
+}
+
+async function processWordInfoQueue() {
+  if (isProcessing || requestQueue.length === 0) {
+    return;
+  }
+
+  isProcessing = true;
+  try {
+    const request = requestQueue[0];
+    const { word, articleID, resolve, reject } = request;
+
+    try {
+      const currentLanguage = getLanguage();
+      const isEnglish = currentLanguage.toLowerCase() === "english";
+
+      const translatedWord = await translateContent(word, currentLanguage, "english");
+      const existingEnglishWordInfo = await getWordInfoByWord(translatedWord.toLowerCase());
+
+      let result;
+      if (existingEnglishWordInfo) {
+        result = await handleExistingWordInfo(
+          existingEnglishWordInfo,
+          word,
+          currentLanguage,
+          isEnglish
+        );
+      } else {
+        const wordInfo = await aiWrapper.generateWordInfo(translatedWord);
+        let finalWordInfo = prepareWordInfo(wordInfo, translatedWord, articleID);
+        let savedWordId = await saveWord(finalWordInfo);
+
+        if (!isEnglish) {
+          finalWordInfo = await translateAndSaveWordInfo(
+            finalWordInfo,
+            word,
+            currentLanguage
+          );
+          savedWordId = await saveWord(finalWordInfo);
+        }
+
+        result = {
+          ...finalWordInfo,
+          wordId: savedWordId,
+        };
+      }
+
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  } finally {
+    requestQueue.shift();
+    isProcessing = false;
+
+    if (requestQueue.length > 0) {
+      setTimeout(processWordInfoQueue, 0);
+    }
+  }
+}
+
+export function generateAndSaveWordInfo(word, articleID) {
+  return new Promise((resolve, reject) => {
+    const newRequest = { word, articleID, resolve, reject };
+    updateQueue(newRequest);
+    
+    if (!isProcessing) {
+      processWordInfoQueue();
+    }
+  });
 }

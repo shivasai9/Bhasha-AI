@@ -53,41 +53,49 @@ export const SPEECH_VOICE_CONFIG = {
 
 export const TOPICS = [
   {
+    id: "daily-life",
     name: "Daily Life & Culture",
     description: "Everyday situations, customs, and cultural practices",
     icon: "🌟"
   },
   {
+    id: "entertainment",
     name: "Entertainment",
     description: "Movies, music, shows, and popular media",
     icon: "🎬"
   },
   {
+    id: "food",
     name: "Food & Cooking",
     description: "Recipes, dining, and culinary traditions",
     icon: "🍳"
   },
   {
+    id: "travel",
     name: "Travel & Adventure",
     description: "Destinations, tips, and travel experiences",
     icon: "✈️"
   },
   {
+    id: "arts",
     name: "Arts & Literature",
     description: "Books, art, music, and creative expression",
     icon: "🎨"
   },
   {
+    id: "technology",
     name: "Technology",
     description: "Digital trends, apps, and innovation",
     icon: "💻"
   },
   {
+    id: "nature",
     name: "Nature & Environment",
     description: "Wildlife, ecology, and natural world",
     icon: "🌿"
   },
   {
+    id: "sports",
     name: "Sports & Fitness",
     description: "Athletics, exercise, and wellness activities",
     icon: "⚽"

@@ -3,10 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { Globe2, BookOpen, Sparkles, BookOpenCheck, Layout, CheckCircle2, ChevronLeft, Plus, ArrowRight, X } from "lucide-react";
 import useLanguageSelector from "../hooks/uselanguageSelector";
 import { LANGUAGES, TOPICS } from "../lib/constants";
+import { getInterfaceLanguage, getLearningLanguage, getTopics } from "../lib/languageStorage";
 
 export default function LanguageSelector() {
   const navigate = useNavigate();
-  const { handleWebsiteLanguage, handleTargetLanguage, handleTopicsSelect, step, handleBack, handleStepClick, direction } = useLanguageSelector();
+  const { 
+    handleWebsiteLanguage, 
+    handleTargetLanguage, 
+    handleTopicsSelect, 
+    step, 
+    handleBack, 
+    handleStepClick, 
+    direction,
+    selectedWebsiteLang,
+    selectedLearningLang 
+  } = useLanguageSelector();
+  
   const [selectedTopics, setSelectedTopics] = useState([]);
   const progressRef = useRef(null);
   const containerRef = useRef(null);
@@ -23,6 +35,23 @@ export default function LanguageSelector() {
     }
   }, [step]);
 
+  useEffect(() => {
+    const savedTopics = getTopics();
+    const standardTopicIds = TOPICS.map(t => t.id);
+    
+    const customTopicIds = savedTopics.filter(id => !standardTopicIds.includes(id));
+    
+    const customTopicObjects = customTopicIds.map(id => ({
+      id,
+      name: id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+      description: 'Custom topic',
+      isCustom: true
+    }));
+
+    setCustomTopics(customTopicObjects);
+    setSelectedTopics(savedTopics);
+  }, []);
+
   const getAnimation = () => {
     if (step === 1 && direction === 'forward') {
       return 'animate-fadeUp';
@@ -30,11 +59,11 @@ export default function LanguageSelector() {
     return direction === 'back' ? 'animate-slideInLeft' : 'animate-slideInRight';
   };
 
-  const toggleTopic = (topicName) => {
+  const toggleTopic = (topicId) => {
     setSelectedTopics(prev => 
-      prev.includes(topicName)
-        ? prev.filter(t => t !== topicName)
-        : [...prev, topicName]
+      prev.includes(topicId)
+        ? prev.filter(t => t !== topicId)
+        : [...prev, topicId]
     );
   };
 
@@ -42,12 +71,13 @@ export default function LanguageSelector() {
     e.preventDefault();
     if (customTopic.trim()) {
       const newTopic = {
+        id: customTopic.trim().toLowerCase().replace(/\s+/g, '-'),
         name: customTopic.trim(),
         description: 'Custom topic',
         isCustom: true
       };
       setCustomTopics(prev => [...prev, newTopic]);
-      toggleTopic(newTopic.name);
+      toggleTopic(newTopic.id);
       setCustomTopic('');
       setShowCustomInput(false);
     }
@@ -110,9 +140,9 @@ export default function LanguageSelector() {
       <div className="flex flex-wrap gap-2 mb-4">
         {customTopics.map((topic) => (
           <div
-            key={topic.name}
+            key={topic.id}
             className={`group inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all ${
-              selectedTopics.includes(topic.name)
+              selectedTopics.includes(topic.id)
                 ? 'bg-indigo-100 text-indigo-700 border border-indigo-300'
                 : 'bg-gray-100 text-gray-600 border border-gray-200'
             }`}
@@ -121,8 +151,8 @@ export default function LanguageSelector() {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                toggleTopic(topic.name);
-                setCustomTopics(prev => prev.filter(t => t.name !== topic.name));
+                toggleTopic(topic.id);
+                setCustomTopics(prev => prev.filter(t => t.id !== topic.id));
               }}
               className="p-0.5 hover:bg-gray-200 rounded-full"
             >
@@ -156,13 +186,22 @@ export default function LanguageSelector() {
                 <button
                   key={lang.code}
                   onClick={() => handleWebsiteLanguage(lang.name)}
-                  className="group relative overflow-hidden p-6 bg-white rounded-xl border-2 border-indigo-100 hover:border-indigo-400 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
+                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 ${
+                    selectedWebsiteLang.toLowerCase() === lang.name.toLowerCase()
+                      ? 'border-indigo-600 bg-indigo-50'
+                      : 'border-indigo-100 hover:border-indigo-400'
+                  } transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative text-center">
                     <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">{lang.flag}</span>
                     <span className="text-lg font-medium text-gray-700">{lang.name}</span>
                   </div>
+                  {selectedWebsiteLang.toLowerCase() === lang.name.toLowerCase() && (
+                    <div className="absolute top-2 right-2">
+                      <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -186,13 +225,22 @@ export default function LanguageSelector() {
                 <button
                   key={lang.code}
                   onClick={() => handleTargetLanguage(lang.name)}
-                  className="group relative overflow-hidden p-6 bg-white rounded-xl border-2 border-indigo-100 hover:border-indigo-400 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
+                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 ${
+                    selectedLearningLang.toLowerCase() === lang.name.toLowerCase()
+                      ? 'border-indigo-600 bg-indigo-50'
+                      : 'border-indigo-100 hover:border-indigo-400'
+                  } transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative text-center">
                     <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">{lang.flag}</span>
                     <span className="text-lg font-medium text-gray-700">{lang.name}</span>
                   </div>
+                  {selectedLearningLang.toLowerCase() === lang.name.toLowerCase() && (
+                    <div className="absolute top-2 right-2">
+                      <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -257,10 +305,10 @@ export default function LanguageSelector() {
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {TOPICS.map((topic) => (
                 <button
-                  key={topic.name}
-                  onClick={() => toggleTopic(topic.name)}
+                  key={topic.id}
+                  onClick={() => toggleTopic(topic.id)}
                   className={`p-3 rounded-lg border text-left hover:shadow-sm transition-all h-full ${
-                    selectedTopics.includes(topic.name)
+                    selectedTopics.includes(topic.id)
                       ? 'bg-indigo-50 border-indigo-400'
                       : 'bg-white border-gray-200 hover:border-indigo-300'
                   }`}
@@ -276,7 +324,7 @@ export default function LanguageSelector() {
                       </div>
                     </div>
                     <CheckCircle2 className={`w-4 h-4 flex-shrink-0 transition-all mt-1 ${
-                      selectedTopics.includes(topic.name)
+                      selectedTopics.includes(topic.id)
                         ? 'text-indigo-600'
                         : 'text-gray-300'
                     }`} />

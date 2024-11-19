@@ -1,12 +1,20 @@
-import { useState } from 'react';
-import { saveInterfaceLanguage, saveLearningLanguage, saveTopics } from "../lib/languageStorage";
+import { useState, useEffect } from 'react';
+import { saveInterfaceLanguage, saveLearningLanguage, saveTopics, getInterfaceLanguage, getLearningLanguage } from "../lib/languageStorage";
 
 const useLanguageSelector = (onLanguageChange = null) => {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState('forward');
+  const [selectedWebsiteLang, setSelectedWebsiteLang] = useState('');
+  const [selectedLearningLang, setSelectedLearningLang] = useState('');
+
+  useEffect(() => {
+    setSelectedWebsiteLang(getInterfaceLanguage());
+    setSelectedLearningLang(getLearningLanguage());
+  }, []);
 
   const handleWebsiteLanguage = (langCode) => {
     setDirection('forward');
+    setSelectedWebsiteLang(langCode.toLowerCase());
     saveInterfaceLanguage(langCode);
     if (onLanguageChange) {
       onLanguageChange(langCode.toLowerCase());
@@ -16,6 +24,7 @@ const useLanguageSelector = (onLanguageChange = null) => {
 
   const handleTargetLanguage = (langCode) => {
     setDirection('forward');
+    setSelectedLearningLang(langCode.toLowerCase());
     saveLearningLanguage(langCode);
     setStep(3);
   };
@@ -42,6 +51,8 @@ const useLanguageSelector = (onLanguageChange = null) => {
     handleBack,
     handleStepClick,
     direction,
+    selectedWebsiteLang,
+    selectedLearningLang,
   };
 };
 

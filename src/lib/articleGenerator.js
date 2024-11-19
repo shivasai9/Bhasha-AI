@@ -9,12 +9,10 @@ import { getLearningLanguage } from "./languageStorage";
 import { fetchImagesData, getUniqueId } from "./utils";
 import { translateArticle } from "./translation.service";
 
-// Helper function to fetch existing articles by language
 async function fetchExistingArticles(language) {
   return await getArticlesByLanguage(language);
 }
 
-// Helper function to initialize the AI wrapper
 async function initializeAI() {
   return await aiWrapper.initialize();
 }
@@ -49,13 +47,11 @@ async function generateAndSaveArticle(customTopic = null, language) {
   }
 }
 
-// Helper function to generate a single article
 export async function generateArticle(customTopic = null) {
   const language = getLearningLanguage();
   return await generateAndSaveArticle(customTopic, language);
 }
 
-// Helper function to generate multiple articles
 export async function generateMultipleArticles(count, onProgress) {
   const articles = [];
   for (let i = 0; i < count; i++) {

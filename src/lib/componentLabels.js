@@ -239,3 +239,23 @@ export const SUMMARY_WRITER_LABELS = {
     }
   }
 };
+
+export const QUIZ_SECTION_LABELS = {
+  completion: {
+    title: "Quiz Complete!",
+    subtitle: "Here's how well you understood the article",
+    scoreText: "You got {correct} out of {total} questions right",
+    tryAgainButton: "Try Again"
+  },
+  progress: {
+    questionProgress: "Question {current} of {total}",
+    percentComplete: "{percent}% Complete"
+  },
+  question: {
+    correctAnswer: "Correct Answer: {answer}"
+  },
+  buttons: {
+    nextQuestion: "Next Question",
+    showResults: "Show Results"
+  }
+};

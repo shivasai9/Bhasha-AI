@@ -1,9 +1,17 @@
 import React from 'react';
 import { useQuiz } from '../../hooks/useQuiz';
+import { useLabels } from '../../hooks/useLabels';
 import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from 'lucide-react';
 import QuizSkeleton from './QuizSkeleton';
 
-export default function QuizSection({ article,selectedDifficulty }) {
+const replaceParams = (text, params) => {
+  return Object.entries(params).reduce((str, [key, value]) => {
+    return str.replace(`{${key}}`, value);
+  }, text);
+};
+
+export default function QuizSection({ article, selectedDifficulty }) {
+  const labels = useLabels('QUIZ_SECTION_LABELS');
   const {
     questions,
     currentQuestion,
@@ -27,15 +35,18 @@ export default function QuizSection({ article,selectedDifficulty }) {
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-gradient-to-r from-indigo-500 to-purple-500 px-8 py-12 text-center text-white">
           <Award className="w-16 h-16 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-2">Quiz Complete!</h2>
-          <p className="text-lg opacity-90">Here's how well you understood the article</p>
+          <h2 className="text-3xl font-bold mb-2">{labels.completion.title}</h2>
+          <p className="text-lg opacity-90">{labels.completion.subtitle}</p>
         </div>
         
         <div className="p-8 text-center">
           <div className="mb-8">
             <p className="text-5xl font-bold text-indigo-600 mb-2">{score}%</p>
             <p className="text-gray-600">
-              You got {Math.round((score / 100) * totalQuestions)} out of {totalQuestions} questions right
+              {replaceParams(labels.completion.scoreText, {
+                correct: Math.round((score / 100) * totalQuestions),
+                total: totalQuestions
+              })}
             </p>
           </div>
 
@@ -44,7 +55,7 @@ export default function QuizSection({ article,selectedDifficulty }) {
             className="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
           >
             <RotateCcw className="w-5 h-5" />
-            Try Again
+            {labels.completion.tryAgainButton}
           </button>
         </div>
       </div>
@@ -65,10 +76,15 @@ export default function QuizSection({ article,selectedDifficulty }) {
         {/* Question Header */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-sm font-medium text-gray-500">
-            Question {currentQuestionIndex + 1} of {totalQuestions}
+            {replaceParams(labels.progress.questionProgress, {
+              current: currentQuestionIndex + 1,
+              total: totalQuestions
+            })}
           </h3>
           <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-            {Math.round(((answeredQuestions) / totalQuestions) * 100)}% Complete
+            {replaceParams(labels.progress.percentComplete, {
+              percent: Math.round(((answeredQuestions) / totalQuestions) * 100)
+            })}
           </span>
         </div>
 
@@ -130,7 +146,9 @@ export default function QuizSection({ article,selectedDifficulty }) {
                 ? 'text-green-800'
                 : 'text-red-800'
             }`}>
-              <p>{"Correct Answer: "+currentQuestion.answer}</p>
+              <p>{replaceParams(labels.question.correctAnswer, {
+                answer: currentQuestion.answer
+              })}</p>
               <p>{currentQuestion.explanation}</p>
             </p>
           </div>
@@ -144,12 +162,12 @@ export default function QuizSection({ article,selectedDifficulty }) {
           >
             {currentQuestionIndex < questions.length - 1 ? (
               <>
-                Next Question
+                {labels.buttons.nextQuestion}
                 <ArrowRight className="w-5 h-5" />
               </>
             ) : (
               <>
-                Show Results
+                {labels.buttons.showResults}
                 <Award className="w-5 h-5" />
               </>
             )}

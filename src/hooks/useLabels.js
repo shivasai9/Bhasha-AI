@@ -5,6 +5,24 @@ import * as componentLabels from "../lib/componentLabels";
 
 const exclusionKeys = ["id", "className"];
 
+// New function to protect placeholders during translation
+const protectAndTranslate = async (text, fromLang, toLang) => {
+  // Use more unique markers that won't be affected by translation
+  const placeholders = [];
+  const textToTranslate = text.replace(/\{([^}]+)\}/g, (match) => {
+    placeholders.push(match);
+    // Using <<n>> format instead of ###n### to better survive translation
+    return `<<${placeholders.length - 1}>>`;
+  });
+
+  const translatedText = await translateText(textToTranslate, fromLang, toLang);
+
+  // Restore placeholders in the translated text
+  return placeholders.reduce((text, placeholder, index) => {
+    return text.replace(`<<${index}>>`, placeholder);
+  }, translatedText);
+};
+
 export function useLabels(componentName) {
   const [labels, setLabels] = useState(componentName ? componentLabels[componentName] : componentLabels);
   const interfaceLanguage = getInterfaceLanguage();
@@ -29,7 +47,7 @@ export function useLabels(componentName) {
                 return translatedItem;
               }
               return typeof item === "string"
-                ? await translateText(item, "english", interfaceLanguage)
+                ? await protectAndTranslate(item, "english", interfaceLanguage)
                 : item;
             })
           );
@@ -45,7 +63,7 @@ export function useLabels(componentName) {
         }
 
         return typeof value === "string"
-          ? await translateText(value, "english", interfaceLanguage)
+          ? await protectAndTranslate(value, "english", interfaceLanguage)
           : value;
       };
 

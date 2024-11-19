@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save } from 'lucide-react';
+import { Save, ArrowLeft } from 'lucide-react';
 import Header from './common/Header';
 import LanguageDropdown from './common/LanguageDropdown';
 import { LANGUAGES } from '../lib/constants';
@@ -30,11 +30,27 @@ export default function Settings() {
     navigate('/articles');
   };
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/articles');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
+          <button
+            onClick={handleBack}
+            className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Back
+          </button>
+          
           <h1 className="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
           
           <div className="bg-white rounded-xl shadow-md p-6 space-y-6">

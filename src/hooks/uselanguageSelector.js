@@ -1,19 +1,33 @@
-import { useState, useEffect } from 'react';
-import { saveInterfaceLanguage, saveLearningLanguage, saveTopics, getInterfaceLanguage, getLearningLanguage } from "../lib/languageStorage";
+import { useState, useEffect } from "react";
+import {
+  saveInterfaceLanguage,
+  saveLearningLanguage,
+  saveTopics,
+  getInterfaceLanguage,
+  getLearningLanguage,
+} from "../lib/languageStorage";
 
 const useLanguageSelector = (onLanguageChange = null) => {
   const [step, setStep] = useState(1);
-  const [direction, setDirection] = useState('forward');
-  const [selectedWebsiteLang, setSelectedWebsiteLang] = useState('');
-  const [selectedLearningLang, setSelectedLearningLang] = useState('');
+  const [direction, setDirection] = useState("forward");
+  const [selectedWebsiteLang, setSelectedWebsiteLang] = useState("");
+  const [selectedLearningLang, setSelectedLearningLang] = useState("");
 
   useEffect(() => {
-    setSelectedWebsiteLang(getInterfaceLanguage());
-    setSelectedLearningLang(getLearningLanguage());
+    const interfaceLanguage = getInterfaceLanguage() || "";
+    const learningLanguage = getLearningLanguage() || "";
+    if (!interfaceLanguage) {
+      saveInterfaceLanguage("");
+    }
+    if (!learningLanguage) {
+      saveLearningLanguage("");
+    }
+    setSelectedLearningLang(learningLanguage);
+    setSelectedWebsiteLang(interfaceLanguage);
   }, []);
 
   const handleWebsiteLanguage = (langCode) => {
-    setDirection('forward');
+    setDirection("forward");
     setSelectedWebsiteLang(langCode.toLowerCase());
     saveInterfaceLanguage(langCode);
     if (onLanguageChange) {
@@ -23,7 +37,7 @@ const useLanguageSelector = (onLanguageChange = null) => {
   };
 
   const handleTargetLanguage = (langCode) => {
-    setDirection('forward');
+    setDirection("forward");
     setSelectedLearningLang(langCode.toLowerCase());
     saveLearningLanguage(langCode);
     setStep(3);
@@ -31,21 +45,21 @@ const useLanguageSelector = (onLanguageChange = null) => {
 
   const handleBack = () => {
     if (step > 1) {
-      setDirection('back');
+      setDirection("back");
       setStep(step - 1);
     }
   };
 
   const handleStepClick = (targetStep) => {
     if (targetStep < step) {
-      setDirection('back');
+      setDirection("back");
       setStep(targetStep);
     }
   };
 
-  return { 
-    handleWebsiteLanguage, 
-    handleTargetLanguage, 
+  return {
+    handleWebsiteLanguage,
+    handleTargetLanguage,
     handleTopicsSelect: saveTopics,
     step,
     handleBack,

@@ -8,7 +8,7 @@ export const saveInterfaceLanguage = (language) => {
 };
 
 export const getInterfaceLanguage = () => {
-  return localStorage.getItem(LANGUAGE_KEY) || 'english';
+  return localStorage.getItem(LANGUAGE_KEY);
 };
 
 export const saveLearningLanguage = (language) => {
@@ -17,7 +17,7 @@ export const saveLearningLanguage = (language) => {
 };
 
 export const getLearningLanguage = () => {
-  return localStorage.getItem(TARGET_LANGUAGE_KEY) || 'spanish';
+  return localStorage.getItem(TARGET_LANGUAGE_KEY);
 };
 
 export const saveTopics = (topics) => {

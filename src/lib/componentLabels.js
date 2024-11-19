@@ -46,3 +46,22 @@ export const ARTICLE_LIST_LABELS = {
   generatingArticles: "Generating article(s)... ({count} remaining)",
   goBack: "Go back"
 };
+
+export const SETTINGS_LABELS = {
+  pageTitle: "Settings",
+  backButton: "Back",
+  saveButton: "Save Changes",
+  interfaceSection: {
+    title: "Choose your language",
+    description: "This will be used throughout the website for navigation and instructions"
+  },
+  learningSection: {
+    title: "Learning Language",
+    description: "Select the language you want to learn. We'll create personalized content to help you master this language."
+  }
+};
+
+export const LANGUAGE_DROPDOWN_LABELS = {
+  interfaceLanguage: "Interface Language",
+  learningLanguage: "Learning Language"
+};

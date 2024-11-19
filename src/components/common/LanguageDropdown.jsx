@@ -1,8 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { LANGUAGES } from '../../lib/constants';
+import { useLabels } from '../../hooks/useLabels';
 
 export default function LanguageDropdown({ value, onChange, isOpen, setIsOpen, label }) {
+  const labels = useLabels('LANGUAGE_DROPDOWN_LABELS');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function LanguageDropdown({ value, onChange, isOpen, setIsOpen, l
   return (
     <div className="space-y-2" ref={dropdownRef}>
       <label className="block text-sm font-medium text-gray-700">
-        {label}
+        {labels[label]}
       </label>
       <div className="relative">
         <button

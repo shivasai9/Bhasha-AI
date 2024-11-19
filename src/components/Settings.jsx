@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Layout, BookOpenCheck } from 'lucide-react';
 import Header from './common/Header';
 import LanguageDropdown from './common/LanguageDropdown';
 import { LANGUAGES } from '../lib/constants';
 import { saveInterfaceLanguage, saveLearningLanguage, getInterfaceLanguage, getLearningLanguage } from '../lib/languageStorage';
+import { useLabels } from '../hooks/useLabels';
 
 export default function Settings() {
   const findMatchingLanguageName = (storedName) => {
@@ -23,6 +24,7 @@ export default function Settings() {
   );
   const [isInterfaceOpen, setIsInterfaceOpen] = useState(false);
   const [isLearningOpen, setIsLearningOpen] = useState(false);
+  const labels = useLabels('SETTINGS_LABELS');
 
   const handleSave = () => {
     saveInterfaceLanguage(interfaceLanguage);
@@ -48,26 +50,44 @@ export default function Settings() {
             className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
           >
             <ArrowLeft className="w-5 h-5 mr-1" />
-            Back
+            {labels.backButton}
           </button>
           
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-8">{labels.pageTitle}</h1>
           
           <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center space-x-4 text-gray-600">
+                <Layout className="w-6 h-6 text-indigo-600" />
+                <p className="text-xl font-medium">{labels.interfaceSection?.title}</p>
+              </div>
+              <p className="text-gray-500 ml-10 text-sm">
+                {labels.interfaceSection?.description}
+              </p>
+            </div>
             <LanguageDropdown
               value={interfaceLanguage}
               onChange={setInterfaceLanguage}
               isOpen={isInterfaceOpen}
               setIsOpen={setIsInterfaceOpen}
-              label="Interface Language"
+              label="interfaceLanguage"
             />
 
+            <div className="space-y-2 mb-4 mt-8">
+              <div className="flex items-center space-x-4 text-gray-600">
+                <BookOpenCheck className="w-6 h-6 text-indigo-600" />
+                <p className="text-xl font-medium">{labels.learningSection?.title}</p>
+              </div>
+              <p className="text-gray-500 ml-10 text-sm">
+                {labels.learningSection?.description}
+              </p>
+            </div>
             <LanguageDropdown
               value={learningLanguage}
               onChange={setLearningLanguage}
               isOpen={isLearningOpen}
               setIsOpen={setIsLearningOpen}
-              label="Learning Language"
+              label="learningLanguage"
             />
 
             <button
@@ -75,7 +95,7 @@ export default function Settings() {
               className="w-full flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
               <Save className="w-5 h-5 mr-2" />
-              Save Changes
+              {labels.saveButton}
             </button>
           </div>
         </div>

@@ -99,3 +99,23 @@ export const translateQuestions = async (
     throw error;
   }
 };
+
+export const translateText = async (text, sourceLanguage, targetLanguage) => {
+  try {
+    if (sourceLanguage.toLowerCase() === targetLanguage.toLowerCase()) {
+      return text;
+    }
+
+    const langCode = LANGUAGE_CODES[targetLanguage.toLowerCase()];
+    const sourceLangCode = LANGUAGE_CODES[sourceLanguage.toLowerCase()];
+    const translator = await translation.createTranslator({
+      sourceLanguage: sourceLangCode,
+      targetLanguage: langCode,
+    });
+
+    return await translator.translate(text);
+  } catch (error) {
+    console.error("Translation failed:", error);
+    throw error;
+  }
+};

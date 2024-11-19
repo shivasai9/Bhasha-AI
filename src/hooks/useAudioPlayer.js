@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { SPEECH_VOICE_CONFIG } from '../lib/constants';
-import { getLanguage } from '../lib/languageStorage';
+import { getLearningLanguage } from '../lib/languageStorage';
 
 export function useAudioPlayer(text) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,7 +42,7 @@ export function useAudioPlayer(text) {
 
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
-        const currentLanguage = getLanguage();
+        const currentLanguage = getLearningLanguage();
         const langCode = SPEECH_VOICE_CONFIG[currentLanguage]?.lang || 'en-US';
         const filteredVoices = voices.filter(voice => voice.lang.startsWith(langCode.split('-')[0]));
         setAvailableVoices(filteredVoices);
@@ -96,7 +96,7 @@ export function useAudioPlayer(text) {
       utterance.rate = speed;
       utterance.volume = volume;
 
-      const currentLanguage = getLanguage();
+      const currentLanguage = getLearningLanguage();
       const voiceConfig = SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG['english'];
       utterance.lang = voiceConfig.lang;
 

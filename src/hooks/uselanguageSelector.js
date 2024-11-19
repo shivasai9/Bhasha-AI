@@ -1,15 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { saveLanguage, saveTargetLanguage, saveTopics } from "../lib/languageStorage";
+import { saveInterfaceLanguage, saveLearningLanguage, saveTopics } from "../lib/languageStorage";
 
 const useLanguageSelector = (onLanguageChange = null) => {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState('forward');
 
   const handleWebsiteLanguage = (langCode) => {
     setDirection('forward');
-    saveLanguage(langCode);
+    saveInterfaceLanguage(langCode);
     if (onLanguageChange) {
       onLanguageChange(langCode.toLowerCase());
     }
@@ -18,7 +16,7 @@ const useLanguageSelector = (onLanguageChange = null) => {
 
   const handleTargetLanguage = (langCode) => {
     setDirection('forward');
-    saveTargetLanguage(langCode);
+    saveLearningLanguage(langCode);
     setStep(3);
   };
 

@@ -1,6 +1,6 @@
 import { aiWrapper } from "./ai";
 import { saveWord, getWordInfoByWord } from "./dbUtils";
-import { getLanguage } from "./languageStorage";
+import { getLearningLanguage } from "./languageStorage";
 import { translateContent } from "./translation.service";
 
 let requestQueue = [];
@@ -110,7 +110,7 @@ async function processWordInfoQueue() {
     const { word, articleID, resolve, reject } = request;
 
     try {
-      const currentLanguage = getLanguage();
+      const currentLanguage = getLearningLanguage();
       const isEnglish = currentLanguage.toLowerCase() === "english";
 
       const translatedWord = await translateContent(word, currentLanguage, "english");

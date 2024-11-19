@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Languages, ArrowRight, ChevronDown } from "lucide-react";
 import { LANGUAGES } from "../../../lib/constants";
 import { translateContent } from "../../../lib/translation.service";
-import { getLanguage } from "../../../lib/languageStorage";
+import { getLearningLanguage } from "../../../lib/languageStorage";
 
 export default function TranslateView({ loading, selectedText }) {
-  const currentLanguage = getLanguage();
+  const currentLanguage = getLearningLanguage();
   const availableLanguages = LANGUAGES.filter(
     (lang) => lang.name.toLowerCase() !== currentLanguage
   );

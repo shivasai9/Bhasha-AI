@@ -7,7 +7,7 @@ import {
 } from "../lib/dbUtils";
 import { useParams, useNavigate } from "react-router-dom";
 import { generateArticleContent } from "../lib/articleGenerator";
-import { getLanguage } from "../lib/languageStorage";
+import { getLearningLanguage } from "../lib/languageStorage";
 import { translateContent } from "../lib/translation.service";
 
 export function useArticleView() {
@@ -19,7 +19,7 @@ export function useArticleView() {
   const [articleDataLoading, setArticleDataLoading] = useState(true);
   const { id: articleId, difficulty = "easy", title } = useParams();
   const [activeTab, setActiveTab] = useState("read");
-  const [language, setLanguage] = useState(getLanguage());
+  const [language, setLanguage] = useState(getLearningLanguage());
   const navigate = useNavigate();
   const [selectedDifficulty, setSelectedDifficulty] = useState(difficulty);
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getLanguage } from "../lib/languageStorage";
+import { getLearningLanguage } from "../lib/languageStorage";
 
 export function useSummaryWriter() {
   const [summary, setSummary] = useState("");
@@ -9,7 +9,7 @@ export function useSummaryWriter() {
   const [isEnglish, setIsEnglish] = useState(true);
 
   useEffect(() => {
-    const currentLanguage = getLanguage();
+    const currentLanguage = getLearningLanguage();
     setIsEnglish(currentLanguage === "english");
   }, []);
   const handleSummaryChange = (e) => {

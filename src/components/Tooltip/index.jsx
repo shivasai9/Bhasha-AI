@@ -11,7 +11,7 @@ import TranslateView from "./views/TranslateView";
 import AllView from "./views/AllView";
 import "./Tooltip.css";
 import { SPEECH_VOICE_CONFIG } from "../../lib/constants";
-import { getLanguage } from "../../lib/languageStorage";
+import { getLearningLanguage } from "../../lib/languageStorage";
 
 export default function Tooltip({
   word = "",
@@ -33,7 +33,7 @@ export default function Tooltip({
 
   const handleSpeak = () => {
     const utterance = new SpeechSynthesisUtterance(word);
-    const currentLanguage = getLanguage();
+    const currentLanguage = getLearningLanguage();
     const voiceConfig =
       SPEECH_VOICE_CONFIG[currentLanguage] || SPEECH_VOICE_CONFIG["english"];
 

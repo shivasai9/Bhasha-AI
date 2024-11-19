@@ -1,23 +1,22 @@
 const LANGUAGE_KEY = 'website_language';
+const TARGET_LANGUAGE_KEY = 'learning_language';
+const TOPICS_KEY = 'selected_topics';
 
-export const saveLanguage = (language) => {
+export const saveInterfaceLanguage = (language) => {
   const lowerCasedLanguage = language.toLowerCase();
   localStorage.setItem(LANGUAGE_KEY, lowerCasedLanguage);
 };
 
-export const getLanguage = () => {
+export const getInterfaceLanguage = () => {
   return localStorage.getItem(LANGUAGE_KEY) || 'english';
 };
 
-const TARGET_LANGUAGE_KEY = 'learning_language';
-const TOPICS_KEY = 'selected_topics';
-
-export const saveTargetLanguage = (language) => {
+export const saveLearningLanguage = (language) => {
   const lowerCasedLanguage = language.toLowerCase();
   localStorage.setItem(TARGET_LANGUAGE_KEY, lowerCasedLanguage);
 };
 
-export const getTargetLanguage = () => {
+export const getLearningLanguage = () => {
   return localStorage.getItem(TARGET_LANGUAGE_KEY) || 'spanish';
 };
 

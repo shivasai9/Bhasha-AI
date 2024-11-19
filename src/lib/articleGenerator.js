@@ -5,7 +5,7 @@ import {
   saveArticle,
   saveArticleContent,
 } from "./dbUtils";
-import { getLanguage } from "./languageStorage";
+import { getLearningLanguage } from "./languageStorage";
 import { fetchImagesData, getUniqueId } from "./utils";
 import { translateArticle } from "./translation.service";
 
@@ -51,7 +51,7 @@ async function generateAndSaveArticle(customTopic = null, language) {
 
 // Helper function to generate a single article
 export async function generateArticle(customTopic = null) {
-  const language = getLanguage();
+  const language = getLearningLanguage();
   return await generateAndSaveArticle(customTopic, language);
 }
 
@@ -77,7 +77,7 @@ export async function generateMultipleArticles(count, onProgress) {
 }
 
 export async function generateArticles(count = 3, onProgress = null) {
-  const language = getLanguage();
+  const language = getLearningLanguage();
   let articles = [];
   try {
     const existingArticles = await fetchExistingArticles(language);

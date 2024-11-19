@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { generateArticle, generateArticles } from "../lib/articleGenerator";
 import { getArticlesByLanguage } from "../lib/dbUtils";
-import { getLanguage } from "../lib/languageStorage";
+import { getLearningLanguage } from "../lib/languageStorage";
 import { translateAndSaveArticle } from "../lib/utils";
 
 export function useArticles() {
@@ -9,7 +9,7 @@ export function useArticles() {
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
   const [isCustomArticle, setIsCustomArticle] = useState(false);
-  const [language, setLanguage] = useState(getLanguage());
+  const [language, setLanguage] = useState(getLearningLanguage());
   console.log("==generated articles==", generatingCount);
   const loadArticles = async () => {
     setLoading(true);

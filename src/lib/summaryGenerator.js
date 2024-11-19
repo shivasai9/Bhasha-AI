@@ -1,12 +1,12 @@
 import { aiWrapper } from "./ai";
 import { upsertRecord, getArticleContent, getArticleById } from "./dbUtils";
 import { STORES } from "./constants";
-import { getLanguage } from "./languageStorage";
+import { getLearningLanguage } from "./languageStorage";
 import { translateContent } from "./translation.service";
 
 export async function generateAndSaveSummary(articleId, content, level) {
   try {
-    const language = getLanguage();
+    const language = getLearningLanguage();
     const existingContent = await getArticleContent(articleId, level, language);
     
     if (!existingContent) {

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { getLearningLanguage } from "../lib/languageStorage";
+import { aiWrapper } from "../lib/ai";
 
-export function useSummaryWriter() {
+export function useSummaryWriter(article) {
   const [summary, setSummary] = useState("");
   const [feedback, setFeedback] = useState({ errors: [], corrected: "" });
   const [loading, setLoading] = useState(false);
@@ -21,15 +22,17 @@ export function useSummaryWriter() {
     setLoading(true);
 
     try {
-      // In a real implementation, this would use Chrome's AI API
+      // Calling Correction Summary Prompt
+      console.log(article);
+      const parsedSummary =await aiWrapper.correctSummary(article.article.title, summary);
       setFeedback({
         errors: [
           {
-            original: "Sample error sentence",
-            correction: "Corrected sample sentence",
+            original: parsedSummary.Errors,
+            correction: parsedSummary.Suggestions,
           },
         ],
-        corrected: "Sample corrected summary",
+        corrected: parsedSummary["Corrected Summary"],
       });
       setShowFeedback(true);
     } catch (error) {

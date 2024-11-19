@@ -7,6 +7,7 @@ import {
   GENERATE_ARTICLE_CONTENT,
   GENERATE_WORD_INFO,
   generateArticleCreationPrompt,
+  CORRECT_SUMMARY,
 } from "./prompts";
 import { getArticlesByLanguage } from "./dbUtils";
 
@@ -112,6 +113,39 @@ class AIWrapper {
       }));
     } catch (error) {
       console.error("Quiz generation failed:", error);
+      this.destroy();
+      throw error;
+    }
+  }
+
+  async correctSummary(title, summary) {
+    try {
+      console.log(title)
+      const start = Date.now();
+      const prompt = CORRECT_SUMMARY.replace("{{title}}", title);
+      const customPrompt = prompt.replace("{{summary}}", summary);
+      console.log(customPrompt);
+      const generateWithRetry = async () => {
+        this.destroy();
+        const initialized = await this.initialize();
+        if (!initialized) throw new Error("Could not initialize AI");
+
+        if (!this.session) {
+          throw new Error("Session is not initialized");
+        }
+        const result = await this.session.prompt(customPrompt);
+        return JSON.parse(result.trim());
+      };
+
+      const parsed = await withRetry(generateWithRetry, 5, 1000);
+      const end = Date.now();
+      console.log(`Summary generated in ${(end - start) / 1000} seconds`);
+
+      this.destroy();
+      console.log(parsed);
+      return (parsed);
+    } catch (error) {
+      console.error("Summary correction generation failed:", error);
       this.destroy();
       throw error;
     }

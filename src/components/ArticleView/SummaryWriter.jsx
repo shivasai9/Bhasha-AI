@@ -3,7 +3,7 @@ import { useSummaryWriter } from "../../hooks/useSummaryWriter";
 import { AlertCircle, CheckCircle, Info } from "lucide-react";
 import { useLabels } from "../../hooks/useLabels";
 
-export default function SummaryWriter() {
+export default function SummaryWriter(article) {
   const labels = useLabels('SUMMARY_WRITER_LABELS');
   const {
     summary,
@@ -13,7 +13,7 @@ export default function SummaryWriter() {
     handleSummaryChange,
     handleSubmit,
     isEnglish,
-  } = useSummaryWriter();
+  } = useSummaryWriter(article);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
@@ -64,9 +64,9 @@ export default function SummaryWriter() {
                     <AlertCircle className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-amber-800 font-medium">{labels.feedback.suggestions.originalLabel}</p>
-                      <p className="text-amber-700 mb-2">{error.original}</p>
+                      {error.original.map((err) => <p className="text-amber-700 mb-2">{err}</p>)}
                       <p className="text-amber-800 font-medium">{labels.feedback.suggestions.suggestionLabel}</p>
-                      <p className="text-amber-700">{error.correction}</p>
+                      {error.correction.map((suggestion) => <p className="text-amber-700 mb-2">{suggestion}</p>)}
                     </div>
                   </div>
                 ))}

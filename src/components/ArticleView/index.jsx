@@ -65,7 +65,7 @@ export default function ArticleView() {
           </>
         );
       case "summarize":
-        return <SummaryWriter />;
+        return <SummaryWriter article={article}/>;
       case "quiz":
         return <QuizSection article={article} selectedDifficulty={selectedDifficulty} />;
       default:

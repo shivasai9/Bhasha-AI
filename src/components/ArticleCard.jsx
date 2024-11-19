@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLabels } from "../hooks/useLabels";
 import DifficultyModal from "./DifficultyModal";
 import { BookOpen } from "lucide-react";
 import PlaceholderImage from "./PlaceholderImage";
@@ -23,6 +24,7 @@ const presetDifficulties = [
 ];
 
 export default function ArticleCard({ article, onDifficultySelect, disabled }) {
+  const labels = useLabels('ARTICLE_CARD_LABELS');
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const kebabCaseTitle = convertToKebabCase(article.title);
 
@@ -86,11 +88,11 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
                 difficulty.className
               } ${disabled ? "cursor-not-allowed" : ""}`}
             >
-              {difficulty.label}
+              {labels[`${difficulty.id}Label`]}
             </a>
           ))}
 
-          <span className="text-sm text-gray-500">or</span>
+          <span className="text-sm text-gray-500">{labels.orText}</span>
 
           <button
             onClick={() => setShowDifficultyModal(true)}
@@ -100,7 +102,7 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
             }`}
           >
             <BookOpen className="w-4 h-4 mr-2" />
-            Custom Level
+            {labels.customLevelButton}
           </button>
         </div>
       </div>

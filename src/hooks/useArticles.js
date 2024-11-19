@@ -3,21 +3,26 @@ import { generateArticle, generateArticles } from "../lib/articleGenerator";
 import { getArticlesByLanguage } from "../lib/dbUtils";
 import { getLearningLanguage } from "../lib/languageStorage";
 import { translateAndSaveArticle } from "../lib/utils";
+import { useLabels } from "../hooks/useLabels";
 
 export function useArticles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
   const [isCustomArticle, setIsCustomArticle] = useState(false);
+  const labels = useLabels('ARTICLE_LIST_LABELS');
+  
   const language = getLearningLanguage();
+
   const loadArticles = async () => {
     setLoading(true);
     try {
+      // Always fetch fresh articles
       const existingArticles = await getArticlesByLanguage(language);
-      let englishArticles = existingArticles;
-      if (language.toLowerCase() !== "english") {
-        englishArticles = await getArticlesByLanguage("english");
-      }
+      const englishArticles = language.toLowerCase() !== "english" 
+        ? await getArticlesByLanguage("english")
+        : existingArticles;
+      
       setArticles(existingArticles);
 
       if (
@@ -133,5 +138,6 @@ export function useArticles() {
     generateCustomArticle,
     generateMoreArticles,
     isCustomArticle,
+    labels,
   };
 }

@@ -1,22 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Loader2, ArrowLeft } from "lucide-react";
+import { Plus, Loader2, ArrowLeft, Search } from "lucide-react";
 import Header from "./common/Header";
-import {
-  BookOpen,
-  ChevronDown,
-  Check,
-  Globe2,
-} from "lucide-react";
 import { useArticles } from "../hooks/useArticles";
-import useLanguageSelector from "../hooks/uselanguageSelector";
 import ArticleCard from "./ArticleCard";
 import CustomTopicForm from "./CustomTopicForm";
 import SkeletonArticleCard from "./SkeletonArticleCard";
-import { LANGUAGES } from "../lib/constants";
 
 export default function ArticleList() {
-  const [showCustomForm, setShowCustomForm] = useState(false);
   const {
     articles,
     loading,
@@ -24,8 +15,10 @@ export default function ArticleList() {
     generatingCount,
     generateMoreArticles,
     isCustomArticle,
+    labels,
   } = useArticles();
   const navigate = useNavigate();
+  const [showCustomForm, setShowCustomForm] = useState(false);
   const handleDifficultySelect = (articleId, title, difficulty) => {
     // Prevent interaction while loading
     // TODO: Make it better
@@ -36,7 +29,6 @@ export default function ArticleList() {
   const handleCustomTopic = async (topic) => {
     try {
       await generateCustomArticle(topic);
-      setShowCustomForm(false);
     } catch (error) {
       console.error("Error generating custom article:", error);
     }
@@ -47,37 +39,46 @@ export default function ArticleList() {
       <Header />
       <div className="container mx-auto px-4 py-8 pt-6">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate("/")}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Available Articles
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowCustomForm(!showCustomForm)}
-                disabled={loading || generatingCount > 0}
-                className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg transition-colors ${
-                  loading || generatingCount > 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-indigo-700"
-                }`}
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Custom Article
-              </button>
-            </div>
+          <div className="flex items-center gap-4 mb-2">
+            <button
+              onClick={() => navigate("/")}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label={labels.goBack}
+            >
+              <ArrowLeft className="w-6 h-6 text-gray-600" />
+            </button>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {labels.pageTitle}
+            </h1>
           </div>
 
-          {showCustomForm && <CustomTopicForm onSubmit={handleCustomTopic} />}
+          {/* Create Custom Article Button */}
+          {!showCustomForm && (
+            <button
+              onClick={() => setShowCustomForm(true)}
+              className="w-full mb-6 py-4 bg-white hover:bg-gray-50 text-indigo-600 
+              font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              {labels.customArticleButton}
+            </button>
+          )}
+
+          {/* Custom Article Form */}
+          {showCustomForm && (
+            <div className="bg-white p-5 rounded-lg shadow-sm mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-gray-900">Create a Custom Article</h2>
+                <button
+                  onClick={() => setShowCustomForm(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              </div>
+              <CustomTopicForm onSubmit={handleCustomTopic} />
+            </div>
+          )}
 
           <div className="space-y-6">
             {/* Custom article skeleton at top */}
@@ -86,7 +87,7 @@ export default function ArticleList() {
             {isCustomArticle && generatingCount > 0 && (
               <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
-                <p className="text-gray-600">Generating custom article...</p>
+                <p className="text-gray-600">{labels.generatingArticle}</p>
               </div>
             )}
             {/* Existing articles */}
@@ -114,7 +115,10 @@ export default function ArticleList() {
               <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
                 <p className="text-gray-600">
-                  Generating article(s)... ({generatingCount} remaining)
+                  {labels.generatingArticles.replace(
+                    "{count}",
+                    generatingCount.toString()
+                  )}
                 </p>
               </div>
             )}
@@ -126,7 +130,7 @@ export default function ArticleList() {
                 className="w-full py-4 bg-white hover:bg-gray-50 text-indigo-600 font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                Load More Articles
+                {labels.loadMoreButton}
               </button>
             )}
           </div>

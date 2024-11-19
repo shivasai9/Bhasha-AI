@@ -9,8 +9,7 @@ export function useArticles() {
   const [loading, setLoading] = useState(true);
   const [generatingCount, setGeneratingCount] = useState(0);
   const [isCustomArticle, setIsCustomArticle] = useState(false);
-  const [language, setLanguage] = useState(getLearningLanguage());
-  console.log("==generated articles==", generatingCount);
+  const language = getLearningLanguage();
   const loadArticles = async () => {
     setLoading(true);
     try {
@@ -134,7 +133,5 @@ export function useArticles() {
     generateCustomArticle,
     generateMoreArticles,
     isCustomArticle,
-    setLanguage,
-    language,
   };
 }

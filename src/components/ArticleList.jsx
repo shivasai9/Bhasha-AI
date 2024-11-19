@@ -25,22 +25,8 @@ export default function ArticleList() {
     generatingCount,
     generateMoreArticles,
     isCustomArticle,
-    setLanguage,
-    language,
   } = useArticles();
   const navigate = useNavigate();
-  const { handleLanguageSelect } = useLanguageSelector((newLang) => {
-    setShowCustomForm(false);
-    setLanguage(newLang);
-  });
-  const [isOpen, setIsOpen] = useState(false);
-  const currentLanguage =
-    LANGUAGES.find(
-      (lang) => lang.name.toLowerCase() === language.toLowerCase()
-    ) || LANGUAGES[0];
-
-  const toggleDropdown = () => setIsOpen(!isOpen);
-
   const handleDifficultySelect = (articleId, title, difficulty) => {
     // Prevent interaction while loading
     // TODO: Make it better
@@ -77,42 +63,6 @@ export default function ArticleList() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="flex items-center px-4 py-2.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm gap-2 text-gray-700"
-                >
-                  <span className="text-xl">{currentLanguage.flag}</span>
-                  <span className="font-medium">{currentLanguage.name}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {isOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-                    {LANGUAGES.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          handleLanguageSelect(lang.name);
-                          setIsOpen(false);
-                        }}
-                        className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <span className="text-xl">{lang.flag}</span>
-                        <span className="font-medium">{lang.name}</span>
-                        {currentLanguage.code === lang.code && (
-                          <Check className="w-4 h-4 ml-auto text-indigo-600" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               <button
                 onClick={() => setShowCustomForm(!showCustomForm)}
                 disabled={loading || generatingCount > 0}
@@ -123,7 +73,7 @@ export default function ArticleList() {
                 }`}
               >
                 <Plus className="w-5 h-5 mr-2" />
-                Custom Topic
+                Custom Article
               </button>
             </div>
           </div>

@@ -212,3 +212,30 @@ export const DRAGGABLE_TOOLBAR_LABELS = {
     }
   }
 };
+
+export const SUMMARY_WRITER_LABELS = {
+  title: "Write Your Summary",
+  languageWarning: {
+    message: "Summary writing is only available in English. Please switch to English to use this feature."
+  },
+  textArea: {
+    placeholder: {
+      english: "Write your summary here...",
+      other: "Please switch to English to write your summary"
+    }
+  },
+  submitButton: {
+    loading: "Analyzing...",
+    default: "Submit for Feedback"
+  },
+  feedback: {
+    suggestions: {
+      title: "Suggestions for Improvement",
+      originalLabel: "Original:",
+      suggestionLabel: "Suggestion:"
+    },
+    corrected: {
+      title: "Corrected Version"
+    }
+  }
+};

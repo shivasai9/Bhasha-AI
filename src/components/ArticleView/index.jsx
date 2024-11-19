@@ -4,9 +4,9 @@ import {
   FileText,
   BrainCircuit,
   ArrowLeft,
-  Gauge,
 } from "lucide-react";
 import { useArticleView } from "../../hooks/useArticleView";
+import { useLabels } from "../../hooks/useLabels";
 import ArticleContent from "./ArticleContent";
 import WordInteractionModal from "./WordInteractionModal";
 import SummaryWriter from "./SummaryWriter";
@@ -14,31 +14,15 @@ import AudioPlayer from "./AudioPlayer";
 import QuizSection from "./QuizSection";
 import Header from "../common/Header";
 
-const tabs = [
-  {
-    id: "read",
-    label: "Read",
-    icon: BookOpen,
-    description:
-      "Read the article and click on words to see their meanings, translations, and more.",
-  },
-  {
-    id: "summarize",
-    label: "Summarize",
-    icon: FileText,
-    description:
-      "Write a summary of the article and get AI-powered feedback to improve your writing.",
-  },
-  {
-    id: "quiz",
-    label: "Quiz",
-    icon: BrainCircuit,
-    description:
-      "Test your understanding of the article with interactive questions.",
-  },
-];
+const tabIcons = {
+  read: BookOpen,
+  summarize: FileText,
+  quiz: BrainCircuit,
+};
 
 export default function ArticleView() {
+  const labels = useLabels('ARTICLE_VIEW_LABELS');
+  
   const {
     article,
     articleContent,
@@ -63,7 +47,7 @@ export default function ArticleView() {
           return (
             <div className="flex justify-center items-center p-8">
               <div className="animate-pulse text-gray-600">
-                Generating article content...
+                {labels.loadingMessage}
               </div>
             </div>
           );
@@ -89,7 +73,7 @@ export default function ArticleView() {
     }
   };
 
-  const activeTabInfo = tabs.find((tab) => tab.id === activeTab);
+  const activeTabInfo = labels.tabs.find((tab) => tab.id === activeTab);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,14 +85,14 @@ export default function ArticleView() {
             className="flex items-center gap-2 mb-4 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
+            <span>{labels.backButton}</span>
           </button>
 
           {/* Tab Navigation */}
           <div className="bg-white rounded-lg shadow-md mb-6">
             <div className="flex border-b">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
+              {labels.tabs.map((tab) => {
+                const Icon = tabIcons[tab.id];
                 return (
                   <button
                     key={tab.id}
@@ -129,8 +113,14 @@ export default function ArticleView() {
             {/* Tab Description */}
             <div className="p-4 bg-gray-50 border-b text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <activeTabInfo.icon className="w-4 h-4 text-indigo-600" />
-                <p>{activeTabInfo.description}</p>
+                {activeTabInfo && (
+                  <>
+                    {tabIcons[activeTabInfo.id] && React.createElement(tabIcons[activeTabInfo.id], {
+                      className: "w-4 h-4 text-indigo-600"
+                    })}
+                    <p>{activeTabInfo.description}</p>
+                  </>
+                )}
               </div>
             </div>
           </div>

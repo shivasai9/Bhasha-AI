@@ -65,3 +65,33 @@ export const LANGUAGE_DROPDOWN_LABELS = {
   interfaceLanguage: "Interface Language",
   learningLanguage: "Learning Language"
 };
+
+export const ARTICLE_VIEW_LABELS = {
+  backButton: "Back",
+  loadingMessage: "Generating article content...",
+  tabs: [
+    {
+      id: "read",
+      label: "Read",
+      description: "Read the article and click on words to see their meanings, translations, and more."
+    },
+    {
+      id: "summarize",
+      label: "Summarize",
+      description: "Write a summary of the article and get AI-powered feedback to improve your writing."
+    },
+    {
+      id: "quiz",
+      label: "Quiz",
+      description: "Test your understanding of the article with interactive questions."
+    }
+  ]
+};
+
+export const AUDIO_PLAYER_LABELS = {
+  playButton: "Play Audio",
+  pauseButton: "Pause Audio",
+  loadingText: "Loading audio...",
+  errorText: "Error loading audio",
+  speedLabel: "Speed:",
+};

@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import { useLabels } from '../../hooks/useLabels';
 import { useArticleContent } from "../../hooks/useArticleContent";
 import { ExternalLink } from "lucide-react";
 import PlaceholderImage from "../PlaceholderImage";
@@ -18,8 +19,9 @@ export default function ArticleContent({
   content,
   contentLoading,
   selectedDifficulty,
-  onDifficultyChange,
+  onDifficultyChange
 }) {
+  const labels = useLabels('ARTICLE_CONTENT_LABELS');
   const {
     getClickableText,
     tooltipElement,
@@ -31,7 +33,12 @@ export default function ArticleContent({
     handleSummaryClick,
     articleData
   } = useArticleContent(article, content, selectedDifficulty);
-
+  const getDifficultyLabel = () => {
+    return selectedDifficulty
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
   const processChildren = (children) => {
     return React.Children.map(children, child => {
       if (typeof child === 'string') {
@@ -41,15 +48,32 @@ export default function ArticleContent({
     });
   };
 
+  if (contentLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <h2 className="text-xl font-semibold text-gray-700">{labels.loading.title}</h2>
+        <p className="text-gray-500">{labels.loading.description}</p>
+        <div className="space-y-6 w-[57%]">
+          <div className="h-4 bg-gray-200 rounded-full animate-pulse w-3/4"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded-full animate-pulse w-5/6"></div>
+          </div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded-full animate-pulse w-11/12"></div>
+            <div className="h-4 bg-gray-200 rounded-full animate-pulse w-4/5"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!content) {
+    return <div className="text-gray-500 p-4">{labels.noContentMessage}</div>;
+  }
+
   if (!article) return null;
   const { imageUrl, imageAlt, refUrl } = articleData;
-
-  const getDifficultyLabel = () => {
-    return selectedDifficulty
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
 
   const getButtonTheme = () => {
     return difficultyThemes[selectedDifficulty] || difficultyThemes.default;
@@ -95,7 +119,7 @@ export default function ArticleContent({
                     className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    <span>Source: Wikipedia</span>
+                    <span>{labels.articleInfo.source}</span>
                   </a>
                 </div>
               )}
@@ -139,7 +163,7 @@ export default function ArticleContent({
                     {summary}
                   </ReactMarkdown>
                 ) : (
-                  <p className="text-lg">No summary available</p>
+                  <p className="text-lg">{labels.articleInfo.noSummary}</p>
                 )}
               </div>
             </div>

@@ -24,6 +24,56 @@ export const DIFFICULTY_MODAL_LABELS = {
   ]
 };
 
+export const ENHANCED_DIFFICULTY_MODAL_LABELS = {
+  title: "Select Difficulty Level",
+  customLevelLabel: "Custom Level Name",
+  customLevelPlaceholder: "Enter your custom level...",
+  suggestedPresetsTitle: "Custom Presets",
+  customLevelButton: {
+    withCustom: "Apply Custom Level",
+    withPreset: (level) => `Apply ${level} Level`,
+    default: "Select a Difficulty Level"
+  },
+  presetDifficulties: [
+    {
+      id: 'easy',
+      label: 'Easy',
+      description: 'Simple vocabulary and basic sentence structures',
+      className: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+    },
+    {
+      id: 'medium',
+      label: 'Medium',
+      description: 'Moderate complexity with varied vocabulary',
+      className: 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+    },
+    {
+      id: 'hard',
+      label: 'Hard',
+      description: 'Complex sentences and advanced vocabulary',
+      className: 'bg-rose-100 text-rose-700 hover:bg-rose-200'
+    }
+  ],
+  presets: [
+    {
+      label: "Creative Writing",
+      description: "Focus on imaginative expression and storytelling"
+    },
+    {
+      label: "For Children Below 5",
+      description: "Simple vocabulary and basic concepts"
+    },
+    {
+      label: "Technical",
+      description: "Advanced terminology and complex concepts"
+    },
+    {
+      label: "Conversational",
+      description: "Focus on daily dialogue and common phrases"
+    }
+  ]
+};
+
 export const ARTICLE_CARD_LABELS = {
   customLevelButton: "Custom Level",
   easyLabel: "Easy",
@@ -94,4 +144,71 @@ export const AUDIO_PLAYER_LABELS = {
   loadingText: "Loading audio...",
   errorText: "Error loading audio",
   speedLabel: "Speed:",
+  tooltips: {
+    reset: "Start from beginning",
+    skipBack: "Go back 5 words",
+    playPause: {
+      play: "Start reading",
+      pause: "Pause reading"
+    },
+    volume: "Adjust volume",
+    speed: "Change reading speed",
+    voice: "Change voice settings"
+  },
+  volumeOptions: [
+    { value: 1, label: "100%" },
+    { value: 0.75, label: "75%" },
+    { value: 0.5, label: "50%" },
+    { value: 0.25, label: "25%" },
+    { value: 0, label: "Mute" }
+  ],
+  speedOptions: "x Speed",
+  playbackStatus: {
+    playing: "Now reading...",
+    stopped: "Click play to start"
+  },
+  voiceDefault: "Voice"
+};
+
+export const ARTICLE_CONTENT_LABELS = {
+  difficultyLevels: {
+    title: "Select Difficulty Level",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    custom: "Custom"
+  },
+  articleInfo: {
+    readingTime: "min read",
+    wordCount: "words",
+    difficulty: "Difficulty:",
+    source: "Source: Wikipedia",
+    noSummary: "No summary available"
+  },
+  loading: {
+    title: "Loading content...",
+    description: "Please wait while we prepare your article"
+  },
+  clickableWordsHint: "Click on any word to see its meaning and translation",
+  noContentMessage: "No content available"
+};
+
+export const DRAGGABLE_TOOLBAR_LABELS = {
+  header: "Article Controls",
+  actions: {
+    summary: {
+      fullArticle: {
+        title: "Full Article",
+        description: "View complete content"
+      },
+      summary: {
+        title: "Summary",
+        description: "Get quick overview"
+      }
+    },
+    difficulty: {
+      title: "Difficulty Level",
+      changeHint: "Click to change level"
+    }
+  }
 };

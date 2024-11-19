@@ -3,14 +3,16 @@ import { getInterfaceLanguage } from "../lib/languageStorage";
 import { translateText } from "../lib/translation.service";
 import * as componentLabels from "../lib/componentLabels";
 
+const exclusionKeys = ["id", "className"];
+
 export function useLabels(componentName) {
-  const [labels, setLabels] = useState(componentLabels[componentName] || {});
+  const [labels, setLabels] = useState(componentName ? componentLabels[componentName] : componentLabels);
   const interfaceLanguage = getInterfaceLanguage();
 
   useEffect(() => {
     const translateLabels = async () => {
       if (interfaceLanguage.toLowerCase() === "english") {
-        setLabels(componentLabels[componentName]);
+        setLabels(componentName ? componentLabels[componentName] : componentLabels);
         return;
       }
 
@@ -21,8 +23,8 @@ export function useLabels(componentName) {
               if (typeof item === "object") {
                 const translatedItem = {};
                 for (const [key, val] of Object.entries(item)) {
-                  translatedItem[key] =
-                    key === "id" ? val : await translateValue(val, key);
+                  translatedItem[key] = 
+                    exclusionKeys.includes(key) ? val : await translateValue(val, key);
                 }
                 return translatedItem;
               }
@@ -36,9 +38,8 @@ export function useLabels(componentName) {
         if (typeof value === "object" && value !== null) {
           const translatedObj = {};
           for (const [key, val] of Object.entries(value)) {
-            // Skip translation for 'id' keys
-            translatedObj[key] =
-              key === "id" ? val : await translateValue(val, key);
+            translatedObj[key] = 
+              exclusionKeys.includes(key) ? val : await translateValue(val, key);
           }
           return translatedObj;
         }

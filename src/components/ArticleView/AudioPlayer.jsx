@@ -12,9 +12,12 @@ import {
   Mic,
 } from "lucide-react";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
+import { useLabels } from "../../hooks/useLabels";
 import CustomTooltip from "./CustomTooltip.jsx";
 
 export default function AudioPlayer({ text }) {
+  const labels = useLabels('AUDIO_PLAYER_LABELS');
+  
   const {
     isPlaying,
     speed,
@@ -45,12 +48,12 @@ export default function AudioPlayer({ text }) {
   ];
 
   const tooltips = {
-    reset: "Start from beginning",
-    skipBack: "Go back 5 words",
-    playPause: isPlaying ? "Pause reading" : "Start reading",
-    volume: "Adjust volume",
-    speed: "Change reading speed",
-    voice: "Select voice",
+    reset: labels.tooltips.reset,
+    skipBack: labels.tooltips.skipBack,
+    playPause: isPlaying ? labels.tooltips.playPause.pause : labels.tooltips.playPause.play,
+    volume: labels.tooltips.volume,
+    speed: labels.tooltips.speed,
+    voice: labels.tooltips.voice,
   };
 
   const resetButtonRef = useRef(null);
@@ -191,7 +194,7 @@ export default function AudioPlayer({ text }) {
                 />
                 {showVolumeSlider && (
                   <div className="absolute left-0 bottom-full mb-2 bg-white rounded-lg shadow-xl divide-y divide-gray-100">
-                    {volumeOptions.map((option) => (
+                    {labels.volumeOptions.map((option) => (
                       <button
                         key={option.value}
                         onClick={() => {
@@ -244,7 +247,7 @@ export default function AudioPlayer({ text }) {
                             : "text-gray-700"
                         }`}
                       >
-                        {s}x Speed
+                        {s + labels.speedOptions}
                       </button>
                     ))}
                   </div>
@@ -261,7 +264,7 @@ export default function AudioPlayer({ text }) {
                 >
                   <Mic className="w-5 h-5" />
                   <span className="text-sm font-medium truncate">
-                    {selectedVoice?.name?.split(' ')[0] || 'Voice'}
+                    {selectedVoice?.name?.split(' ')[0] || labels.voiceDefault}
                   </span>
                 </button>
                 <CustomTooltip
@@ -294,7 +297,7 @@ export default function AudioPlayer({ text }) {
           </div>
 
           <div className="text-sm font-medium mt-2">
-            {isPlaying ? "Now reading..." : "Click play to start"}
+            {isPlaying ? labels.playbackStatus.playing : labels.playbackStatus.stopped}
           </div>
         </div>
 

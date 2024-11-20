@@ -1,5 +1,6 @@
-import { WIKI_IMAGE_URL } from "./constants";
+import { BRAND_NAME, WIKI_IMAGE_URL } from "./constants";
 import { saveArticle } from "./dbUtils";
+import { getInterfaceLanguage } from "./languageStorage";
 import { translateArticle } from "./translation.service";
 
 export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
@@ -100,3 +101,12 @@ export const filterImageUrls = (imagesData) => {
 
   return filteredImages;
 };
+
+export const getBrandName = () => {
+  const interfaceLanguage = getInterfaceLanguage();
+  const translatedName = BRAND_NAME[interfaceLanguage] || BRAND_NAME.default;
+  return {
+    original: BRAND_NAME.original,
+    translated: translatedName
+  };
+}

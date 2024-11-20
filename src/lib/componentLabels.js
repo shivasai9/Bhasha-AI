@@ -259,3 +259,14 @@ export const QUIZ_SECTION_LABELS = {
     showResults: "Show Results"
   }
 };
+
+export const HEADER_LABELS = {
+  navigation: {
+    articles: "Articles"
+  },
+  userMenu: {
+    savedWords: "Saved Words",
+    savedArticles: "Saved Articles",
+    settings: "Settings"
+  }
+};

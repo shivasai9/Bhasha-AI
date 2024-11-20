@@ -101,3 +101,10 @@ export const TOPICS = [
     icon: "⚽"
   }
 ];
+
+export const BRAND_NAME = {
+  "english": "LanguageAI",
+  "spanish": "IdiomaAI",
+  "french": "LangueAI",
+  "original": "BashaAI"
+}

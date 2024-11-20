@@ -30,6 +30,7 @@ const getTopicDescriptions = () => {
 export async function generateArticleCreationPrompt(customTopic = null) {
   const existingArticles = await getArticlesByLanguage("english");
   const existingTopics = existingArticles.map((article) => {
+    // TODO: update the condition
     const topic = article.title.split(":")[0].trim();
     return topic;
   });

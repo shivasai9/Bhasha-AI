@@ -24,12 +24,11 @@ const performTransaction = async (storeName, mode, operation) => {
   });
 };
 
-// Words Store Operations
 export const saveWord = (wordData) =>
   performTransaction(STORES.WORDS, "readwrite", (store) =>
     store.put({
       ...wordData,
-      isSaved: wordData.isSaved ?? false,
+      isSaved: wordData.isSaved ? 1 : 0,
       timestamp: wordData.timestamp || new Date().toISOString(),
     })
   );
@@ -53,18 +52,11 @@ export const getSavedWords = () =>
     "readonly",
     (store) =>
       new Promise((resolve, reject) => {
-        const cursor = store.index("isSavedIndex").openCursor(1);
-        const words = [];
+        const request = store.index("isSavedIndex").getAll(1);
 
-        cursor.onerror = () => reject(cursor.error);
-        cursor.onsuccess = function (event) {
-          const cursor = /** @type {IDBRequest} */ (event.target).result;
-          if (cursor) {
-            words.push(cursor.value);
-            cursor.continue();
-          } else {
-            resolve(words);
-          }
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          resolve(request.result || []);
         };
       })
   );
@@ -76,7 +68,7 @@ export const updateWordStatus = (wordId, isSaved) =>
 
     const updatedWord = {
       ...word,
-      isSaved,
+      isSaved: isSaved ? 1 : 0,
       timestamp: new Date().toISOString(),
     };
     return store.put(updatedWord);

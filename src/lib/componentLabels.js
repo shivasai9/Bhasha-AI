@@ -1,3 +1,5 @@
+import { TOPICS } from './constants';
+
 export const DIFFICULTY_MODAL_LABELS = {
   title: "Custom Difficulty Level",
   customLevelLabel: "Custom Level Name",
@@ -269,4 +271,34 @@ export const HEADER_LABELS = {
     savedArticles: "Saved Articles",
     settings: "Settings"
   }
+};
+
+export const LANGUAGE_SELECTOR_LABELS = {
+  steps: {
+    interface: {
+      title: "Choose your language",
+      description: "This will be used throughout the website for navigation and instructions. You can change this later in settings.",
+    },
+    learning: {
+      title: "Which language would you like to learn?",
+      description: "Select the language you want to learn. We'll create personalized content to help you master this language efficiently.",
+    },
+    topics: {
+      title: "What interests you?",
+      description: "Choose topics that interest you and we'll curate content aligned with your preferences. Add custom topics or select from our suggestions.",
+      skipButton: "Skip for now",
+    }
+  },
+  customTopics: {
+    addButton: "Add Custom Topic",
+    inputPlaceholder: "Enter your topic...",
+    addNewButton: "Add",
+  },
+  continueButton: "Continue with {count} topics",
+  backButton: "Go back",
+  poweredBy: "Powered by Chrome Built-In AI",
+};
+
+export const TOPIC_LABELS = {
+  TOPICS: TOPICS
 };

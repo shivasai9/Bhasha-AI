@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Globe2, BookOpen, Sparkles, BookOpenCheck, Layout, CheckCircle2, ChevronLeft, Plus, ArrowRight, X } from "lucide-react";
 import useLanguageSelector from "../hooks/uselanguageSelector";
 import { LANGUAGES, TOPICS } from "../lib/constants";
-import { getInterfaceLanguage, getLearningLanguage, getTopics } from "../lib/languageStorage";
+import { getTopics } from "../lib/languageStorage";
+import { useLabels } from '../hooks/useLabels';
 
 export default function LanguageSelector() {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ export default function LanguageSelector() {
   const [customTopic, setCustomTopic] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customTopics, setCustomTopics] = useState([]);
+  const labels = useLabels('LANGUAGE_SELECTOR_LABELS');
+  const topicLabels = useLabels('TOPIC_LABELS');
 
   useEffect(() => {
     if (progressRef.current && containerRef.current) {
@@ -174,11 +177,10 @@ export default function LanguageSelector() {
             <div className="space-y-2 mb-8">
               <div className="flex items-center space-x-4 text-gray-600">
                 <Layout className="w-6 h-6 animate-pulse text-indigo-600" />
-                <p className="text-xl font-medium">Choose your language</p>
+                <p className="text-xl font-medium">{labels?.steps?.interface?.title}</p>
               </div>
               <p className="text-gray-500 ml-10 text-sm">
-                This will be used throughout the website for navigation and instructions. 
-                You can change this later in settings.
+                {labels?.steps?.interface?.description}
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
@@ -213,11 +215,10 @@ export default function LanguageSelector() {
             <div className="space-y-2 mb-8">
               <div className="flex items-center space-x-4 text-gray-600">
                 <BookOpenCheck className="w-6 h-6 animate-pulse text-indigo-600" />
-                <p className="text-xl font-medium">Which language would you like to learn?</p>
+                <p className="text-xl font-medium">{labels?.steps?.learning?.title}</p>
               </div>
               <p className="text-gray-500 ml-10 text-sm">
-                Select the language you want to learn. We'll create personalized content 
-                to help you master this language efficiently.
+                {labels?.steps?.learning?.description}
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
@@ -253,18 +254,17 @@ export default function LanguageSelector() {
               <div className="flex items-center justify-between text-gray-600">
                 <div className="flex items-center space-x-4">
                   <BookOpen className="w-6 h-6 text-indigo-600" />
-                  <p className="text-xl font-medium">What interests you?</p>
+                  <p className="text-xl font-medium">{labels?.steps?.topics?.title}</p>
                 </div>
                 <button
                   onClick={() => handleNavigateToArticles([])}
                   className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
                 >
-                  Skip for now <ArrowRight className="w-4 h-4" />
+                  {labels?.steps?.topics?.skipButton} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
               <p className="text-gray-500 ml-10 text-sm">
-                Choose topics that interest you and we'll curate content aligned with your preferences. 
-                Add custom topics or select from our suggestions.
+                {labels?.steps?.topics?.description}
               </p>
             </div>
 
@@ -276,7 +276,7 @@ export default function LanguageSelector() {
                     type="text"
                     value={customTopic}
                     onChange={(e) => setCustomTopic(e.target.value)}
-                    placeholder="Enter your topic..."
+                    placeholder={labels?.customTopics?.inputPlaceholder}
                     className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     autoFocus
                   />
@@ -285,7 +285,7 @@ export default function LanguageSelector() {
                     disabled={!customTopic.trim()}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400"
                   >
-                    Add
+                    {labels?.customTopics?.addNewButton}
                   </button>
                 </div>
               </form>
@@ -295,7 +295,7 @@ export default function LanguageSelector() {
                 className="mb-4 w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 flex items-center justify-center gap-2 transition-all"
               >
                 <Plus className="w-5 h-5" />
-                Add Custom Topic
+                {labels?.customTopics?.addButton}
               </button>
             )}
 
@@ -303,7 +303,7 @@ export default function LanguageSelector() {
             <CustomTopicsBadges />
 
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {TOPICS.map((topic) => (
+              {(topicLabels?.TOPICS || TOPICS).map((topic) => (
                 <button
                   key={topic.id}
                   onClick={() => toggleTopic(topic.id)}
@@ -341,7 +341,7 @@ export default function LanguageSelector() {
                   : 'bg-gray-400 cursor-not-allowed'
               }`}
             >
-              Continue with {selectedTopics.length} topics
+              {labels?.continueButton?.replace('{count}', selectedTopics.length)}
             </button>
           </div>
         );
@@ -357,7 +357,7 @@ export default function LanguageSelector() {
             <div className="flex items-center justify-center mb-8">
               <Globe2 className="w-12 h-12 text-indigo-600 mr-4" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
-                Basha AI
+                {"BhashaAI"}
               </h1>
             </div>
             <ProgressBar />
@@ -367,7 +367,7 @@ export default function LanguageSelector() {
               </div>
               <div className="mt-8 flex items-center justify-center space-x-2 text-sm text-gray-500">
                 <Sparkles className="w-4 h-4" />
-                <p>Powered by Chrome Built-In AI</p>
+                <p>{labels?.poweredBy}</p>
               </div>
             </div>
           </div>

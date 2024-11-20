@@ -19,6 +19,8 @@ const getTopicDescriptions = () => {
       };
     }
     return {
+      // TODO: Translate from interfaceLanguage to English
+      // Maybe use detectLanguage and translate to English
       name: id.split('-').map(word => 
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' '),

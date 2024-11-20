@@ -108,3 +108,9 @@ export const BRAND_NAME = {
   "french": "LangueAI",
   "original": "BashaAI"
 }
+
+export const LANGUAGE_CODES_TO_NAME = {
+  en: "english",
+  es: "spanish",
+  fr: "french",
+};

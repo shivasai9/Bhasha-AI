@@ -3,7 +3,7 @@ import { getInterfaceLanguage } from "../lib/languageStorage";
 import { translateText } from "../lib/translation.service";
 import * as componentLabels from "../lib/componentLabels";
 
-const exclusionKeys = ["id", "className"];
+const exclusionKeys = ["id", "className", "icon"];
 
 const protectAndTranslate = async (text, fromLang, toLang) => {
   const placeholders = [];

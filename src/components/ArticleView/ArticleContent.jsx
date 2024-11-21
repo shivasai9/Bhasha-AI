@@ -6,6 +6,7 @@ import PlaceholderImage from "../PlaceholderImage";
 import DifficultyLevelModal from './DifficultyLevelModal.jsx';
 import DraggableToolbar from './DraggableToolbar';
 import ReactMarkdown from 'react-markdown';
+import ImageAttribution from './ImageAttribution';
 
 const difficultyThemes = {
   easy: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
@@ -73,7 +74,7 @@ export default function ArticleContent({
   }
 
   if (!article) return null;
-  const { imageUrl, imageAlt, refUrl } = articleData;
+  const { imageUrl, imageAlt, refUrl, imagesData } = articleData;
 
   const getButtonTheme = () => {
     return difficultyThemes[selectedDifficulty] || difficultyThemes.default;
@@ -110,18 +111,17 @@ export default function ArticleContent({
                   </div>
                 )}
               </div>
-              {imageUrl && imageUrl.length > 0 && (
-                <div className="text-center">
-                  <a
-                    href={refUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>{labels.articleInfo.source}</span>
-                  </a>
-                </div>
+              {imageUrl && imagesData?.[0]?.attribution && (
+                <ImageAttribution 
+                  attribution={{
+                    artist: imagesData[0].attribution.artist,
+                    license: {
+                      name: imagesData[0].attribution.licenseName,
+                      url: imagesData[0].attribution.licenseUrl
+                    },
+                    source: imagesData[0].attribution.imagePage
+                  }} 
+                />
               )}
             </div>
           </div>

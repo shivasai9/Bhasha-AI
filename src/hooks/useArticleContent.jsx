@@ -99,14 +99,7 @@ export function useArticleContent(article, content, selectedDifficulty) {
   }, []);
 
   return {
-    showDifficultyModal,
-    setShowDifficultyModal,
-    showSummary,
-    summary,
-    summaryLoading,
-    articleData,
     getClickableText,
-    handleSummaryClick,
     tooltipElement: tooltipData && (
       <Tooltip
         word={tooltipData.word}
@@ -116,5 +109,17 @@ export function useArticleContent(article, content, selectedDifficulty) {
         triggerElBoundingClientRect={triggerElBoundingClientRect}
       />
     ),
+    showDifficultyModal,
+    setShowDifficultyModal,
+    showSummary,
+    summary,
+    summaryLoading,
+    handleSummaryClick,
+    articleData: {
+      imageUrl: article?.imagesData?.[0]?.url,
+      imageAlt: article?.title,
+      refUrl: article?.imagesData?.[0]?.refUrl,
+      imagesData: article?.imagesData || []
+    }
   };
 }

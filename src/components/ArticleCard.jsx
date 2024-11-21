@@ -3,6 +3,7 @@ import { useLabels } from "../hooks/useLabels";
 import DifficultyModal from "./DifficultyModal";
 import { BookOpen } from "lucide-react";
 import PlaceholderImage from "./PlaceholderImage";
+import ImageAttribution from "./ArticleView/ImageAttribution";
 import { convertToKebabCase, filterImageUrls } from "../lib/utils";
 
 const presetDifficulties = [
@@ -47,10 +48,9 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
 
   const { imagesData = [] } = article;
   const filteredImageData = filterImageUrls(imagesData);
-  const imageUrl = filteredImageData.length ? filteredImageData[0].url : null;
-  const imageAlt = filteredImageData.length
-    ? filteredImageData[0].alt
-    : article.title;
+  const imageData = filteredImageData.length ? filteredImageData[0] : null;
+  const imageUrl = imageData?.url;
+  const imageAlt = imageData?.alt || article.title;
 
   return (
     <div
@@ -60,12 +60,26 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
     >
       <div className="w-1/3 relative">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={imageAlt}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          <>
+            <img
+              src={imageUrl}
+              alt={imageAlt}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0">
+              <ImageAttribution 
+                attribution={{
+                  artist: imageData.attribution?.artist,
+                  license: {
+                    name: imageData.attribution?.licenseName,
+                    url: imageData.attribution?.licenseUrl
+                  },
+                  source: imageData.attribution?.imagePage
+                }} 
+              />
+            </div>
+          </>
         ) : (
           <PlaceholderImage />
         )}

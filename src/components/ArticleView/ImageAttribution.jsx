@@ -1,20 +1,44 @@
 import { ExternalLink } from "lucide-react";
+import { truncateArtistName } from "../../lib/licencing/licenceUtils";
+import { useRef, useState } from "react";
+import CustomTooltip from "./CustomTooltip";
 
 export default function ImageAttribution({ attribution }) {
   if (!attribution) return null;
   
-  const processedArtist = attribution.artist.replace(
-    /<a(\s+[^>]*)?>/g,
-    '<a$1 target="_blank" rel="noopener noreferrer">'
-  );
+  const { name, originalName, url } = truncateArtistName(attribution.artist);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const artistRef = useRef(null);
   
   return (
     <div className="text-[11px] leading-normal text-gray-500 bg-gray-50 px-2 py-1.5 rounded">
       <div className="flex items-center justify-center gap-x-1.5">
-        by
-        <span 
-          dangerouslySetInnerHTML={{ __html: processedArtist }}
-          className="font-medium text-gray-600"
+        {url ? (
+          <a 
+            ref={artistRef}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-gray-600"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            {name}
+          </a>
+        ) : (
+          <span 
+            ref={artistRef}
+            className="font-medium text-gray-600"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            {name}
+          </span>
+        )}
+        <CustomTooltip 
+          text={originalName}
+          visible={showTooltip && originalName !== name}
+          containerRef={artistRef}
         />
         {attribution.license && (
           <>

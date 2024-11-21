@@ -11,7 +11,7 @@ export default function ImageAttribution({ attribution }) {
   const artistRef = useRef(null);
   
   return (
-    <div className="text-[11px] leading-normal text-gray-500 bg-gray-50 px-2 py-1.5 rounded">
+    <div className="text-[11px] leading-normal text-gray-100 bg-gradient-to-t from-black/60 to-black/20 backdrop-blur-sm px-2 py-1.5">
       <div className="flex items-center justify-center gap-x-1.5">
         {url ? (
           <a 
@@ -19,7 +19,7 @@ export default function ImageAttribution({ attribution }) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-gray-600"
+            className="font-medium text-white/90 hover:text-white"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -28,7 +28,7 @@ export default function ImageAttribution({ attribution }) {
         ) : (
           <span 
             ref={artistRef}
-            className="font-medium text-gray-600"
+            className="font-medium text-white/90"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -42,12 +42,12 @@ export default function ImageAttribution({ attribution }) {
         />
         {attribution.license && (
           <>
-            <span>·</span>
+            <span className="text-white/70">·</span>
             <a
               href={attribution.license.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-gray-900"
+              className="text-white/80 hover:text-white"
             >
               {attribution.license.name}
             </a>
@@ -55,12 +55,12 @@ export default function ImageAttribution({ attribution }) {
         )}
         {attribution.source && (
           <>
-            <span>·</span>
+            <span className="text-white/70">·</span>
             <a
               href={attribution.source}
               target="_blank"
               rel="noopener noreferrer" 
-              className="inline-flex items-center text-gray-600 hover:text-gray-900"
+              className="inline-flex items-center text-white/80 hover:text-white"
             >
               <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
               <span>Source</span>

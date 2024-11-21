@@ -98,7 +98,7 @@ export default function ArticleContent({
         <div className="relative">
           <div className="float-right ml-8 mb-6 w-2/5">
             <div className="sticky top-8">
-              <div className="rounded-lg overflow-hidden shadow-lg mb-2">
+              <div className="rounded-lg overflow-hidden shadow-lg mb-1">
                 {imageUrl ? (
                   <img
                     src={imageUrl}

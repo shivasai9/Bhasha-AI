@@ -5,6 +5,9 @@ import useLanguageSelector from "../hooks/uselanguageSelector";
 import { LANGUAGES, TOPICS } from "../lib/constants";
 import { getTopics } from "../lib/languageStorage";
 import { useLabels } from '../hooks/useLabels';
+import { useApiStatus } from '../hooks/useApiStatus';
+import { AlertTriangle, AlertCircle } from 'lucide-react';
+import ApiStatusBanner from './ApiStatusBanner';
 
 export default function LanguageSelector() {
   const navigate = useNavigate();
@@ -28,6 +31,11 @@ export default function LanguageSelector() {
   const [customTopics, setCustomTopics] = useState([]);
   const labels = useLabels('LANGUAGE_SELECTOR_LABELS');
   const topicLabels = useLabels('TOPIC_LABELS');
+  const { translationStatus, promptsStatus, summarizationStatus } = useApiStatus();
+
+  const isApisAvailable = translationStatus === "Available" && 
+                         promptsStatus === "Available" && 
+                         summarizationStatus === "Available";
 
   useEffect(() => {
     if (progressRef.current && containerRef.current) {
@@ -183,16 +191,20 @@ export default function LanguageSelector() {
                 {labels?.steps?.interface?.description}
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className={`grid gap-6 md:grid-cols-3 ${!isApisAvailable ? 'opacity-60' : ''}`}>
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => handleWebsiteLanguage(lang.name)}
-                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 ${
-                    selectedWebsiteLang.toLowerCase() === lang.name.toLowerCase()
+                  onClick={() => isApisAvailable && handleWebsiteLanguage(lang.name)}
+                  disabled={!isApisAvailable}
+                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
+                    ${selectedWebsiteLang.toLowerCase() === lang.name.toLowerCase()
                       ? 'border-indigo-600 bg-indigo-50'
                       : 'border-indigo-100 hover:border-indigo-400'
-                  } transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1`}
+                    } 
+                    transition-all duration-300 hover:shadow-xl transform 
+                    ${isApisAvailable ? 'hover:-translate-y-1' : 'cursor-not-allowed'}
+                  `}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative text-center">
@@ -207,6 +219,11 @@ export default function LanguageSelector() {
                 </button>
               ))}
             </div>
+            {!isApisAvailable && (
+              <div className="mt-4 text-center text-sm text-red-600">
+                Please enable required features to start selecting languages
+              </div>
+            )}
           </div>
         );
       case 2:
@@ -221,16 +238,20 @@ export default function LanguageSelector() {
                 {labels?.steps?.learning?.description}
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className={`grid gap-6 md:grid-cols-3 ${!isApisAvailable ? 'opacity-60' : ''}`}>
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => handleTargetLanguage(lang.name)}
-                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 ${
-                    selectedLearningLang.toLowerCase() === lang.name.toLowerCase()
+                  onClick={() => isApisAvailable && handleTargetLanguage(lang.name)}
+                  disabled={!isApisAvailable}
+                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
+                    ${selectedLearningLang.toLowerCase() === lang.name.toLowerCase()
                       ? 'border-indigo-600 bg-indigo-50'
                       : 'border-indigo-100 hover:border-indigo-400'
-                  } transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1`}
+                    } 
+                    transition-all duration-300 hover:shadow-xl transform 
+                    ${isApisAvailable ? 'hover:-translate-y-1' : 'cursor-not-allowed'}
+                  `}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative text-center">
@@ -245,6 +266,11 @@ export default function LanguageSelector() {
                 </button>
               ))}
             </div>
+            {!isApisAvailable && (
+              <div className="mt-4 text-center text-sm text-red-600">
+                Please enable required features to start selecting languages
+              </div>
+            )}
           </div>
         );
       case 3:
@@ -360,6 +386,7 @@ export default function LanguageSelector() {
                 {"BhashaAI"}
               </h1>
             </div>
+            <ApiStatusBanner isApisAvailable={isApisAvailable} />
             <ProgressBar />
             <div className="space-y-6">
               <div className="relative overflow-hidden">

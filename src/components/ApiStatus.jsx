@@ -1,14 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CheckCircle,
   XCircle,
   Loader2,
   ChevronDown,
   ChevronUp,
+  ArrowLeft,
 } from "lucide-react";
 import { useApiStatus } from "../hooks/useApiStatus";
 
 const ApiStatus = () => {
+  const navigate = useNavigate();
   const [expandedCard, setExpandedCard] = useState(null);
   const { translationStatus, promptsStatus, summarizationStatus } =
     useApiStatus();
@@ -29,6 +32,8 @@ const ApiStatus = () => {
   const requirements = {
     translation: {
       system: [
+        "Chrome Canary version 131.0.6778.2 or newer required",
+        "Supported platforms: Windows, Mac, or Linux",
         "Windows 10/11 or MacOS 13+ or Linux",
         "22 GB storage space minimum",
         "4 GB Video RAM minimum",
@@ -40,29 +45,46 @@ const ApiStatus = () => {
         "Select 'Enabled' and restart Chrome",
         "Navigate to translation demo page",
         "Wait for language models to download",
+        "Run `await translation.canTranslate({sourceLanguage: 'en', targetLanguage: 'es'});` in console until it shows 'readily'",
         "Check components status in chrome://components",
-        "Refresh this page to see updated status", // Added step
+        "Refresh this page to see updated status",
       ],
+      links: {
+        documentation: "https://docs.google.com/document/d/1bzpeKk4k26KfjtR-_d9OuXLMpJdRMiLZAOVNMuFIejk/edit?tab=t.0#heading=h.f94l44u7xfg9",
+        demo: "https://translation-demo.glitch.me/"
+      }
     },
     prompts: {
       system: [
-        "Windows 10/11 or MacOS 13+ or Linux",
-        "22 GB storage space minimum",
+        "Chrome Canary version 131.0.6778.2 or newer required",
+        "Supported platforms: Windows, Mac, or Linux",
+        "Windows 10/11 or MacOS 13+ (Ventura) or Linux",
+        "22 GB storage space on Chrome profile volume",
         "4 GB Video RAM minimum",
-        "GPU required",
+        "Integrated or discrete GPU required",
         "Non-metered network connection",
+        "Chrome version 128.0.6545.0 or above",
       ],
       steps: [
+        "Acknowledge Google's Generative AI Prohibited Uses Policy",
         "Enable Gemini Nano flag in chrome://flags/#optimization-guide-on-device-model",
+        "Select 'Enabled BypassPerfRequirement' option",
         "Enable Prompt API flag in chrome://flags/#prompt-api-for-gemini-nano",
-        "Restart Chrome",
-        "Force model download via console",
-        "Wait for Gemini Nano download completion",
-        "Refresh this page to see updated status", // Added step
+        "Select 'Enabled' and restart Chrome",
+        "Run `await ai.languageModel.create();` in console to trigger model download",
+        "Run `(await ai.languageModel.capabilities()).available;` in console until it shows 'readily'",
+        "Check chrome://components for model status",
+        "Refresh page to see updated status",
       ],
+      links: {
+        documentation: "https://docs.google.com/document/d/18otm-D9xhn_XyObbQrc1v7SI-7lBX3ynZkjEpiS1V04",
+        playground: "https://chrome.dev/web-ai-demos/prompt-api-playground/",
+      }
     },
     summarization: {
       system: [
+        "Chrome Canary version 131.0.6778.2 or newer required",
+        "Supported platforms: Windows, Mac, or Linux",
         "Windows 10/11 or MacOS 13+ or Linux",
         "22 GB storage space minimum",
         "4 GB Video RAM minimum",
@@ -72,12 +94,61 @@ const ApiStatus = () => {
       steps: [
         "Enable Summarization API flag in chrome://flags/#summarization-api",
         "Select 'Enabled' and restart Chrome",
-        "Use console to trigger model download",
-        "Wait for capabilities to show 'readily'",
+        "Run `await ai.summarizer.create();` in console to trigger model download",
+        "Run `(await ai.summarizer.capabilities()).available;` in console until it shows 'readily'",
         "Check chrome://components for status",
-        "Refresh this page to see updated status", // Added step
+        "Refresh this page to see updated status",
       ],
+      links: {
+        documentation: "https://docs.google.com/document/d/1Bvd6cU9VIEb7kHTAOCtmmHNAYlIZdeNmV7Oy-2CtimA/edit?tab=t.0",
+        demo: "https://chrome.dev/web-ai-demos/summarization-api-playground/",
+      }
     },
+  };
+
+  const formatChromeUrl = (step) => {
+    const chromeUrlPattern = /(chrome:\/\/[^\s]+)/g;
+    return step.split(chromeUrlPattern).map((part, index) => {
+      if (part.match(chromeUrlPattern)) {
+        return (
+          <span
+            key={index}
+            className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-800"
+          >
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
+  const CodeBlock = ({ code }) => {
+    const [copied, setCopied] = useState(false);
+    
+    const copyToClipboard = async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    };
+
+    return (
+      <div className="relative">
+        <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+          <code>{code}</code>
+        </pre>
+        <button
+          onClick={copyToClipboard}
+          className="absolute top-2 right-2 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
+        >
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+    );
   };
 
   const StatusCard = ({ title, status, description, type }) => (
@@ -156,19 +227,54 @@ const ApiStatus = () => {
               {requirements[type].steps.map((step, i) => (
                 <li key={i} className="flex gap-3">
                   <span className="font-medium text-indigo-600">{i + 1}.</span>
-                  {step}
+                  <span>{formatChromeUrl(step)}</span>
                 </li>
               ))}
             </ol>
           </div>
+
+          {requirements[type].links && (
+            <div className="bg-gray-50 rounded-xl p-4">
+              <h3 className="text-gray-900 font-medium mb-3">Useful Links</h3>
+              <div className="grid gap-2">
+                {Object.entries(requirements[type].links).map(([key, url]) => (
+                  <a 
+                    key={key}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:text-indigo-800"
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)} →
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
       <div className="max-w-5xl mx-auto px-4 py-8">
+        <button
+          onClick={handleBack}
+          className="flex items-center text-white/80 hover:text-white mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 mr-1" />
+          Back
+        </button>
+
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
             API Status Dashboard

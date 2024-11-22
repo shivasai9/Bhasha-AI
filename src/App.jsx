@@ -5,6 +5,7 @@ import ArticleList from './components/ArticleList';
 import ArticleView from './components/ArticleView';
 import Settings from './components/Settings';
 import SavedWords from './components/SavedWords';
+import ApiStatus from './components/ApiStatus.jsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/article/:id/:title/:difficulty" element={<ArticleView />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/saved-words" element={<SavedWords />} />
+        <Route path="/api-status" element={<ApiStatus />} />
         <Route path="*" element={<LanguageSelector />} />
       </Routes>
     </Router>

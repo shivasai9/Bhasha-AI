@@ -13,13 +13,13 @@ export function useChatBot(article, articleContent) {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentPromptType, setCurrentPromptType] = useState('DEFAULT');
-  const [tokenInfo, setTokenInfo] = useState({ left: 0, total: 4096 });
+  const [tokenInfo, setTokenInfo] = useState({ left: 4096, total: 4096 });
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   const destroySession = () => {
     botService.destroy();
     setMessages([]);
-    setTokenInfo({ left: 0, total: 4096 });
+    setTokenInfo({ left: 4096, total: 4096 });
     setIsSessionExpired(false);
   };
 

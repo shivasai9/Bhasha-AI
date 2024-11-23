@@ -21,7 +21,7 @@ const protectAndTranslate = async (text, fromLang, toLang) => {
 
 export function useLabels(componentName) {
   const [labels, setLabels] = useState(componentName ? componentLabels[componentName] : componentLabels);
-  const interfaceLanguage = getInterfaceLanguage();
+  const interfaceLanguage = getInterfaceLanguage() || "english";
 
   useEffect(() => {
     const translateLabels = async () => {

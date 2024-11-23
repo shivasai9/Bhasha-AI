@@ -75,12 +75,12 @@ const ChatMessages = ({
                 renderMessageContent(message.content)
             )}
             {message.options && (
-              <div className="mt-3 space-y-2 bg-white rounded-lg overflow-hidden">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {message.options.map((option) => (
                   <button
                     key={option.id}
                     onClick={() => handleOptionClick(option)}
-                    className="block w-full text-left p-2 hover:bg-gray-100 text-sm text-gray-700 transition-colors border-b last:border-b-0"
+                    className="px-3 py-1.5 bg-white rounded-full text-sm text-gray-700 hover:bg-gray-50 border border-gray-200 transition-colors flex items-center gap-1 shadow-sm hover:shadow"
                   >
                     {option.name}
                   </button>

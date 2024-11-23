@@ -1,9 +1,10 @@
 export const BOT_MESSAGES = {
   initial: (articleTitle) => ({
     type: "bot",
-    content: `👋 Hi! I'm Article Buddy, your friendly reading companion. I see you're reading "${articleTitle || 'this article'}". How can I help you understand it better? Feel free to ask about:`,
+    content: `👋 Hi! I'm Article Buddy, your friendly reading companion. I see you're reading "${articleTitle || 'this article'}". How can I help you understand it better?`,
     options: [
       { id: 'difficult-sentences', name: "🤔 Difficult sentences" },
+      { id: 'other', name: "✨ Other" },
     ],
   }),
 
@@ -28,4 +29,20 @@ export const BOT_MESSAGES = {
     content: `I understand you're asking about: ${inputMessage}. Let me help you understand the article "${articleTitle || 'this article'}" better.`,
     options: undefined,
   }),
+
+  followUpPrompt: {
+    type: "bot",
+    content: "Feel free to ask any questions you have about the article. I'm here to help clarify and deepen your understanding.",
+    options: undefined
+  },
+
+  whatsNext: {
+    type: "bot",
+    content: "What would you like to know next?",
+    options: [
+      { id: 'difficult-sentences', name: "🤔 Difficult sentences" },
+      { id: 'follow-up', name: "❓ Ask follow-up questions" },
+      { id: 'other', name: "✨ Other" },
+    ],
+  },
 };

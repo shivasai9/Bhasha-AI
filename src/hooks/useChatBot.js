@@ -68,6 +68,7 @@ export function useChatBot(article, articleContent) {
 
     try {
       let isFirstChunk = true;
+      let finalChunk = '';
       
       await botService.sendStreamingMessage(
         inputMessage, 
@@ -79,6 +80,7 @@ export function useChatBot(article, articleContent) {
               options: undefined,
             }]);
             isFirstChunk = false;
+            finalChunk = chunk;
             setIsStreaming(true);
             setIsLoading(false);
           } else {
@@ -86,6 +88,7 @@ export function useChatBot(article, articleContent) {
               const newMessages = [...prev];
               if (newMessages[newMessages.length - 1].type === "bot") {
                 newMessages[newMessages.length - 1].content = chunk;
+                finalChunk = chunk;
               }
               return newMessages;
             });
@@ -94,6 +97,12 @@ export function useChatBot(article, articleContent) {
         },
         currentPromptType
       );
+
+      setTimeout(() => {
+        setMessages((prev) => [...prev, BOT_MESSAGES.whatsNext]);
+        triggerScroll();
+      }, 500);
+
     } catch (error) {
       console.error("Failed to get bot response:", error);
       setMessages((prev) => [...prev, {
@@ -111,7 +120,8 @@ export function useChatBot(article, articleContent) {
         total: maxTokens
       });
       
-      if (tokensLeft < 5000) {
+      // Keep 700 as the minimum number of tokens to avoid session expiry
+      if (tokensLeft < 700) {
         setIsSessionExpired(true);
       }
       
@@ -131,17 +141,28 @@ export function useChatBot(article, articleContent) {
     setMessages((prev) => [...prev, userMessage]);
     triggerScroll();
 
-    if (option.id === 'difficult-sentences') {
-      setCurrentPromptType('SENTENCE_ANALYSIS');
-      setTimeout(() => {
-        setMessages((prev) => [...prev, BOT_MESSAGES.difficultParagraphPrompt]);
-        triggerScroll();
-      }, 1000);
-      return;
-    }
+    switch(option.id) {
+      case 'difficult-sentences':
+        setCurrentPromptType('SENTENCE_ANALYSIS');
+        setTimeout(() => {
+          setMessages((prev) => [...prev, BOT_MESSAGES.difficultParagraphPrompt]);
+          triggerScroll();
+        }, 1000);
+        break;
 
-    setCurrentPromptType('DEFAULT');
-    setMessages((prev) => [...prev, userMessage]);
+      case 'follow-up':
+      case 'other':
+        setCurrentPromptType('FOLLOW_UP');
+        setTimeout(() => {
+          setMessages((prev) => [...prev, BOT_MESSAGES.followUpPrompt]);
+          triggerScroll();
+        }, 1000);
+        break;
+
+      default:
+        setCurrentPromptType('DEFAULT');
+        setMessages((prev) => [...prev, userMessage]);
+    }
   };
 
   const toggleOpen = () => {

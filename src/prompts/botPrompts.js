@@ -13,4 +13,10 @@ Sentence to analyze: `,
 
 Here is the article content to analyze:
 ${articleContent}`,
+
+  FOLLOW_UP: `Based on the article content and the user's question:
+1. Provide a focused answer using information from the article
+2. Clarify any related concepts mentioned in the article
+3. Connect the answer to the article's main themes
+Stay within the scope of the article's content.`,
 };

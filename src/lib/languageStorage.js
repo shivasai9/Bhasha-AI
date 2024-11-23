@@ -1,6 +1,7 @@
 const LANGUAGE_KEY = 'website_language';
 const TARGET_LANGUAGE_KEY = 'learning_language';
 const TOPICS_KEY = 'selected_topics';
+const GENERATED_SUBTOPICS_KEY = 'generated_subtopics';
 
 export const saveInterfaceLanguage = (language) => {
   const lowerCasedLanguage = language.toLowerCase();
@@ -26,4 +27,12 @@ export const saveTopics = (topics) => {
 
 export const getTopics = () => {
   return JSON.parse(localStorage.getItem(TOPICS_KEY) || '[]');
+};
+
+export const saveGeneratedSubTopics = (subtopics) => {
+  localStorage.setItem(GENERATED_SUBTOPICS_KEY, JSON.stringify(subtopics));
+};
+
+export const getGeneratedSubTopics = () => {
+  return JSON.parse(localStorage.getItem(GENERATED_SUBTOPICS_KEY) || '[]');
 };

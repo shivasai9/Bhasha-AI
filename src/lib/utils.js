@@ -42,6 +42,9 @@ export async function withRetry(fn, maxAttempts = 5, baseDelayMs = 1000) {
 
 export async function fetchImagesData(keyword) {
   try {
+    if (!keyword) {
+      return [];
+    }
     const response = await fetch(`${WIKI_IMAGE_URL}${keyword}`);
     const data = await response.json();
     let imagesData = [];

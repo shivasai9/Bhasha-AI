@@ -27,7 +27,7 @@ async function generateAndSaveArticle(customTopic = null, language) {
       articleID: getUniqueId(),
       ...articleData,
       language: "english",
-      timestamp: Date.now(),
+      createdDate: Date.now(),
       isSaved: false,
       imagesData,
     };

@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { withRetry } from "./utils";
 import {
-  CREATE_RANDOM_ARTICLE,
   CREATE_CUSTOM_ARTICLE,
   CREATE_ARTICLE_QUESTIONS,
   GENERATE_ARTICLE_CONTENT,
@@ -10,6 +9,10 @@ import {
   CORRECT_SUMMARY,
 } from "./prompts";
 import { getArticlesByLanguage } from "./dbUtils";
+import {
+  getGeneratedSubTopics,
+  saveGeneratedSubTopics,
+} from "./languageStorage";
 
 class AIWrapper {
   constructor() {
@@ -52,11 +55,21 @@ class AIWrapper {
         const initialized = await this.initialize();
         if (!initialized) throw new Error("Could not initialize AI");
 
-        const prompt = await generateArticleCreationPrompt(customTopic);
+        const { prompt, topic } = await generateArticleCreationPrompt(
+          customTopic
+        );
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
+        
         const result = await this.session.prompt(prompt);
+        const existingGeneratedSubTopics = getGeneratedSubTopics() || [];
+        saveGeneratedSubTopics([...existingGeneratedSubTopics, topic]);
+
+        console.log(
+          `Tokens used: ${this.session.tokensSoFar}/${this.session.maxTokens} (${this.session.tokensLeft} left)`
+        );
+
         return JSON.parse(result.trim());
       };
 
@@ -120,7 +133,7 @@ class AIWrapper {
 
   async correctSummary(title, summary) {
     try {
-      console.log(title)
+      console.log(title);
       const start = Date.now();
       const prompt = CORRECT_SUMMARY.replace("{{title}}", title);
       const customPrompt = prompt.replace("{{summary}}", summary);
@@ -143,7 +156,7 @@ class AIWrapper {
 
       this.destroy();
       console.log(parsed);
-      return (parsed);
+      return parsed;
     } catch (error) {
       console.error("Summary correction generation failed:", error);
       this.destroy();
@@ -165,14 +178,14 @@ class AIWrapper {
         }
         const result = await this.session.prompt(prompt);
         const cleaned = result
-        .trim()
-        .replace(/[^\w\s.,\n]/g, "") // Keep words, spaces, dots, commas, newlines
-        .replace(/[ \t]+/g, " ") // Replace multiple spaces/tabs with single space
-        .replace(/,\s*\./g, ".") // Replace ", ." with just "."
-        .replace(/\s+\./g, ".") // Remove spaces before dots
-        .replace(/\.+/g, ".") // Replace multiple dots with single dot
-        .replace(/\n\s+/g, "\n") // Remove spaces after newlines
-        .replace(/\n{3,}/g, "\n\n") // Replace 3+ newlines with double newline
+          .trim()
+          .replace(/[^\w\s.,\n]/g, "") // Keep words, spaces, dots, commas, newlines
+          .replace(/[ \t]+/g, " ") // Replace multiple spaces/tabs with single space
+          .replace(/,\s*\./g, ".") // Replace ", ." with just "."
+          .replace(/\s+\./g, ".") // Remove spaces before dots
+          .replace(/\.+/g, ".") // Replace multiple dots with single dot
+          .replace(/\n\s+/g, "\n") // Remove spaces after newlines
+          .replace(/\n{3,}/g, "\n\n") // Replace 3+ newlines with double newline
           .trim();
 
         return cleaned;

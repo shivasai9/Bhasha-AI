@@ -1,5 +1,8 @@
 import { getArticlesByLanguage } from "./dbUtils";
-import { getTopics } from "./languageStorage";
+import {
+  getTopics,
+  getGeneratedSubTopics,
+} from "./languageStorage";
 import { TOPICS } from "./constants";
 
 const getRandomItem = (array) => {
@@ -28,6 +31,24 @@ const getTopicDescriptions = () => {
     };
   });
 };
+
+export function getPossibleSubTopics() {
+  const selectedTopicIds = getTopics();
+  if (!selectedTopicIds.length) return [];
+
+  const generatedSubTopics = getGeneratedSubTopics();
+
+  return selectedTopicIds.reduce((allSubTopics, id) => {
+    const topic = TOPICS.find((t) => t.id === id);
+    if (topic && topic.subTopics) {
+      const filteredSubTopics = topic.subTopics.filter(
+        (subTopic) => !generatedSubTopics.includes(subTopic)
+      );
+      return [...allSubTopics, ...filteredSubTopics];
+    }
+    return allSubTopics;
+  }, []);
+}
 
 export async function generateArticleCreationPrompt(customTopic = null) {
   const existingArticles = await getArticlesByLanguage("english");
@@ -60,59 +81,27 @@ export async function generateArticleCreationPrompt(customTopic = null) {
     return prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", customTopic);
   }
 
-  const topicDescriptions = getTopicDescriptions();
-  
-  if (!topicDescriptions.length) {
-    const randomTopic = getRandomItem(TOPICS);
-    return prompt + CREATE_RANDOM_ARTICLE
-      .replace("{{topicName}}", randomTopic.name)
-      .replace("{{topicDescription}}", randomTopic.description);
+  const availableSubTopics = getPossibleSubTopics();
+
+  if (!availableSubTopics.length) {
+    const randomTopic = '"Any Random Topic"';
+    return prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", randomTopic);
   }
 
-  const selectedTopic = getRandomItem(topicDescriptions);
-  return prompt + CREATE_RANDOM_ARTICLE
-    .replace("{{topicName}}", selectedTopic.name)
-    .replace("{{topicDescription}}", selectedTopic.description);
+  const selectedSubTopic = getRandomItem(availableSubTopics);
+  const res = {
+    prompt:
+      prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", selectedSubTopic),
+    topic: selectedSubTopic,
+  };
+
+  return res;
 }
-
-export const CREATE_RANDOM_ARTICLE = `
-Task: Generate an article about "{{topicName}}" considering this context: {{topicDescription}}
-
-Example using:
-Topic: "Daily Life & Culture"
-Description: "Everyday situations, customs, and cultural practices"
-
-{
-  "title": "Morning Rituals Around the World",
-  "summary": "From Japanese fish markets to Italian espresso bars, morning routines reveal fascinating cultural traditions worldwide. These daily practices showcase how different societies begin their day, reflecting deep-rooted customs and social values.",
-  "imageKeywords": ["breakfast", "ritual", "culture", "tradition", "morning"]
-}
-
-Rules for generating the article:
-1. Focus specifically on the given topic and its description
-2. Generate an engaging and informative title in clear English
-3. Ensure the summary is factually accurate and written in proper English
-4. Keep the summary exactly two sentences long in standard English
-5. Write in a friendly and engaging tone using natural English expressions
-6. Provide exactly five single-word keywords ordered by relevance for Wikimedia image search:
-   - Each keyword must be a single word in English only
-   - Keywords should match the article's main theme and content
-   - Order from most relevant to least relevant
-   - Use common, searchable terms that would exist in image databases
-   - Avoid abstract concepts that wouldn't have direct images
-7. Return pure JSON without any markdown or code formatting
-
-Return it in this JSON format:
-{
-  "title": "The title",
-  "summary": "A two-sentence summary",
-  "imageKeywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
-}`;
 
 export const CREATE_CUSTOM_ARTICLE = `
 You are an experienced educator and content writer who specializes in creating engaging content in English.
 
-Example (Topic: Space Exploration):
+Example (If the Topic is "Space Exploration"):
 {
   "title": "The New Era of Mars Exploration",
   "summary": "Humans are closer than ever to reaching Mars with modern technology. Multiple space agencies are working together to make this dream a reality.",
@@ -120,16 +109,39 @@ Example (Topic: Space Exploration):
 }
 
 Now, generate an article about {{topic}} using these rules:
-1. Generate an engaging and informative title in clear English
-2. Ensure the summary is factually accurate and written in proper English
-3. Keep the summary exactly two sentences long in standard English
+1. If the topic is "Any Random Topic":
+   - First, generate a unique and interesting topic
+   - Choose from diverse fields like science, history, culture, technology, nature, etc.
+   - Avoid common or generic topics
+   - Make sure it's specific enough to be engaging
+   - Example random topics:
+     * "Underground Cities of the World"
+     * "The Science of Bioluminescence"
+     * "Traditional Games Across Cultures"
+
+2. Generate an engaging and informative title:
+   - Use simple, everyday English words
+   - Avoid technical jargon or complex terms
+   - Make it easy to understand for non-native speakers
+   - Keep it clear and straightforward
+
+3. Create a summary that is:
+   - Written in simple, clear English
+   - Uses basic vocabulary and common words
+   - Avoids complicated sentences and fancy language
+   - Easy to understand for all English levels
+   - Exactly two sentences long
+   - Factually accurate and engaging
+
 4. Write in a friendly and engaging tone using natural English expressions
+
 5. Provide exactly five single-word keywords ordered by relevance for Wikimedia image search:
    - Each keyword must be a single word in English only
    - Keywords should match the article's main theme and content
    - Order from most relevant to least relevant
    - Use common, searchable terms that would exist in image databases
    - Avoid abstract concepts that wouldn't have direct images
+
 6. Return pure JSON without any markdown or code formatting
 
 Return it in this JSON format:
@@ -195,7 +207,7 @@ Response format: {
 }
 
 Don't find errors in Article. Find errors only from Written Summary. Do not include any markdown or code formatting, only the pure JSON object.
-`
+`;
 
 export const GENERATE_ARTICLE_CONTENT = `
 Generate an article content based on the following title and summary, adhering to the specified tone and length requirements.

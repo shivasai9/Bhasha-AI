@@ -16,17 +16,32 @@ export function useChatBot(article, articleContent) {
   const [tokenInfo, setTokenInfo] = useState({ left: 0, total: 4096 });
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
+  const destroySession = () => {
+    botService.destroy();
+    setMessages([]);
+    setTokenInfo({ left: 0, total: 4096 });
+    setIsSessionExpired(false);
+  };
+
+  const openChat = () => {
+    setIsOpen(true);
+    setShowTooltip(false);
+    if (article?.title) {
+      setMessages([BOT_MESSAGES.initial(article.title)]);
+    }
+  };
+
+  const closeChat = () => {
+    destroySession();
+    setIsOpen(false);
+    setIsMinimized(false);
+  };
+
   useEffect(() => {
     if (articleContent) {
       botService.setArticleContent(articleContent);
     }
   }, [articleContent]);
-
-  useEffect(() => {
-    if (article?.title) {
-      setMessages([BOT_MESSAGES.initial(article.title)]);
-    }
-  }, [article?.title]);
 
   const triggerScroll = () => {
     setShouldScrollToBottom(true);
@@ -166,8 +181,11 @@ export function useChatBot(article, articleContent) {
   };
 
   const toggleOpen = () => {
-    setIsOpen(prev => !prev);
-    setShowTooltip(false);
+    if (isOpen) {
+      closeChat();
+    } else {
+      openChat();
+    }
   };
 
   const toggleMinimize = () => setIsMinimized(prev => !prev);
@@ -197,5 +215,6 @@ export function useChatBot(article, articleContent) {
     tokenInfo,
     isSessionExpired,
     createNewSession,
+    destroySession,
   };
 }

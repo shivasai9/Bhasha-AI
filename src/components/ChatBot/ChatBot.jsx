@@ -16,8 +16,8 @@ export default function ChatBot({ article, articleContent }) {
     handleSubmit,
     handleOptionClick,
     setInputMessage,
-    toggleOpen,
-    toggleMinimize,
+    toggleOpen: originalToggleOpen,
+    toggleMinimize: originalToggleMinimize,
     showHoverTooltip,
     handleMouseEnter,
     handleMouseLeave,
@@ -29,6 +29,21 @@ export default function ChatBot({ article, articleContent }) {
     isSessionExpired,
     createNewSession,
   } = useChatBot(article, articleContent);
+
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const toggleResize = () => setIsExpanded(prev => !prev);
+
+  const handleMinimize = () => {
+    if (!isMinimized) {
+      setIsExpanded(false);
+    }
+    originalToggleMinimize();
+  };
+
+  const handleClose = () => {
+    setIsExpanded(false);
+    originalToggleOpen();
+  };
 
   const messagesEndRef = useRef(null);
 
@@ -47,21 +62,27 @@ export default function ChatBot({ article, articleContent }) {
         setShowTooltip={setShowTooltip}
         handleMouseEnter={handleMouseEnter}
         handleMouseLeave={handleMouseLeave}
-        toggleOpen={toggleOpen}
+        toggleOpen={originalToggleOpen}
       />
     );
   }
 
   return (
     <div
-      className={`fixed right-6 bottom-6 w-96 bg-white rounded-xl shadow-xl transition-all overflow-hidden ${
-        isMinimized ? "h-14" : "h-[600px]"
+      className={`fixed right-6 bottom-6 bg-white rounded-xl shadow-xl transition-all overflow-hidden ${
+        isMinimized 
+          ? "h-14 w-80"
+          : isExpanded 
+            ? "h-[80vh] w-[50vw]" 
+            : "h-[600px] w-96"
       }`}
     >
       <ChatHeader
         isMinimized={isMinimized}
-        toggleMinimize={toggleMinimize}
-        toggleOpen={toggleOpen}
+        toggleMinimize={handleMinimize}
+        toggleOpen={handleClose}
+        isExpanded={isExpanded}
+        toggleResize={toggleResize}
       />
 
       {!isMinimized && (

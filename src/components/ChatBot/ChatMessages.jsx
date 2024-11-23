@@ -41,7 +41,7 @@ const ChatMessages = ({
   };
 
   return (
-    <div className="h-[calc(100%-130px)] overflow-y-auto p-4 space-y-4">
+    <div className="h-[calc(100%-165px)] overflow-y-auto p-4 space-y-4">
       {messages.map((message, index) => (
         <div
           key={index}

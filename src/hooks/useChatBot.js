@@ -13,6 +13,9 @@ export function useChatBot(article, articleContent) {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentPromptType, setCurrentPromptType] = useState('DEFAULT');
+  const [tokenInfo, setTokenInfo] = useState({ left: 0, total: 4096 });
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
   useEffect(() => {
     if (articleContent) {
       botService.setArticleContent(articleContent);
@@ -29,9 +32,27 @@ export function useChatBot(article, articleContent) {
     setShouldScrollToBottom(true);
   };
 
+  const createNewSession = async () => {
+    setIsLoading(true);
+    try {
+      botService.destroy();
+      await botService.initializeSession();
+      setIsSessionExpired(false);
+      setMessages(prev => [...prev, {
+        type: "bot",
+        content: "New session created! You can continue chatting.",
+        options: undefined,
+      }]);
+    } catch (error) {
+      console.error("Failed to create new session:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!inputMessage.trim() || isLoading) return;
+    if (!inputMessage.trim() || isLoading || isSessionExpired || isStreaming) return;
 
     const userMessage = {
       type: "user",
@@ -81,6 +102,19 @@ export function useChatBot(article, articleContent) {
         options: undefined,
       }]);
     } finally {
+      const session = botService.getSession();
+      const tokensLeft = session?.tokensLeft || 0;
+      const maxTokens = session?.maxTokens || 0;
+      
+      setTokenInfo({
+        left: tokensLeft,
+        total: maxTokens
+      });
+      
+      if (tokensLeft < 5000) {
+        setIsSessionExpired(true);
+      }
+      
       setIsLoading(false);
       setIsStreaming(false);
       setCurrentPromptType('DEFAULT');
@@ -139,5 +173,8 @@ export function useChatBot(article, articleContent) {
     setShouldScrollToBottom,
     isLoading,
     isStreaming,
+    tokenInfo,
+    isSessionExpired,
+    createNewSession,
   };
 }

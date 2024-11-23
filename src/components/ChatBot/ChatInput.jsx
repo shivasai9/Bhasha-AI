@@ -4,7 +4,7 @@ import { Send } from 'lucide-react';
 
 const INITIAL_HEIGHT = '56px';
 
-const ChatInput = ({ inputMessage, setInputMessage, handleSubmit, isLoading }) => {
+const ChatInput = ({ inputMessage, setInputMessage, handleSubmit, isLoading, disabled }) => {
   const textareaRef = useRef(null);
 
   const resetHeight = () => {
@@ -49,8 +49,10 @@ const ChatInput = ({ inputMessage, setInputMessage, handleSubmit, isLoading }) =
           onKeyDown={handleKeyDown}
           onInput={handleInput}
           placeholder="Ask me anything about the article... (Shift+Enter for new line)"
-          className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none overflow-hidden max-h-32 placeholder:text-sm"
-          disabled={isLoading}
+          className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none overflow-hidden max-h-32 placeholder:text-sm ${
+            disabled ? 'bg-gray-50 cursor-not-allowed' : ''
+          }`}
+          disabled={disabled || isLoading}
           style={{ 
             height: INITIAL_HEIGHT,
             lineHeight: '1.5' 
@@ -58,9 +60,9 @@ const ChatInput = ({ inputMessage, setInputMessage, handleSubmit, isLoading }) =
         />
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={disabled || isLoading}
           className={`p-2 bg-indigo-600 text-white rounded-lg self-end ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'
+            disabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'
           }`}
         >
           <Send className="w-5 h-5" />

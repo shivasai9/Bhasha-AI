@@ -40,18 +40,21 @@ class BotService {
       }
 
       const response = await botAIWrapper.askBot(message);
-      
-      if (botAIWrapper.session?.tokensLeft < 1000) {
-        console.log('Token limit approaching, will initialize new session on next message');
-        this.isInitialized = false;
-      }
-
       return response;
     } catch (error) {
       console.error('Error sending message:', error);
       this.isInitialized = false;
       throw error;
     }
+  }
+
+  getSession() {
+    return botAIWrapper.session;
+  }
+
+  destroy() {
+    botAIWrapper.destroy();
+    this.isInitialized = false;
   }
 
   _getPromptByType(message, promptType) {
@@ -73,15 +76,10 @@ class BotService {
 
       const prompt = this._getPromptByType(message, promptType);
       await botAIWrapper.askBotStream(prompt, onChunk);
-      
-      if (botAIWrapper.session?.tokensLeft < 1000) {
-        console.log('Token limit approaching, will initialize new session on next message');
-        this.isInitialized = false;
-      }
 
     } catch (error) {
       console.error('Error sending streaming message:', error);
-      this.isInitialized = false;
+      // this.isInitialized = false;
       throw error;
     }
   }

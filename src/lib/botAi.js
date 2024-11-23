@@ -48,15 +48,6 @@ class BotAIWrapper {
         }
       }
 
-      if (this.session.tokensLeft < 1000) {
-        console.log("Token limit approaching, creating new session...");
-        this.destroy();
-        const initialized = await this.initializeBotSession(this.articleContent);
-        if (!initialized) {
-          throw new Error("Could not initialize new Bot AI session");
-        }
-      }
-
       console.log(`Before prompt - Tokens: ${this.session.tokensSoFar}/${this.session.maxTokens} (${this.session.tokensLeft} left)`);
       
       const result = await this.session.prompt(userPrompt);
@@ -92,18 +83,8 @@ class BotAIWrapper {
         }
       }
 
-      if (this.session.tokensLeft < 1000) {
-        console.log("Token limit approaching, creating new session...");
-        this.destroy();
-        const initialized = await this.initializeBotSession(this.articleContent);
-        if (!initialized) {
-          throw new Error("Could not initialize new Bot AI session");
-        }
-      }
-
       console.log(`Before prompt - Tokens: ${this.session.tokensSoFar}/${this.session.maxTokens} (${this.session.tokensLeft} left)`);
       
-      let lastResponse = '';
       const stream = await this.session.promptStreaming(userPrompt);
       
       for await (const chunk of stream) {

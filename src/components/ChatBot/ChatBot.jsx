@@ -25,6 +25,9 @@ export default function ChatBot({ article, articleContent }) {
     setShouldScrollToBottom,
     isLoading,
     isStreaming,
+    tokenInfo,
+    isSessionExpired,
+    createNewSession,
   } = useChatBot(article, articleContent);
 
   const messagesEndRef = useRef(null);
@@ -63,6 +66,20 @@ export default function ChatBot({ article, articleContent }) {
 
       {!isMinimized && (
         <>
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
+            <div className="text-xs text-gray-600 font-medium">
+              Tokens remaining: {tokenInfo.left}/{tokenInfo.total}
+            </div>
+            {isSessionExpired && (
+              <button
+                onClick={createNewSession}
+                className="text-xs px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                disabled={isLoading}
+              >
+                Create New Session
+              </button>
+            )}
+          </div>
           <ChatMessages
             messages={messages}
             handleOptionClick={handleOptionClick}
@@ -75,6 +92,7 @@ export default function ChatBot({ article, articleContent }) {
             setInputMessage={setInputMessage}
             handleSubmit={handleSubmit}
             isLoading={isLoading}
+            disabled={isSessionExpired || isLoading || isStreaming}
           />
         </>
       )}

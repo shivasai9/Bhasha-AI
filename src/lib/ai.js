@@ -11,7 +11,9 @@ import {
 import { getArticlesByLanguage } from "./dbUtils";
 import {
   getGeneratedSubTopics,
+  getRandomGeneratedTopics,
   saveGeneratedSubTopics,
+  saveRandomGeneratedTopics,
 } from "./languageStorage";
 
 class AIWrapper {
@@ -63,16 +65,22 @@ class AIWrapper {
         }
 
         const result = await this.session.prompt(prompt);
+        const parsedResult = JSON.parse(result.trim());
         const existingGeneratedSubTopics = getGeneratedSubTopics() || [];
-        if (!customTopic) {
+        if (!customTopic && topic) {
           saveGeneratedSubTopics([...existingGeneratedSubTopics, topic]);
+        }
+        if (topic === "Any Random Topic") {
+          const esistingRandomGeneratedTopics =
+            getRandomGeneratedTopics() || [];
+          saveRandomGeneratedTopics([...esistingRandomGeneratedTopics, parsedResult.title]);
         }
 
         console.log(
           `Tokens used: ${this.session.tokensSoFar}/${this.session.maxTokens} (${this.session.tokensLeft} left)`
         );
 
-        return JSON.parse(result.trim());
+        return parsedResult;
       };
 
       const parsed = await withRetry(generateWithRetry, 5, 1000);

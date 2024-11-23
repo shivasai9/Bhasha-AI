@@ -96,6 +96,7 @@ export const ARTICLE_LIST_LABELS = {
   randomArticleButton: "Generate Random Article",
   loadMoreButton: "Load More Articles",
   generatingArticle: "Generating custom article...",
+  generatingRandomArticle: "Generating random article...",
   generatingArticles: "Generating article(s)... ({count} remaining)",
   goBack: "Go back"
 };

@@ -19,6 +19,7 @@ export default function ArticleList() {
   } = useArticles();
   const navigate = useNavigate();
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const [isRandomArticle, setIsRandomArticle] = useState(false);
   const handleDifficultySelect = (articleId, title, difficulty) => {
     // Prevent interaction while loading
     // TODO: Make it better
@@ -28,6 +29,7 @@ export default function ArticleList() {
 
   const handleCustomTopic = async (topic) => {
     try {
+      setIsRandomArticle(topic === "Any Random Topic");
       await generateCustomArticle(topic);
     } catch (error) {
       console.error("Error generating custom article:", error);
@@ -95,10 +97,14 @@ export default function ArticleList() {
             {/* Custom article skeleton at top */}
             {isCustomArticle && generatingCount > 0 && <SkeletonArticleCard />}
             {/* Custom article loading message */}
-            {isCustomArticle && generatingCount > 0 && (
+            {(isCustomArticle || isRandomArticle) && generatingCount > 0 && (
               <div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
-                <p className="text-gray-600">{labels.generatingArticle}</p>
+                <p className="text-gray-600">
+                  {isRandomArticle 
+                    ? labels.generatingRandomArticle 
+                    : labels.generatingArticle}
+                </p>
               </div>
             )}
             {/* Existing articles */}

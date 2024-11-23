@@ -13,6 +13,7 @@ import SummaryWriter from "./SummaryWriter";
 import AudioPlayer from "./AudioPlayer";
 import QuizSection from "./QuizSection";
 import Header from "../common/Header";
+import ChatBot from "../ChatBot/ChatBot";
 
 const tabIcons = {
   read: BookOpen,
@@ -137,6 +138,10 @@ export default function ArticleView() {
           )}
         </div>
       </div>
+      <ChatBot 
+        article={article}
+        articleContent={articleContent}
+      />
     </div>
   );
 }

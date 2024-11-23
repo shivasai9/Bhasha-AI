@@ -1,36 +1,32 @@
-
 import React from 'react';
 import { Bot, X } from 'lucide-react';
 
 const ChatBotButton = ({ 
   showTooltip, 
-  showHoverTooltip, 
   setShowTooltip, 
   handleMouseEnter, 
   handleMouseLeave, 
   toggleOpen 
 }) => {
+
+  const handleTooltipClose = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShowTooltip(false);
+  };
+
   return (
-    <div
-      className="fixed bottom-6 right-6 group"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {(showTooltip || showHoverTooltip) && (
+    <div className="fixed bottom-6 right-6">
+      {showTooltip && (
         <div className="absolute bottom-full right-0 mb-2">
-          <div className="bg-white text-gray-800 text-sm py-2.5 px-4 rounded-xl shadow-lg whitespace-nowrap flex items-center gap-3 border border-gray-100">
-            <span className="flex items-center gap-2">
-              <div className="p-1 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
-                <Bot className="w-4 h-4 text-white" />
-              </div>
-              Need help understanding the article?
-            </span>
+          <div className="bg-white text-gray-800 text-sm py-3 px-5 rounded-xl shadow-lg flex items-start gap-4 border border-gray-100 min-w-[300px]">
+            <div className="flex flex-col flex-1 gap-1">
+              <span className="font-medium">Hi, I'm Article Buddy, your AI assistant.</span>
+              <span>Ask me anything about the article! 👋</span>
+            </div>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowTooltip(false);
-              }}
-              className="hover:bg-gray-100 p-1 rounded-full transition-colors"
+              onClick={handleTooltipClose}
+              className="flex-shrink-0 hover:bg-gray-100 p-1 rounded-full transition-colors"
             >
               <X className="w-3 h-3" />
             </button>
@@ -40,6 +36,8 @@ const ChatBotButton = ({
       )}
       <button
         onClick={toggleOpen}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
       >
         <Bot className="w-6 h-6" />

@@ -18,7 +18,6 @@ export default function ChatBot({ article, articleContent }) {
     setInputMessage,
     toggleOpen: originalToggleOpen,
     toggleMinimize: originalToggleMinimize,
-    showHoverTooltip,
     handleMouseEnter,
     handleMouseLeave,
     shouldScrollToBottom,
@@ -54,11 +53,18 @@ export default function ChatBot({ article, articleContent }) {
     }
   }, [messages, shouldScrollToBottom]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTooltip(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   if (!isOpen) {
     return (
       <ChatBotButton
         showTooltip={showTooltip}
-        showHoverTooltip={showHoverTooltip}
         setShowTooltip={setShowTooltip}
         handleMouseEnter={handleMouseEnter}
         handleMouseLeave={handleMouseLeave}

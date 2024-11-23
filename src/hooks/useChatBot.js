@@ -4,8 +4,7 @@ import botService from '../lib/bot.service';
 
 export function useChatBot(article, articleContent) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(true);
-  const [showHoverTooltip, setShowHoverTooltip] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isMinimized, setIsMinimized] = useState(false);
@@ -190,8 +189,8 @@ export function useChatBot(article, articleContent) {
 
   const toggleMinimize = () => setIsMinimized(prev => !prev);
 
-  const handleMouseEnter = () => !isOpen && setShowHoverTooltip(true);
-  const handleMouseLeave = () => setShowHoverTooltip(false);
+  const handleMouseEnter = () => !isOpen && setShowTooltip(true);
+  const handleMouseLeave = () => setShowTooltip(false);
 
   return {
     isOpen,
@@ -205,7 +204,6 @@ export function useChatBot(article, articleContent) {
     setInputMessage,
     toggleOpen,
     toggleMinimize,
-    showHoverTooltip,
     handleMouseEnter,
     handleMouseLeave,
     shouldScrollToBottom,

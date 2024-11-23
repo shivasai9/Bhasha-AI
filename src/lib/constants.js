@@ -1,4 +1,4 @@
-export const DB_NAME = "bashaAi";
+export const DB_NAME = "BhashaAi";
 export const DB_VERSION = 1;
 
 export const STORES = {
@@ -279,7 +279,7 @@ export const BRAND_NAME = {
   english: "LanguageAI",
   spanish: "IdiomaAI",
   french: "LangueAI",
-  original: "BashaAI",
+  original: "BhashaAI",
 };
 
 export const LANGUAGE_CODES_TO_NAME = {

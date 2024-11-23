@@ -93,6 +93,7 @@ export const CUSTOM_TOPIC_FORM_LABELS = {
 export const ARTICLE_LIST_LABELS = {
   pageTitle: "Available Articles",
   customArticleButton: "Custom Article",
+  randomArticleButton: "Generate Random Article",
   loadMoreButton: "Load More Articles",
   generatingArticle: "Generating custom article...",
   generatingArticles: "Generating article(s)... ({count} remaining)",
@@ -301,4 +302,8 @@ export const LANGUAGE_SELECTOR_LABELS = {
 
 export const TOPIC_LABELS = {
   TOPICS: TOPICS
+};
+
+export const IMAGE_ATTRIBUTION_LABELS = {
+  source: "Source"
 };

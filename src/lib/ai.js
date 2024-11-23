@@ -61,10 +61,12 @@ class AIWrapper {
         if (!this.session) {
           throw new Error("Session is not initialized");
         }
-        
+
         const result = await this.session.prompt(prompt);
         const existingGeneratedSubTopics = getGeneratedSubTopics() || [];
-        saveGeneratedSubTopics([...existingGeneratedSubTopics, topic]);
+        if (!customTopic) {
+          saveGeneratedSubTopics([...existingGeneratedSubTopics, topic]);
+        }
 
         console.log(
           `Tokens used: ${this.session.tokensSoFar}/${this.session.maxTokens} (${this.session.tokensLeft} left)`

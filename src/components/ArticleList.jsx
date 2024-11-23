@@ -54,14 +54,25 @@ export default function ArticleList() {
 
           {/* Create Custom Article Button */}
           {!showCustomForm && (
-            <button
-              onClick={() => setShowCustomForm(true)}
-              className="w-full mb-6 py-4 bg-white hover:bg-gray-50 text-indigo-600 
-              font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              {labels.customArticleButton}
-            </button>
+            <>
+              <button
+                onClick={() => setShowCustomForm(true)}
+                className="w-full mb-3 py-4 bg-white hover:bg-gray-50 text-indigo-600 
+                font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                {labels.customArticleButton}
+              </button>
+
+              <button
+                onClick={() => handleCustomTopic("Any Random Topic")}
+                className="w-full mb-6 py-4 bg-white hover:bg-gray-50 text-emerald-600 
+                font-medium rounded-lg shadow-md transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                {labels.randomArticleButton}
+              </button>
+            </>
           )}
 
           {/* Custom Article Form */}

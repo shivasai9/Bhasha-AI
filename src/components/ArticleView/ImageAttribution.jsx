@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { truncateArtistName } from "../../lib/licencing/licenceUtils";
 import { useRef, useState } from "react";
 import CustomTooltip from "./CustomTooltip";
+import { useLabels } from "../../hooks/useLabels";
 
 export default function ImageAttribution({ attribution }) {
   if (!attribution) return null;
@@ -9,6 +10,7 @@ export default function ImageAttribution({ attribution }) {
   const { name, originalName, url } = truncateArtistName(attribution.artist);
   const [showTooltip, setShowTooltip] = useState(false);
   const artistRef = useRef(null);
+  const labels = useLabels('IMAGE_ATTRIBUTION_LABELS');
   
   return (
     <div className="text-[11px] leading-normal text-gray-100 bg-gradient-to-t from-black/60 to-black/20 backdrop-blur-sm px-2 py-1.5">
@@ -63,7 +65,7 @@ export default function ImageAttribution({ attribution }) {
               className="inline-flex items-center text-white/80 hover:text-white"
             >
               <ExternalLink className="w-2.5 h-2.5 mr-0.5" />
-              <span>Source</span>
+              <span>{labels.source}</span>
             </a>
           </>
         )}

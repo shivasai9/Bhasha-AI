@@ -9,29 +9,6 @@ const getRandomItem = (array) => {
   return array[Math.floor(Math.random() * array.length)];
 };
 
-const getTopicDescriptions = () => {
-  const selectedTopicIds = getTopics();
-  if (!selectedTopicIds.length) return [];
-
-  return selectedTopicIds.map(id => {
-    const standardTopic = TOPICS.find(t => t.id === id);
-    if (standardTopic) {
-      return {
-        name: standardTopic.name,
-        description: standardTopic.description
-      };
-    }
-    return {
-      // TODO: Translate from interfaceLanguage to English
-      // Maybe use detectLanguage and translate to English
-      name: id.split('-').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' '),
-      description: `Content related to ${id.split('-').join(' ')}`
-    };
-  });
-};
-
 export function getPossibleSubTopics() {
   const selectedTopicIds = getTopics();
   if (!selectedTopicIds.length) return [];
@@ -78,14 +55,20 @@ export async function generateArticleCreationPrompt(customTopic = null) {
   }
 
   if (customTopic) {
-    return prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", customTopic);
+    return {
+      prompt: prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", customTopic),
+      topic: customTopic,
+    };
   }
 
   const availableSubTopics = getPossibleSubTopics();
 
   if (!availableSubTopics.length) {
     const randomTopic = '"Any Random Topic"';
-    return prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", randomTopic);
+    return {
+      prompt: prompt + CREATE_CUSTOM_ARTICLE.replace("{{topic}}", randomTopic),
+      topic: randomTopic,
+    }
   }
 
   const selectedSubTopic = getRandomItem(availableSubTopics);

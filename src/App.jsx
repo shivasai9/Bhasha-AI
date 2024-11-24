@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LanguageSelector from './components/LanguageSelector';
+import LearningModeSelector from './components/LearningModeSelector';
 import ArticleList from './components/ArticleList';
 import ArticleView from './components/ArticleView';
 import Settings from './components/Settings';
@@ -12,6 +13,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LanguageSelector />} />
+        <Route path="/learning-mode-selector" element={<LearningModeSelector />} />
         <Route path="/articles" element={<ArticleList />} />
         <Route path="/article/:id/:title/:difficulty" element={<ArticleView />} />
         <Route path="/settings" element={<Settings />} />

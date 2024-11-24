@@ -78,7 +78,7 @@ export default function LanguageSelector() {
 
   const handleNavigateToArticles = (topics = []) => {
     handleTopicsSelect(topics);
-    navigate("/articles");
+    navigate("/learning-mode-selector");
   };
 
   const ProgressBar = () => (

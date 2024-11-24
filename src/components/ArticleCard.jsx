@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLabels } from "../hooks/useLabels";
 import DifficultyModal from "./DifficultyModal";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Mic, Book, PenTool, Languages, BrainCircuit, Bot } from "lucide-react";
 import PlaceholderImage from "./PlaceholderImage";
 import ImageAttribution from "./ArticleView/ImageAttribution";
 import { convertToKebabCase, filterImageUrls } from "../lib/utils";
@@ -22,6 +22,15 @@ const presetDifficulties = [
     label: "Hard",
     className: "bg-rose-100 text-rose-700 hover:bg-rose-200",
   },
+];
+
+const features = [
+  { icon: BrainCircuit, label: 'Interactive Quizzes' },
+  { icon: Languages, label: 'Multi-language Translation' },
+  { icon: Mic, label: 'Text-to-Speech' },
+  { icon: Book, label: 'Vocabulary Tools' },
+  { icon: PenTool, label: 'Summary Exercise' },
+  { icon: Bot, label: 'Article Buddy AI Chat' }
 ];
 
 export default function ArticleCard({ article, onDifficultySelect, disabled }) {
@@ -91,6 +100,26 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
         <p className="text-gray-600 mb-4 line-clamp-3 min-h-[4.5rem]">
           {article.summary}
         </p>
+
+        {/* Feature badges */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="group relative flex items-center bg-gray-100 rounded-full px-3 py-1"
+            >
+              <feature.icon className="w-3 h-3 mr-1 text-gray-600" />
+              <span className="text-xs text-gray-600">{feature.label}</span>
+              
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  {feature.label}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
         <div className="flex items-center gap-3 mt-auto">
           {presetDifficulties.map((difficulty) => (

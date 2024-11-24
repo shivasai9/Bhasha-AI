@@ -46,24 +46,6 @@ export default function LearningModeSelector() {
       color: 'from-emerald-500 to-teal-500',
       shadowColor: 'shadow-emerald-500/25',
       comingSoon: true
-    },
-    {
-      id: 'exercises',
-      icon: Brain,
-      title: 'Interactive Exercises',
-      description: 'Enhance your skills with personalized language exercises and quizzes',
-      color: 'from-rose-500 to-pink-500',
-      shadowColor: 'shadow-rose-500/25',
-      comingSoon: true
-    },
-    {
-      id: 'immersion',
-      icon: Lightbulb,
-      title: 'Immersive Learning',
-      description: 'Learn through immersive scenarios and real-world situations',
-      color: 'from-amber-500 to-orange-500',
-      shadowColor: 'shadow-amber-500/25',
-      comingSoon: true
     }
   ];
 
@@ -122,7 +104,7 @@ export default function LearningModeSelector() {
                     onClick={() => !mode.comingSoon && navigate(mode.href)}
                     disabled={mode.comingSoon}
                     className={`w-full h-full p-6 rounded-xl transition-all duration-500 
-                      ${mode.comingSoon ? 'opacity-75 cursor-not-allowed' : 'hover:scale-[1.03] hover:rotate-1 cursor-pointer'}
+                      ${mode.comingSoon ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'}
                       bg-gradient-to-br ${mode.color} ${mode.shadowColor} shadow-lg
                       border border-white/20 backdrop-blur-sm
                       hover:shadow-2xl hover:border-white/40

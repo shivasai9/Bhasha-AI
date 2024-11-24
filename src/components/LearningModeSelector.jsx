@@ -45,7 +45,7 @@ export default function LearningModeSelector() {
       description: 'Practice through AI-powered conversations with instant feedback',
       color: 'from-emerald-500 to-teal-500',
       shadowColor: 'shadow-emerald-500/25',
-      comingSoon: true
+      href: '/conversations'
     }
   ];
 

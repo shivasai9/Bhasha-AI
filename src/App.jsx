@@ -7,6 +7,7 @@ import ArticleView from './components/ArticleView';
 import Settings from './components/Settings';
 import SavedWords from './components/SavedWords';
 import ApiStatus from './components/ApiStatus.jsx';
+import ConversationInterface from './components/AIConversation/ConversationInterface';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/saved-words" element={<SavedWords />} />
         <Route path="/api-status" element={<ApiStatus />} />
+        <Route path="/conversations" element={<ConversationInterface />} />
         <Route path="*" element={<LanguageSelector />} />
       </Routes>
     </Router>

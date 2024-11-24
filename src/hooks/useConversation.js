@@ -12,6 +12,10 @@ export function useConversation() {
   const [showVolumeMenu, setShowVolumeMenu] = useState(false);
   const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [isVoicesLoading, setIsVoicesLoading] = useState(true);
+  const isVoicesReady = useRef(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const recognition = useRef(null);
   const synthesis = useRef(window.speechSynthesis);
@@ -42,13 +46,38 @@ export function useConversation() {
   const clearTooltip = () => setActiveTooltip(null);
 
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = synthesis.current.getVoices();
-      const englishVoices = voices.filter(voice => 
-        SPEECH_VOICE_CONFIG.english.voicePattern.test(voice.lang)
-      );
-      setAvailableVoices(englishVoices);
-      setSelectedVoice(englishVoices[0]);
+    let retryCount = 0;
+    const maxRetries = 3;
+    let isSubscribed = true; // Add subscription flag
+
+    const loadVoices = async () => {
+      setIsVoicesLoading(true);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const voices = synthesis.current.getVoices();
+        const englishVoices = voices.filter(voice => 
+          SPEECH_VOICE_CONFIG.english.voicePattern.test(voice.lang)
+        );
+
+        if (englishVoices.length === 0 && retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(loadVoices, 500);
+          return;
+        }
+
+        if (isSubscribed) {
+          setAvailableVoices(englishVoices);
+          if (englishVoices.length > 0) {
+            setSelectedVoice(englishVoices[0]);
+            isVoicesReady.current = true; // Mark voices as ready
+          }
+        }
+      } finally {
+        if (isSubscribed) {
+          setIsVoicesLoading(false);
+        }
+      }
     };
 
     if (typeof speechSynthesis !== 'undefined') {
@@ -64,6 +93,8 @@ export function useConversation() {
   }, []);
 
   useEffect(() => {
+    if (!isVoicesReady.current) return;
+
     if ("webkitSpeechRecognition" in window) {
       recognition.current = new webkitSpeechRecognition();
       recognition.current.continuous = true;
@@ -75,10 +106,24 @@ export function useConversation() {
           .map(result => result.transcript)
           .join("");
 
+        setStreamingText(transcript);
+        setIsStreaming(true);
+        scrollToBottom();
+
         if (event.results[0].isFinal) {
+          setStreamingText("");
+          setIsStreaming(false);
           addMessage("user", transcript);
           simulateAIResponse(transcript);
+          recognition.current.stop();
+          setIsListening(false);
         }
+      };
+
+      recognition.current.onend = () => {
+        setStreamingText("");
+        setIsStreaming(false);
+        setIsListening(false);
       };
     }
 
@@ -88,7 +133,7 @@ export function useConversation() {
       }
       stopSpeaking();
     };
-  }, []);
+  }, [selectedVoice]);
 
   const toggleListening = () => {
     if (isListening) {
@@ -99,6 +144,10 @@ export function useConversation() {
     setIsListening(!isListening);
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const addMessage = (type, content) => {
     setMessages(prev => [...prev, { 
       id: Date.now().toString(),
@@ -106,19 +155,21 @@ export function useConversation() {
       content, 
       timestamp: new Date() 
     }]);
+    scrollToBottom();
   };
 
   const simulateAIResponse = (userMessage) => {
     setTimeout(() => {
       const responseId = Date.now().toString();
       addMessage("ai", `Response to: ${userMessage}`);
-      speak(`Response to: ${userMessage}`, responseId);
+      speak(`Response to: ${userMessage}`, responseId, true);
     }, 1000);
   };
 
-  const stopSpeaking = () => {
-    if (synthesis.current.speaking) {
+  const stopSpeaking = async () => {
+    if (synthesis.current?.speaking) {
       synthesis.current.cancel();
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
     if (currentUtterance.current) {
       currentUtterance.current = null;
@@ -126,33 +177,67 @@ export function useConversation() {
     setCurrentlyPlayingId(null);
   };
 
-  const speak = (text, messageId) => {
+  const speak = async (text, messageId, enableMicAfter = false) => {
     if (currentlyPlayingId === messageId) {
-      return; // Don't restart same message
+      return;
     }
     
     stopSpeaking();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    try {
+      currentUtterance.current = new SpeechSynthesisUtterance(text);
+      
+      if (!synthesis.current) {
+        synthesis.current = window.speechSynthesis;
+      }
+      
+      if (synthesis.current.paused) {
+        synthesis.current.resume();
+      }
+      
+      const currentVoice = selectedVoice || (availableVoices.length > 0 ? availableVoices[0] : null);
+      
+      if (currentVoice) {
+        currentUtterance.current.voice = currentVoice;
+      }
+      
+      currentUtterance.current.volume = volume;
+      currentUtterance.current.rate = 1.0;
+      currentUtterance.current.pitch = 1.0;
+      currentUtterance.current.lang = 'en-US';
+
+      currentUtterance.current.onstart = () => {
+        console.log('Speech started');
+        setCurrentlyPlayingId(messageId);
+      };
+
+      currentUtterance.current.onend = () => {
+        console.log('Speech ended normally');
+        setCurrentlyPlayingId(null);
+        currentUtterance.current = null;
+        if (enableMicAfter && recognition.current) {
+          recognition.current.start();
+          setIsListening(true);
+        }
+      };
+
+      currentUtterance.current.onerror = (error) => {
+        console.error('Speech error:', error);
+        if (error.error !== 'canceled') {
+          setCurrentlyPlayingId(null);
+          currentUtterance.current = null;
+        }
+      };
+
+      setCurrentlyPlayingId(messageId);
+      synthesis.current.speak(currentUtterance.current);
+
+    } catch (error) {
+      console.error('Speak error:', error);
+      setCurrentlyPlayingId(null);
     }
-    utterance.volume = volume;
-
-    utterance.onend = () => {
-      setCurrentlyPlayingId(null);
-      currentUtterance.current = null;
-    };
-
-    utterance.onerror = () => {
-      setCurrentlyPlayingId(null);
-      currentUtterance.current = null;
-    };
-
-    currentUtterance.current = utterance;
-    setCurrentlyPlayingId(messageId);
-    synthesis.current.speak(utterance);
   };
 
   const updateVolume = (newVolume) => {
@@ -173,7 +258,7 @@ export function useConversation() {
     if (currentlyPlayingId === messageId) {
       stopSpeaking();
     } else {
-      speak(text, messageId);
+      speak(text, messageId, false);
     }
   };
 
@@ -200,6 +285,10 @@ export function useConversation() {
     toggleVolumeMenu,
     toggleVoiceMenu,
     handleTooltip,
-    clearTooltip
+    clearTooltip,
+    isVoicesLoading,
+    streamingText,
+    isStreaming,
+    scrollToBottom,
   };
 }

@@ -29,7 +29,10 @@ export default function ConversationView({ topic, onClose }) {
     toggleVolumeMenu,
     toggleVoiceMenu,
     handleTooltip,
-    clearTooltip
+    clearTooltip,
+    streamingText,
+    isStreaming,
+    dots,
   } = useConversation();
 
   const getVolumeTooltip = () => {
@@ -73,6 +76,8 @@ export default function ConversationView({ topic, onClose }) {
                 messagesEndRef={messagesEndRef}
                 currentlyPlayingId={currentlyPlayingId}
                 togglePlay={togglePlay}
+                streamingText={streamingText}
+                isStreaming={isStreaming}
               />
 
               <div className="flex-none border-t border-gray-200 p-4 pb-8 bg-indigo-600 mb-4">

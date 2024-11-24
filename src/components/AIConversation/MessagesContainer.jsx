@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PlayCircle, PauseCircle, User, Bot } from 'lucide-react';
 
 export default function MessagesContainer({ 
   messages, 
   messagesEndRef, 
   currentlyPlayingId,
-  togglePlay 
+  togglePlay,
+  streamingText,
+  isStreaming
 }) {
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamingText]);
+
   const MessageBubble = ({ message }) => {
     const isBot = message.type === 'ai';
     const isPlaying = currentlyPlayingId === message.id;
@@ -52,11 +58,22 @@ export default function MessagesContainer({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+    <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
       <div className="space-y-4 p-4">
         {messages.map((message, index) => (
           <MessageBubble key={index} message={message} />
         ))}
+        {isStreaming && streamingText && (
+          <div className="flex items-start gap-2 flex-row-reverse">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600">
+              <User className="w-5 h-5 text-white" />
+            </div>
+            <div className="max-w-[75%] p-3 rounded-lg bg-indigo-600 text-white flex items-center gap-1">
+              {streamingText}
+              <span className="after:content-[''] after:animate-dots" />
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
     </div>

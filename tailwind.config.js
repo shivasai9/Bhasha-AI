@@ -18,6 +18,7 @@ export default {
         'slideInLeft': 'slideInLeft 0.4s ease-out',
         'slideOutRight': 'slideOutRight 0.4s ease-out',
         'fadeUp': 'fadeUp 0.4s ease-out',
+        'dots': 'dots 1.5s infinite',
       },
       keyframes: {
         wave: {
@@ -47,6 +48,12 @@ export default {
         fadeUp: {
           '0%': { transform: 'translateY(20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        dots: {
+          '0%, 20%': { content: "''" },
+          '40%': { content: "'.'" },
+          '60%': { content: "'..'" },
+          '80%, 100%': { content: "'...'" },
         },
       },
       transitionProperty: {

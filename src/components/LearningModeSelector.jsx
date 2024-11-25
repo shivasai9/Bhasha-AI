@@ -48,7 +48,8 @@ export default function LearningModeSelector() {
         'Multiple conversation scenarios',
         'Adaptive difficulty levels',
         'Ask for Grammar and vocabulary corrections',
-        'Practice speaking and listening skills'
+        'Practice speaking and listening skills',
+        'Personalized discussions based on your interests'
       ],
       color: 'from-emerald-500 to-teal-500',
       shadowColor: 'shadow-emerald-500/25',

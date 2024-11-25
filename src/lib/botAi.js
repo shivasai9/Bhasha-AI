@@ -7,10 +7,8 @@ class BotAIWrapper {
     this.articleContent = null;
   }
 
-  async initializeBotSession(articleContent) {
+  async initializeBotSession(systemPrompt = '') {
     try {
-      this.articleContent = articleContent;
-
       if (!this.session || this.session?.destroyed) {
         if (!window.ai?.languageModel) {
           console.warn("Chrome AI API not available");
@@ -22,9 +20,8 @@ class BotAIWrapper {
           console.warn("AI model not readily available");
           return false;
         }
-  console.log("Creating new session from botAi.js");
         this.session = await window.ai.languageModel.create({
-          systemPrompt: PROMPTS.SYSTEM(this.articleContent),
+          systemPrompt: systemPrompt,
         });
       }
       return this.session;

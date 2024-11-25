@@ -1,43 +1,46 @@
-
 import { botAIWrapper } from './botAi';
 import { CONVERSATION_PROMPTS } from '../prompts/botConversationPrompts';
 
 class AIConversationService {
   constructor() {
     this.isInitialized = false;
+    this.currentPromptType = null;
+    this.currentTopic = null;
   }
 
   async initializeSession(conversationType = 'OPEN_ENDED', topic = '') {
-    if (this.isInitialized) {
-      return true;
-    }
+    try {
+      this.currentPromptType = conversationType;
+      this.currentTopic = topic;
 
-    let systemPrompt = CONVERSATION_PROMPTS.SYSTEM;
-    let initialPrompt;
+      let systemPrompt = CONVERSATION_PROMPTS.SYSTEM;
 
-    switch (conversationType) {
-      case 'GRAMMAR':
-        initialPrompt = CONVERSATION_PROMPTS.GRAMMAR_PRACTICE(topic);
-        break;
-      case 'SCENARIO':
-        initialPrompt = CONVERSATION_PROMPTS.SCENARIO_PRACTICE(topic);
-        break;
-      case 'TOPIC':
-        initialPrompt = CONVERSATION_PROMPTS.TOPIC_DISCUSSION(topic);
-        break;
-      default:
-        initialPrompt = CONVERSATION_PROMPTS.OPEN_ENDED;
-    }
+      switch (conversationType) {
+        case 'GRAMMAR':
+          systemPrompt += CONVERSATION_PROMPTS.GRAMMAR_EXTENSION(topic);
+          break;
+        case 'SCENARIO':
+          systemPrompt += CONVERSATION_PROMPTS.SCENARIO_EXTENSION(topic);
+          break;
+        case 'TOPIC':
+          systemPrompt += CONVERSATION_PROMPTS.TOPIC_EXTENSION(topic);
+          break;
+        default:
+          systemPrompt += CONVERSATION_PROMPTS.OPEN_ENDED_EXTENSION;
+      }
 
-    const session = await botAIWrapper.initializeBotSession();
-    
-    if (session) {
-      this.isInitialized = true;
-      // Send initial prompt to set context
-      await this.sendMessage(initialPrompt);
-      return true;
+      const session = await botAIWrapper.initializeBotSession(systemPrompt);
+      
+      if (session) {
+        this.isInitialized = true;
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Session initialization failed:', error);
+      this.isInitialized = false;
+      throw error;
     }
-    return false;
   }
 
   async sendMessage(message) {

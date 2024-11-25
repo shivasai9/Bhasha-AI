@@ -37,46 +37,33 @@ export default function MessagesContainer({
             ? "bg-indigo-600 text-white"
             : "bg-gray-100"
         }`}>
-          <div className="flex items-center gap-2">
-            {isBot && (
-              <button
-                onClick={() => togglePlay(message.id, message.content)}
-                className="p-1 hover:bg-gray-200 rounded-full"
-              >
-                {isPlaying ? (
-                  <PauseCircle className="w-5 h-5 text-indigo-600" />
-                ) : (
-                  <PlayCircle className="w-5 h-5 text-indigo-600" />
-                )}
-              </button>
-            )}
-            {message.content}
-          </div>
+          {message.isLoading ? (
+            <div className="space-y-2">
+              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              {isBot && (
+                <button
+                  onClick={() => togglePlay(message.id, message.content)}
+                  className="p-1 hover:bg-gray-200 rounded-full"
+                >
+                  {isPlaying ? (
+                    <PauseCircle className="w-5 h-5 text-indigo-600" />
+                  ) : (
+                    <PlayCircle className="w-5 h-5 text-indigo-600" />
+                  )}
+                </button>
+              )}
+              {message.content}
+            </div>
+          )}
         </div>
       </div>
     );
   };
-
-  const MessageSkeleton = () => (
-    <div className="flex items-start gap-2">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 animate-pulse" />
-      <div className="max-w-[75%] space-y-2">
-        <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
-      </div>
-    </div>
-  );
-
-  if (messages.length === 0) {
-    return (
-      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-        <div className="space-y-4 p-4">
-          <MessageSkeleton />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">

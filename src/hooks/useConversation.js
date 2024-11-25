@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { SPEECH_VOICE_CONFIG } from '../lib/constants';
 import aiConversationService from '../lib/aiConversation.service';
 import { CONVERSATION_MESSAGES } from '../constants/conversationMessages';
+import { getUniqueId } from '../lib/utils';
 
 export function useConversation() {
   const [messages, setMessages] = useState([]);
@@ -54,7 +55,7 @@ export function useConversation() {
   useEffect(() => {
     let retryCount = 0;
     const maxRetries = 3;
-    let isSubscribed = true; // Add subscription flag
+    let isSubscribed = true;
 
     const loadVoices = async () => {
       setIsVoicesLoading(true);
@@ -76,7 +77,7 @@ export function useConversation() {
           setAvailableVoices(englishVoices);
           if (englishVoices.length > 0) {
             setSelectedVoice(englishVoices[0]);
-            isVoicesReady.current = true; // Mark voices as ready
+            isVoicesReady.current = true;
           }
         }
       } finally {
@@ -145,14 +146,27 @@ export function useConversation() {
     const initialize = async () => {
       if (!isVoicesReady.current) return;
       
+      const initialId = getUniqueId();
+      setMessages([{
+        id: initialId,
+        type: "ai",
+        content: "",
+        isLoading: true,
+        timestamp: new Date()
+      }]);
+      
       await aiConversationService.initializeSession();
       const initialMessage = CONVERSATION_MESSAGES.openEnded.initial;
-      const messageId = Date.now().toString();
-      initialMessage.id = messageId;
-      setMessages([initialMessage]);
+      
+      setMessages([{
+        id: initialId,
+        type: "ai",
+        content: initialMessage.content,
+        timestamp: new Date()
+      }]);
       
       if (availableVoices.length > 0) {
-        speak(initialMessage.content, messageId, true);
+        speak(initialMessage.content, initialId, true);
       }
     };
 
@@ -178,7 +192,7 @@ export function useConversation() {
 
   const addMessage = (type, content) => {
     setMessages(prev => [...prev, { 
-      id: Date.now().toString(),
+      id: getUniqueId(),
       type, 
       content, 
       timestamp: new Date() 
@@ -190,44 +204,30 @@ export function useConversation() {
     if (isSessionExpired || isLoading) return;
     setIsLoading(true);
     setIsStreaming(false);
+    
+    const skeletonId = getUniqueId();
+    setMessages(prev => [...prev, {
+      id: skeletonId,
+      type: "ai",
+      content: "",
+      isLoading: true,
+      timestamp: new Date()
+    }]);
+    scrollToBottom();
+
     try {
-      let isFirstChunk = true;
-      let previousChunkLength = 0;
+      const response = await aiConversationService.sendMessage(userMessage);
       
-      await aiConversationService.sendStreamingMessage(
-        userMessage,
-        (chunk) => {
-          if (isFirstChunk) {
-            const responseId = Date.now().toString();
-            setMessages(prev => [...prev, {
-              id: responseId,
-              type: "ai",
-              content: chunk,
-              timestamp: new Date()
-            }]);
-            isFirstChunk = false;
-            setIsStreaming(true);
-            setIsLoading(false);
-            speak(chunk, responseId, true);
-            previousChunkLength = chunk.length;
-          } else {
-            setMessages(prev => {
-              const newMessages = [...prev];
-              const lastMessage = newMessages[newMessages.length - 1];
-              if (lastMessage.type === "ai") {
-                const newContent = chunk.slice(previousChunkLength);
-                lastMessage.content = chunk;
-                if (newContent.trim()) {
-                  // queueChunk(newContent, lastMessage.id);
-                }
-                previousChunkLength = chunk.length;
-              }
-              return newMessages;
-            });
-          }
-          scrollToBottom();
-        }
-      );
+      setMessages(prev => prev.map(msg => 
+        msg.id === skeletonId ? {
+          id: skeletonId,
+          type: "ai",
+          content: response,
+          timestamp: new Date()
+        } : msg
+      ));
+
+      speak(response, skeletonId, true);
 
       // Update session token info
       const session = aiConversationService.getSession();
@@ -245,13 +245,14 @@ export function useConversation() {
 
     } catch (error) {
       console.error("Failed to get AI response:", error);
-      const errorId = Date.now().toString();
-      setMessages(prev => [...prev, {
-        id: errorId,
-        type: "ai",
-        content: "I apologize, but I'm having trouble responding right now. Please try again.",
-        timestamp: new Date()
-      }]);
+      setMessages(prev => prev.map(msg => 
+        msg.id === skeletonId ? {
+          id: skeletonId,
+          type: "ai",
+          content: "I apologize, but I'm having trouble responding right now. Please try again.",
+          timestamp: new Date()
+        } : msg
+      ));
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
@@ -302,12 +303,10 @@ export function useConversation() {
       currentUtterance.current.lang = 'en-US';
 
       currentUtterance.current.onstart = () => {
-        console.log('Speech started');
         setCurrentlyPlayingId(messageId);
       };
 
       currentUtterance.current.onend = () => {
-        console.log('Speech ended normally');
         setCurrentlyPlayingId(null);
         currentUtterance.current = null;
         if (enableMicAfter && recognition.current) {
@@ -361,7 +360,7 @@ export function useConversation() {
       aiConversationService.destroy();
       await aiConversationService.initializeSession();
       setIsSessionExpired(false);
-      const responseId = Date.now().toString();
+      const responseId = getUniqueId();
       setMessages(prev => [...prev, {
         id: responseId,
         type: "ai",

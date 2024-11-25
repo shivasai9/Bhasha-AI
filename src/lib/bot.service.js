@@ -24,7 +24,8 @@ class BotService {
       return true;
     }
 
-    const session = await botAIWrapper.initializeBotSession(this.articleContent);
+    const systemPrompt = PROMPTS.SYSTEM(this.articleContent);
+    const session = await botAIWrapper.initializeBotSession(systemPrompt);
     if (session) {
       this.isInitialized = true;
       return true;

@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { PlayCircle, PauseCircle, User, Bot } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function MessagesContainer({ 
   messages, 
@@ -12,6 +14,34 @@ export default function MessagesContainer({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingText]);
+
+  const renderMessageContent = (content) => {
+    return (
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+          ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2" {...props} />,
+          ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2" {...props} />,
+          li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+          code: ({ node, inline, ...props }) =>
+            inline ? (
+              <code className="bg-gray-200 px-1 rounded" {...props} />
+            ) : (
+              <code className="block bg-gray-200 p-2 rounded mb-2" {...props} />
+            ),
+          h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2" {...props} />,
+          h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2" {...props} />,
+          h3: ({ node, ...props }) => <h3 className="text-base font-bold mb-2" {...props} />,
+          blockquote: ({ node, ...props }) => (
+            <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2" {...props} />
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    );
+  };
 
   const MessageBubble = ({ message }) => {
     const isBot = message.type === 'ai';
@@ -57,7 +87,13 @@ export default function MessagesContainer({
                   )}
                 </button>
               )}
-              {message.content}
+              {isBot ? (
+                <div className="prose dark:prose-invert max-w-none">
+                  {renderMessageContent(message.content)}
+                </div>
+              ) : (
+                message.content
+              )}
             </div>
           )}
         </div>

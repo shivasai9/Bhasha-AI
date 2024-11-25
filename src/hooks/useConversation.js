@@ -240,7 +240,7 @@ export function useConversation() {
         total: maxTokens
       });
       let enableMic = true;
-      if (tokensLeft < 5800) {
+      if (tokensLeft < 720) {
         enableMic = false;
         setIsSessionExpired(true);
       }

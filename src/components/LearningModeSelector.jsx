@@ -42,7 +42,7 @@ export default function LearningModeSelector() {
       id: 'conversations',
       icon: MessageCircle,
       title: 'Real-time Conversations',
-      description: 'Practice through AI-powered conversations with instant feedback',
+      description: 'Practice language skills through interactive AI-powered conversations',
       features: [
         'Natural voice interactions with AI',
         'Multiple conversation scenarios',

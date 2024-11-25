@@ -46,6 +46,9 @@ export default function ConversationView({ topic, onClose }) {
     if (isSessionExpired) {
       return "Session is expired. Create a new one by clicking the button on top.";
     }
+    if (currentlyPlayingId) {
+      return "Please wait until the message is finished or pause to start speaking";
+    }
     return isListening ? "Stop listening" : "Start listening";
   };
 
@@ -175,9 +178,9 @@ export default function ConversationView({ topic, onClose }) {
                             ? "bg-indigo-500 hover:bg-indigo-600"
                             : "bg-white hover:bg-white/90"
                         } ${isListening ? "text-white" : "text-indigo-600"} ${
-                          isSessionExpired ? "opacity-50 cursor-not-allowed" : ""
+                          isSessionExpired || currentlyPlayingId ? "opacity-50 cursor-not-allowed" : ""
                         }`}
-                        disabled={isSessionExpired}
+                        disabled={isSessionExpired || currentlyPlayingId}
                       >
                         <Mic className="w-6 h-6" />
                         {!isListening && (
@@ -199,7 +202,7 @@ export default function ConversationView({ topic, onClose }) {
                       )}
                       <CustomTooltip
                         text={getMicTooltip()}
-                        visible={activeTooltip === "mic" || isSessionExpired}
+                        visible={activeTooltip === "mic" || isSessionExpired || currentlyPlayingId}
                         containerRef={micRef}
                       />
                     </div>

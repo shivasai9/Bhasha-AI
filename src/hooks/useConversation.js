@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { SPEECH_VOICE_CONFIG } from '../lib/constants';
 import aiConversationService from '../lib/aiConversation.service';
 import { CONVERSATION_MESSAGES } from '../constants/conversationMessages';
-import { getUniqueId } from '../lib/utils';
+import { getUniqueId, sanitizeText } from '../lib/utils';
 
 export function useConversation() {
   const [messages, setMessages] = useState([]);
@@ -240,7 +240,7 @@ export function useConversation() {
         total: maxTokens
       });
       
-      if (tokensLeft < 700) {
+      if (tokensLeft < 5500) {
         setIsSessionExpired(true);
       }
 
@@ -282,7 +282,8 @@ export function useConversation() {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
-      currentUtterance.current = new SpeechSynthesisUtterance(text);
+      const sanitizedText = sanitizeText(text);
+      currentUtterance.current = new SpeechSynthesisUtterance(sanitizedText);
       
       if (!synthesis.current) {
         synthesis.current = window.speechSynthesis;

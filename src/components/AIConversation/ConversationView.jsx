@@ -32,6 +32,10 @@ export default function ConversationView({ topic, onClose }) {
     clearTooltip,
     streamingText,
     isStreaming,
+    tokenInfo,
+    isSessionExpired,
+    createNewSession,
+    isLoading,
   } = useConversation();
 
   const getVolumeTooltip = () => {
@@ -55,13 +59,30 @@ export default function ConversationView({ topic, onClose }) {
       <main className="flex-1 relative bg-gray-50">
         <div className="absolute inset-0 container mx-auto px-4 flex flex-col">
           <div className="max-w-4xl w-full mx-auto flex flex-col h-full">
-            <button
-              onClick={onClose}
-              className="flex-none flex items-center gap-2 my-4 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to Topics</span>
-            </button>
+            <div className="flex justify-between items-center my-4">
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Back to Topics</span>
+              </button>
+              
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">
+                  Tokens remaining: {tokenInfo.left}/{tokenInfo.total}
+                </span>
+                {isSessionExpired && (
+                  <button
+                    onClick={createNewSession}
+                    disabled={isLoading}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    {isLoading ? "Creating..." : "New Session"}
+                  </button>
+                )}
+              </div>
+            </div>
 
             <div className="flex-1 bg-white rounded-lg shadow-md flex flex-col min-h-0">
               <div className="flex-none border-b">

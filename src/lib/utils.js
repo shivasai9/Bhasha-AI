@@ -1,4 +1,4 @@
-import { BRAND_NAME, WIKI_IMAGE_URL } from "./constants";
+import { BRAND_NAME, TOPICS, WIKI_IMAGE_URL } from "./constants";
 import { saveArticle } from "./dbUtils";
 import { getInterfaceLanguage } from "./languageStorage";
 import { translateArticle } from "./translation.service";
@@ -128,3 +128,20 @@ export const getBrandName = () => {
     translated: translatedName
   };
 }
+
+export const getRandomSubtopicsFromUserInterests = () => {
+  const userTopics = JSON.parse(localStorage.getItem('selected_topics') || '[]');
+  const allSubtopics = userTopics.reduce((acc, topicId) => {
+    const topic = TOPICS.find(t => t.id === topicId);
+    if (topic && topic.subTopics) {
+      acc.push(...topic.subTopics);
+    }
+    return acc;
+  }, []);
+
+  const randomSubtopics = allSubtopics
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
+
+  return randomSubtopics;
+};

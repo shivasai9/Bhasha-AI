@@ -1,20 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, Settings, BookmarkIcon, FileText } from 'lucide-react';
+import { BookOpen, User, Settings, BookmarkIcon, FileText, MessageSquare } from 'lucide-react';
 import { useLabels } from '../../hooks/useLabels';
 import { getBrandName } from '../../lib/utils';
 import { getInterfaceLanguage } from '../../lib/languageStorage';
 
 export default function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isFeatureMenuOpen, setIsFeatureMenuOpen] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const menuRef = useRef(null);
+  const featureMenuRef = useRef(null);
   const labels = useLabels('HEADER_LABELS');
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
+      }
+      if (featureMenuRef.current && !featureMenuRef.current.contains(event.target)) {
+        setIsFeatureMenuOpen(false);
       }
     };
 
@@ -32,7 +37,7 @@ export default function Header() {
 
   const menuItems = [
     { icon: BookmarkIcon, label: labels?.userMenu?.savedWords, href: '/saved-words' },
-    { icon: FileText, label: labels?.userMenu?.savedArticles, href: '/saved-articles' },
+    // { icon: FileText, label: labels?.userMenu?.savedArticles, href: '/saved-articles' },
     { icon: Settings, label: labels?.userMenu?.settings, href: '/settings' },
   ];
 
@@ -71,12 +76,34 @@ export default function Header() {
             </Link>
 
             <nav className="flex items-center space-x-8">
-              <Link
-                to="/articles"
-                className="text-white/90 hover:text-white transition-colors px-3 py-2 text-sm font-medium hover:bg-white/10 rounded-md"
-              >
-                {labels?.navigation?.articles}
-              </Link>
+              <div className="relative" ref={featureMenuRef}>
+                <button 
+                  onClick={() => setIsFeatureMenuOpen(!isFeatureMenuOpen)}
+                  className="text-white/90 hover:text-white transition-colors px-3 py-2 text-sm font-medium hover:bg-white/10 rounded-md"
+                >
+                  Features
+                </button>
+
+                {isFeatureMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 animate-in fade-in slide-in-from-top-5 duration-200">
+                    <Link
+                      to="/articles"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4 mr-3" />
+                      Articles
+                    </Link>
+                    <div className="border-b border-gray-100" />
+                    <Link
+                      to="/conversations"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-3" />
+                      AI Chat
+                    </Link>
+                  </div>
+                )}
+              </div>
               
               <div className="relative" ref={menuRef}>
                 <button 

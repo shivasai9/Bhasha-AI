@@ -41,8 +41,8 @@ export default function LanguageSelector() {
     useApiStatus();
 
   const isApisAvailable =
-    translationStatus === "Available" &&
-    promptsStatus === "Available" &&
+    translationStatus === "Available" ||
+    promptsStatus === "Available" ||
     summarizationStatus === "Available";
 
   useEffect(() => {

@@ -25,12 +25,36 @@ const presetDifficulties = [
 ];
 
 const features = [
-  { icon: BrainCircuit, label: 'Interactive Quizzes' },
-  { icon: Languages, label: 'Multi-language Translation' },
-  { icon: Mic, label: 'Text-to-Speech' },
-  { icon: Book, label: 'Vocabulary Tools' },
-  { icon: PenTool, label: 'Summary Exercise' },
-  { icon: Bot, label: 'Article Buddy AI Chat' }
+  { 
+    icon: BrainCircuit, 
+    label: 'Interactive Quizzes',
+    description: 'Test your understanding with dynamic quizzes based on the article content'
+  },
+  { 
+    icon: Languages, 
+    label: 'Multi-language Translation',
+    description: 'Instantly translate the article content into multiple languages for better comprehension'
+  },
+  { 
+    icon: Mic, 
+    label: 'Text-to-Speech',
+    description: 'Listen to the article being read aloud to improve pronunciation and listening skills'
+  },
+  { 
+    icon: Book, 
+    label: 'Vocabulary Tools',
+    description: 'Click on any word in the article to see definitions, synonyms, and usage examples'
+  },
+  { 
+    icon: PenTool, 
+    label: 'Summary Exercise',
+    description: 'Practice writing skills by creating your own summary of the article'
+  },
+  { 
+    icon: Bot, 
+    label: 'Article Buddy AI Chat',
+    description: 'Get help understanding the article by chatting with an AI learning assistant'
+  }
 ];
 
 export default function ArticleCard({ article, onDifficultySelect, disabled }) {
@@ -63,7 +87,7 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md overflow-hidden flex h-[240px] ${
+      className={`bg-white rounded-lg shadow-md overflow-hidden flex h-[290px] ${
         disabled ? "opacity-70" : ""
       }`}
     >
@@ -94,7 +118,7 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
         )}
       </div>
       <div className="w-2/3 p-6 flex flex-col">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2 truncate">
           {article.title}
         </h2>
         <p className="text-gray-600 mb-4 line-clamp-3 min-h-[4.5rem]">
@@ -112,9 +136,12 @@ export default function ArticleCard({ article, onDifficultySelect, disabled }) {
               <span className="text-xs text-gray-600">{feature.label}</span>
               
               {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
-                <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                  {feature.label}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-48 z-10">
+                <div className="bg-gray-900 text-white text-xs rounded py-2 px-3">
+                  <div className="font-medium mb-1">{feature.label}</div>
+                  <div className="break-words">
+                    {feature.description}
+                  </div>
                 </div>
               </div>
             </div>

@@ -3,6 +3,8 @@ import { ArrowLeft, Book, Heart, MessageCircle, Theater, ChevronDown } from 'luc
 import { useNavigate } from 'react-router-dom';
 import ConversationView from './ConversationView';
 import Header from '../common/Header';
+import { saveConversationDetails } from '../../lib/languageStorage';
+import { CONVERSATION_TYPES } from '../../lib/constants';
 
 export default function ConversationInterface() {
   const navigate = useNavigate();
@@ -50,12 +52,14 @@ export default function ConversationInterface() {
     scenarios: "bg-indigo-50 divide-indigo-200"
   };
 
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = (option, type) => {
+    saveConversationDetails(type, option);
     setSelectedOption(option);
     setActiveDropdown(null);
   };
 
   const handleOpenEnded = () => {
+    saveConversationDetails(CONVERSATION_TYPES.OPEN_ENDED, "Open Conversation");
     setSelectedOption("Open Conversation");
   };
 
@@ -116,7 +120,7 @@ export default function ConversationInterface() {
                         {conversationOptions[button.id].map((option) => (
                           <button
                             key={option}
-                            onClick={() => handleOptionSelect(option)}
+                            onClick={() => handleOptionSelect(option, CONVERSATION_TYPES[button.id.toUpperCase()])}
                             className={`w-full text-left px-4 py-3 text-sm text-gray-700 hover:${buttonThemes[button.id]} first:rounded-t-lg last:rounded-b-lg transition-colors`}
                           >
                             {option}

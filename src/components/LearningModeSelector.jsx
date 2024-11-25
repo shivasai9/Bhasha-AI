@@ -43,6 +43,13 @@ export default function LearningModeSelector() {
       icon: MessageCircle,
       title: 'Real-time Conversations',
       description: 'Practice through AI-powered conversations with instant feedback',
+      features: [
+        'Natural voice interactions with AI',
+        'Multiple conversation scenarios',
+        'Adaptive difficulty levels',
+        'Ask for Grammar and vocabulary corrections',
+        'Practice speaking and listening skills'
+      ],
       color: 'from-emerald-500 to-teal-500',
       shadowColor: 'shadow-emerald-500/25',
       href: '/conversations'

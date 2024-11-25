@@ -2,8 +2,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { SPEECH_VOICE_CONFIG } from '../lib/constants';
 import aiConversationService from '../lib/aiConversation.service';
-import { CONVERSATION_MESSAGES } from '../constants/conversationMessages';
 import { getUniqueId, sanitizeText } from '../lib/utils';
+import { getConversationDetails } from '../lib/languageStorage';
+import { getInitialMessage } from '../utils/initialMessageHelper';
 
 export function useConversation() {
   const [messages, setMessages] = useState([]);
@@ -146,8 +147,8 @@ export function useConversation() {
   useEffect(() => {
     const initialize = async () => {
       if (!isVoicesReady.current) return;
-      
-      if(messages && messages.length > 0) return;
+      if (messages && messages.length > 0) return;
+
       const initialId = getUniqueId();
       setMessages([{
         id: initialId,
@@ -156,19 +157,30 @@ export function useConversation() {
         isLoading: true,
         timestamp: new Date()
       }]);
-      
-      await aiConversationService.initializeSession();
-      const initialMessage = CONVERSATION_MESSAGES.openEnded.initial;
-      
-      setMessages([{
-        id: initialId,
-        type: "ai",
-        content: initialMessage.content,
-        timestamp: new Date()
-      }]);
-      
-      if (availableVoices.length > 0) {
-        speak(initialMessage.content, initialId, true);
+
+      try {
+        const { type, option } = getConversationDetails();
+        await aiConversationService.initializeSession(type, option);
+        const initialMessage = await getInitialMessage(type, option);
+        
+        setMessages([{
+          id: initialId,
+          type: "ai",
+          content: initialMessage,
+          timestamp: new Date()
+        }]);
+        
+        if (availableVoices.length > 0) {
+          speak(initialMessage, initialId, true);
+        }
+      } catch (error) {
+        console.error("Failed to get initial message:", error);
+        setMessages([{
+          id: initialId,
+          type: "ai",
+          content: "Hi! I'm your conversation partner. What would you like to talk about?",
+          timestamp: new Date()
+        }]);
       }
     };
 

@@ -45,3 +45,18 @@ export const saveRandomGeneratedTopics = (topics) => {
 export const getRandomGeneratedTopics = () => {
   return JSON.parse(localStorage.getItem(RANDOM_GENERATED_TOPICS_KEY) || '[]');
 };
+
+const CONVERSATION_TYPE_KEY = 'conversation_type';
+const CONVERSATION_OPTION_KEY = 'conversation_option';
+
+export const saveConversationDetails = (type, option) => {
+  localStorage.setItem(CONVERSATION_TYPE_KEY, type);
+  localStorage.setItem(CONVERSATION_OPTION_KEY, option);
+};
+
+export const getConversationDetails = () => {
+  return {
+    type: localStorage.getItem(CONVERSATION_TYPE_KEY),
+    option: localStorage.getItem(CONVERSATION_OPTION_KEY)
+  };
+};

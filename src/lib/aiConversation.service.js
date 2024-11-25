@@ -1,5 +1,6 @@
 import { botAIWrapper } from './botAi';
 import { CONVERSATION_PROMPTS } from '../prompts/botConversationPrompts';
+import { CONVERSATION_TYPES } from './constants';
 
 class AIConversationService {
   constructor() {
@@ -16,13 +17,16 @@ class AIConversationService {
       let systemPrompt = CONVERSATION_PROMPTS.SYSTEM;
 
       switch (conversationType) {
-        case 'GRAMMAR':
+        case CONVERSATION_TYPES.GRAMMAR:
           systemPrompt += CONVERSATION_PROMPTS.GRAMMAR_EXTENSION(topic);
           break;
-        case 'SCENARIO':
+        case CONVERSATION_TYPES.SCENARIOS:
           systemPrompt += CONVERSATION_PROMPTS.SCENARIO_EXTENSION(topic);
           break;
-        case 'TOPIC':
+        case CONVERSATION_TYPES.TOPICS:
+          systemPrompt += CONVERSATION_PROMPTS.TOPIC_EXTENSION(topic);
+          break;
+        case CONVERSATION_TYPES.PERSONAL:
           systemPrompt += CONVERSATION_PROMPTS.TOPIC_EXTENSION(topic);
           break;
         default:

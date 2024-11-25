@@ -290,3 +290,11 @@ export const LANGUAGE_CODES_TO_NAME = {
   es: "spanish",
   fr: "french",
 };
+
+export const CONVERSATION_TYPES = {
+  OPEN_ENDED: "OPEN_ENDED",
+  GRAMMAR: "GRAMMAR",
+  PERSONAL: "PERSONAL",
+  TOPICS: "TOPICS",
+  SCENARIOS: "SCENARIOS"
+};

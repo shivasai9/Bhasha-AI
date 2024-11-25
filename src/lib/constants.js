@@ -39,14 +39,17 @@ export const SPEECH_VOICE_CONFIG = {
   english: {
     lang: "en-US",
     voicePattern: /^en/i,
+    defaultVoice: "Google US English",
   },
   spanish: {
     lang: "es-ES",
     voicePattern: /^es/i,
+    defaultVoice: "Google Español",
   },
   french: {
     lang: "fr-FR",
     voicePattern: /^fr/i,
+    defaultVoice: "Google Français",
   },
 };
 

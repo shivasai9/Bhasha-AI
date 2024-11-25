@@ -76,7 +76,8 @@ export function useConversation() {
         if (isSubscribed) {
           setAvailableVoices(englishVoices);
           if (englishVoices.length > 0) {
-            setSelectedVoice(englishVoices[0]);
+            const defaultVoice = englishVoices.find(voice => voice.name === SPEECH_VOICE_CONFIG.english.defaultVoice);
+            setSelectedVoice(defaultVoice || englishVoices[0]);
             isVoicesReady.current = true;
           }
         }

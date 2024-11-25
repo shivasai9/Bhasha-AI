@@ -72,9 +72,27 @@ export default function ConversationView({ topic, onClose }) {
               </button>
               
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  Tokens remaining: {tokenInfo.left}/{tokenInfo.total}
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-medium text-gray-700">
+                        Tokens: {tokenInfo.left.toLocaleString()}/{tokenInfo.total.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          (tokenInfo.left / tokenInfo.total) < 0.2 
+                            ? 'bg-red-500' 
+                            : (tokenInfo.left / tokenInfo.total) < 0.5 
+                              ? 'bg-yellow-500' 
+                              : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(tokenInfo.left / tokenInfo.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
                 {isSessionExpired && (
                   <button
                     onClick={createNewSession}

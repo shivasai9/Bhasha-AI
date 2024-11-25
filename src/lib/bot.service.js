@@ -62,6 +62,10 @@ class BotService {
     switch (promptType) {
       case 'SENTENCE_ANALYSIS':
         return `${PROMPTS.SENTENCE_ANALYSIS}${message}`;
+      case 'KEY_TERMS':
+        return PROMPTS.KEY_TERMS;
+      case 'MAIN_IDEAS':
+        return PROMPTS.MAIN_IDEAS;
       case 'DEFAULT':
       default:
         return `${PROMPTS.DEFAULT}${message}`;

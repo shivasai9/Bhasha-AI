@@ -4,6 +4,8 @@ export const BOT_MESSAGES = {
     content: `👋 Hi! I'm Article Buddy, your friendly reading companion. I see you're reading "${articleTitle || 'this article'}". How can I help you understand it better?`,
     options: [
       { id: 'difficult-sentences', name: "🤔 Difficult sentences" },
+      { id: 'main-ideas', name: "💡 Main ideas" },
+      { id: 'key-terms', name: "📚 Key terms" },
       { id: 'other', name: "✨ Other" },
     ],
   }),
@@ -41,6 +43,8 @@ export const BOT_MESSAGES = {
     content: "What would you like to know next?",
     options: [
       { id: 'difficult-sentences', name: "🤔 Difficult sentences" },
+      { id: 'main-ideas', name: "💡 Main ideas" },
+      { id: 'key-terms', name: "📚 Key terms" },
       { id: 'follow-up', name: "❓ Ask follow-up questions" },
       { id: 'other', name: "✨ Other" },
     ],

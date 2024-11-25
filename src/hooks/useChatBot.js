@@ -164,6 +164,18 @@ export function useChatBot(article, articleContent) {
         }, 1000);
         break;
 
+      case 'key-terms':
+        setCurrentPromptType('KEY_TERMS');
+        setIsLoading(true);
+        handleAnalysis('KEY_TERMS');
+        break;
+
+      case 'main-ideas':
+        setCurrentPromptType('MAIN_IDEAS');
+        setIsLoading(true);
+        handleAnalysis('MAIN_IDEAS');
+        break;
+
       case 'follow-up':
       case 'other':
         setCurrentPromptType('FOLLOW_UP');
@@ -176,6 +188,75 @@ export function useChatBot(article, articleContent) {
       default:
         setCurrentPromptType('DEFAULT');
         setMessages((prev) => [...prev, userMessage]);
+    }
+  };
+
+  const handleAnalysis = async (promptType) => {
+    setIsLoading(true);
+    setIsStreaming(false);
+
+    try {
+      let isFirstChunk = true;
+      let finalChunk = '';
+      
+      await botService.sendStreamingMessage(
+        '', 
+        (chunk) => {
+          if (isFirstChunk) {
+            setMessages((prev) => [...prev, {
+              type: "bot",
+              content: chunk,
+              options: undefined,
+            }]);
+            isFirstChunk = false;
+            finalChunk = chunk;
+            setIsStreaming(true);
+            setIsLoading(false);
+          } else {
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              if (newMessages[newMessages.length - 1].type === "bot") {
+                newMessages[newMessages.length - 1].content = chunk;
+                finalChunk = chunk;
+              }
+              return newMessages;
+            });
+          }
+          triggerScroll();
+        },
+        promptType
+      );
+
+      setTimeout(() => {
+        setMessages((prev) => [...prev, BOT_MESSAGES.whatsNext]);
+        triggerScroll();
+      }, 500);
+
+    } catch (error) {
+      console.error(`Error in ${promptType} analysis:`, error);
+      setMessages((prev) => [...prev, {
+        type: "bot",
+        content: "I apologize, but I'm having trouble analyzing this right now. Please try again.",
+        options: undefined,
+      }]);
+    } finally {
+      const session = botService.getSession();
+      const tokensLeft = session?.tokensLeft || 0;
+      const maxTokens = session?.maxTokens || 0;
+      
+      setTokenInfo({
+        left: tokensLeft,
+        total: maxTokens
+      });
+      
+      if (tokensLeft < 700) {
+        setIsSessionExpired(true);
+      }
+      
+      setIsLoading(false);
+      setIsStreaming(false);
+      setCurrentPromptType('DEFAULT');
+      triggerScroll();
     }
   };
 

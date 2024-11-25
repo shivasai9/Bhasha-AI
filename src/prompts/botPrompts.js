@@ -24,6 +24,22 @@ PRIORITY 2: Article-Related Questions
 
 Question to answer: `,
 
+  KEY_TERMS: `Analyze the article and:
+1. Identify and list the key technical terms or important concepts
+2. Provide clear, simple definitions for each term
+3. If possible, provide an example from the article where the term is used
+4. Focus only on the most important terms that are crucial for understanding the article
+
+Please format your response as a list.`,
+
+  MAIN_IDEAS: `Analyze the article and:
+1. Identify the main ideas and key arguments
+2. Break down complex concepts into simpler terms
+3. Highlight the most important points
+4. Show how these ideas connect to each other
+
+Please keep the explanation clear and concise.`,
+
   SYSTEM: (articleContent) => `You are Article Buddy, a friendly and helpful AI assistant designed to help users understand articles better. Your responses should be concise, clear, and educational.
 
 Here is the article content to analyze:

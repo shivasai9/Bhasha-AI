@@ -40,10 +40,27 @@ export default function LanguageSelector() {
   const { translationStatus, promptsStatus, summarizationStatus } =
     useApiStatus();
 
-  const isApisAvailable =
-    translationStatus === "Available" ||
-    promptsStatus === "Available" ||
-    summarizationStatus === "Available";
+  const getApiAvailabilityStatus = () => {
+    const isAllAvailable = 
+      translationStatus === "Available" && 
+      promptsStatus === "Available" && 
+      summarizationStatus === "Available";
+
+    const isPartiallyAvailable = 
+      translationStatus === "Available" ||
+      promptsStatus === "Available" ||
+      summarizationStatus === "Available";
+
+    const isPromptsUnavailable = promptsStatus !== "Available";
+    
+    if (isPromptsUnavailable) return "unavailable";
+    if (isAllAvailable) return "available";
+    if (isPartiallyAvailable) return "partial";
+    return "unavailable";
+  };
+
+  const apiStatus = getApiAvailabilityStatus();
+  const canProceed = apiStatus !== "unavailable";
 
   useEffect(() => {
     if (progressRef.current && containerRef.current) {
@@ -147,16 +164,16 @@ export default function LanguageSelector() {
             </div>
             <div
               className={`grid gap-6 md:grid-cols-3 ${
-                !isApisAvailable ? "opacity-60" : ""
+                !canProceed ? "opacity-60" : ""
               }`}
             >
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
                   onClick={() =>
-                    isApisAvailable && handleWebsiteLanguage(lang.name)
+                    canProceed && handleWebsiteLanguage(lang.name)
                   }
-                  disabled={!isApisAvailable}
+                  disabled={!canProceed}
                   className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
                     ${
                       selectedWebsiteLang.toLowerCase() ===
@@ -166,7 +183,7 @@ export default function LanguageSelector() {
                     } 
                     transition-all duration-300 hover:shadow-xl transform 
                     ${
-                      isApisAvailable
+                      canProceed
                         ? "hover:-translate-y-1"
                         : "cursor-not-allowed"
                     }
@@ -190,7 +207,7 @@ export default function LanguageSelector() {
                 </button>
               ))}
             </div>
-            {!isApisAvailable && (
+            {!canProceed && (
               <div className="mt-4 text-center text-sm text-red-600">
                 Please enable required features to start selecting languages
               </div>
@@ -213,16 +230,16 @@ export default function LanguageSelector() {
             </div>
             <div
               className={`grid gap-6 md:grid-cols-3 ${
-                !isApisAvailable ? "opacity-60" : ""
+                !canProceed ? "opacity-60" : ""
               }`}
             >
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
                   onClick={() =>
-                    isApisAvailable && handleTargetLanguage(lang.name)
+                    canProceed && handleTargetLanguage(lang.name)
                   }
-                  disabled={!isApisAvailable}
+                  disabled={!canProceed}
                   className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
                     ${
                       selectedLearningLang.toLowerCase() ===
@@ -232,7 +249,7 @@ export default function LanguageSelector() {
                     } 
                     transition-all duration-300 hover:shadow-xl transform 
                     ${
-                      isApisAvailable
+                      canProceed
                         ? "hover:-translate-y-1"
                         : "cursor-not-allowed"
                     }
@@ -256,7 +273,7 @@ export default function LanguageSelector() {
                 </button>
               ))}
             </div>
-            {!isApisAvailable && (
+            {!canProceed && (
               <div className="mt-4 text-center text-sm text-red-600">
                 Please enable required features to start selecting languages
               </div>
@@ -361,7 +378,7 @@ export default function LanguageSelector() {
                 {"BhashaAI"}
               </h1>
             </div>
-            <ApiStatusBanner isApisAvailable={isApisAvailable} />
+            <ApiStatusBanner status={apiStatus} />
             <ProgressBar />
             <div className="space-y-6">
               <div className="relative overflow-hidden">{renderStep()}</div>

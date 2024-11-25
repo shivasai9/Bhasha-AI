@@ -184,10 +184,17 @@ export function useConversation() {
       }
     };
 
+    const handleBeforeUnload = () => {
+      stopSpeaking();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     initialize();
 
     return () => {
       aiConversationService.destroy();
+      stopSpeaking();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [selectedVoice]);
 

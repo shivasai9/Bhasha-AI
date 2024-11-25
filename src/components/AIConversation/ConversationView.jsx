@@ -32,7 +32,6 @@ export default function ConversationView({ topic, onClose }) {
     clearTooltip,
     streamingText,
     isStreaming,
-    dots,
   } = useConversation();
 
   const getVolumeTooltip = () => {

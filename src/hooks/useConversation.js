@@ -1,6 +1,8 @@
 //@ts-nocheck
 import { useState, useRef, useEffect } from 'react';
 import { SPEECH_VOICE_CONFIG } from '../lib/constants';
+import aiConversationService from '../lib/aiConversation.service';
+import { CONVERSATION_MESSAGES } from '../constants/conversationMessages';
 
 export function useConversation() {
   const [messages, setMessages] = useState([]);
@@ -16,6 +18,10 @@ export function useConversation() {
   const isVoicesReady = useRef(false);
   const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPromptType, setCurrentPromptType] = useState('OPEN_ENDED');
+  const [tokenInfo, setTokenInfo] = useState({ left: 4096, total: 4096 });
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   const recognition = useRef(null);
   const synthesis = useRef(window.speechSynthesis);
@@ -114,7 +120,7 @@ export function useConversation() {
           setStreamingText("");
           setIsStreaming(false);
           addMessage("user", transcript);
-          simulateAIResponse(transcript);
+          askAI(transcript);
           recognition.current.stop();
           setIsListening(false);
         }
@@ -132,6 +138,28 @@ export function useConversation() {
         recognition.current.stop();
       }
       stopSpeaking();
+    };
+  }, [selectedVoice]);
+
+  useEffect(() => {
+    const initialize = async () => {
+      if (!isVoicesReady.current) return;
+      
+      await aiConversationService.initializeSession();
+      const initialMessage = CONVERSATION_MESSAGES.openEnded.initial;
+      const messageId = Date.now().toString();
+      initialMessage.id = messageId;
+      setMessages([initialMessage]);
+      
+      if (availableVoices.length > 0) {
+        speak(initialMessage.content, messageId, true);
+      }
+    };
+
+    initialize();
+
+    return () => {
+      aiConversationService.destroy();
     };
   }, [selectedVoice]);
 
@@ -158,12 +186,77 @@ export function useConversation() {
     scrollToBottom();
   };
 
-  const simulateAIResponse = (userMessage) => {
-    setTimeout(() => {
-      const responseId = Date.now().toString();
-      addMessage("ai", `Response to: ${userMessage}`);
-      speak(`Response to: ${userMessage}`, responseId, true);
-    }, 1000);
+  const askAI = async (userMessage) => {
+    if (isSessionExpired || isLoading) return;
+    setIsLoading(true);
+    setIsStreaming(false);
+    try {
+      let isFirstChunk = true;
+      let previousChunkLength = 0;
+      
+      await aiConversationService.sendStreamingMessage(
+        userMessage,
+        (chunk) => {
+          if (isFirstChunk) {
+            const responseId = Date.now().toString();
+            setMessages(prev => [...prev, {
+              id: responseId,
+              type: "ai",
+              content: chunk,
+              timestamp: new Date()
+            }]);
+            isFirstChunk = false;
+            setIsStreaming(true);
+            setIsLoading(false);
+            speak(chunk, responseId, true);
+            previousChunkLength = chunk.length;
+          } else {
+            setMessages(prev => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              if (lastMessage.type === "ai") {
+                const newContent = chunk.slice(previousChunkLength);
+                lastMessage.content = chunk;
+                if (newContent.trim()) {
+                  // queueChunk(newContent, lastMessage.id);
+                }
+                previousChunkLength = chunk.length;
+              }
+              return newMessages;
+            });
+          }
+          scrollToBottom();
+        }
+      );
+
+      // Update session token info
+      const session = aiConversationService.getSession();
+      const tokensLeft = session?.tokensLeft || 0;
+      const maxTokens = session?.maxTokens || 0;
+      
+      setTokenInfo({
+        left: tokensLeft,
+        total: maxTokens
+      });
+      
+      if (tokensLeft < 700) {
+        setIsSessionExpired(true);
+      }
+
+    } catch (error) {
+      console.error("Failed to get AI response:", error);
+      const errorId = Date.now().toString();
+      setMessages(prev => [...prev, {
+        id: errorId,
+        type: "ai",
+        content: "I apologize, but I'm having trouble responding right now. Please try again.",
+        timestamp: new Date()
+      }]);
+    } finally {
+      setIsLoading(false);
+      setIsStreaming(false);
+      scrollToBottom();
+    }
   };
 
   const stopSpeaking = async () => {
@@ -262,6 +355,26 @@ export function useConversation() {
     }
   };
 
+  const createNewSession = async () => {
+    setIsLoading(true);
+    try {
+      aiConversationService.destroy();
+      await aiConversationService.initializeSession();
+      setIsSessionExpired(false);
+      const responseId = Date.now().toString();
+      setMessages(prev => [...prev, {
+        id: responseId,
+        type: "ai",
+        content: "New session created! You can continue chatting.",
+        timestamp: new Date()
+      }]);
+    } catch (error) {
+      console.error("Failed to create new session:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     messages,
     isListening,
@@ -290,5 +403,9 @@ export function useConversation() {
     streamingText,
     isStreaming,
     scrollToBottom,
+    isLoading,
+    tokenInfo,
+    isSessionExpired,
+    createNewSession,
   };
 }

@@ -37,10 +37,11 @@ export default function LanguageSelector() {
   const containerRef = useRef(null);
   const labels = useLabels("LANGUAGE_SELECTOR_LABELS");
   const topicLabels = useLabels("TOPIC_LABELS");
-  const { translationStatus, promptsStatus, summarizationStatus } =
-    useApiStatus();
+  const { translationStatus, promptsStatus, summarizationStatus, isLoading } = useApiStatus();
 
   const getApiAvailabilityStatus = () => {
+    if (isLoading) return "loading";
+    
     const isAllAvailable = 
       translationStatus === "Available" && 
       promptsStatus === "Available" && 
@@ -60,7 +61,7 @@ export default function LanguageSelector() {
   };
 
   const apiStatus = getApiAvailabilityStatus();
-  const canProceed = apiStatus !== "unavailable";
+  const canProceed = !isLoading && apiStatus !== "unavailable";
 
   useEffect(() => {
     if (progressRef.current && containerRef.current) {
@@ -144,6 +145,40 @@ export default function LanguageSelector() {
       </button>
     ) : null;
 
+  const renderLanguageButtons = (languages, onSelect, selectedLang) => {
+    return languages.map((lang) => (
+      <button
+        key={lang.code}
+        onClick={() => canProceed && onSelect(lang.name)}
+        disabled={!canProceed}
+        className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
+          ${
+            selectedLang.toLowerCase() === lang.name.toLowerCase()
+              ? "border-indigo-600 bg-indigo-50"
+              : "border-indigo-100 hover:border-indigo-400"
+          } 
+          transition-all duration-300 hover:shadow-xl transform 
+          ${!canProceed ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1"}
+        `}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="relative text-center">
+          <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">
+            {lang.flag}
+          </span>
+          <span className="text-lg font-medium text-gray-700">
+            {lang.name}
+          </span>
+        </div>
+        {selectedLang.toLowerCase() === lang.name.toLowerCase() && (
+          <div className="absolute top-2 right-2">
+            <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+          </div>
+        )}
+      </button>
+    ));
+  };
+
   const renderStep = () => {
     const animation = getAnimation();
 
@@ -167,45 +202,7 @@ export default function LanguageSelector() {
                 !canProceed ? "opacity-60" : ""
               }`}
             >
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() =>
-                    canProceed && handleWebsiteLanguage(lang.name)
-                  }
-                  disabled={!canProceed}
-                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
-                    ${
-                      selectedWebsiteLang.toLowerCase() ===
-                      lang.name.toLowerCase()
-                        ? "border-indigo-600 bg-indigo-50"
-                        : "border-indigo-100 hover:border-indigo-400"
-                    } 
-                    transition-all duration-300 hover:shadow-xl transform 
-                    ${
-                      canProceed
-                        ? "hover:-translate-y-1"
-                        : "cursor-not-allowed"
-                    }
-                  `}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative text-center">
-                    <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">
-                      {lang.flag}
-                    </span>
-                    <span className="text-lg font-medium text-gray-700">
-                      {lang.name}
-                    </span>
-                  </div>
-                  {selectedWebsiteLang.toLowerCase() ===
-                    lang.name.toLowerCase() && (
-                    <div className="absolute top-2 right-2">
-                      <CheckCircle2 className="w-5 h-5 text-indigo-600" />
-                    </div>
-                  )}
-                </button>
-              ))}
+              {renderLanguageButtons(LANGUAGES, handleWebsiteLanguage, selectedWebsiteLang)}
             </div>
             {!canProceed && (
               <div className="mt-4 text-center text-sm text-red-600">
@@ -233,45 +230,7 @@ export default function LanguageSelector() {
                 !canProceed ? "opacity-60" : ""
               }`}
             >
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() =>
-                    canProceed && handleTargetLanguage(lang.name)
-                  }
-                  disabled={!canProceed}
-                  className={`group relative overflow-hidden p-6 bg-white rounded-xl border-2 
-                    ${
-                      selectedLearningLang.toLowerCase() ===
-                      lang.name.toLowerCase()
-                        ? "border-indigo-600 bg-indigo-50"
-                        : "border-indigo-100 hover:border-indigo-400"
-                    } 
-                    transition-all duration-300 hover:shadow-xl transform 
-                    ${
-                      canProceed
-                        ? "hover:-translate-y-1"
-                        : "cursor-not-allowed"
-                    }
-                  `}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative text-center">
-                    <span className="text-5xl mb-4 block transform group-hover:scale-110 transition-transform">
-                      {lang.flag}
-                    </span>
-                    <span className="text-lg font-medium text-gray-700">
-                      {lang.name}
-                    </span>
-                  </div>
-                  {selectedLearningLang.toLowerCase() ===
-                    lang.name.toLowerCase() && (
-                    <div className="absolute top-2 right-2">
-                      <CheckCircle2 className="w-5 h-5 text-indigo-600" />
-                    </div>
-                  )}
-                </button>
-              ))}
+              {renderLanguageButtons(LANGUAGES, handleTargetLanguage, selectedLearningLang)}
             </div>
             {!canProceed && (
               <div className="mt-4 text-center text-sm text-red-600">
@@ -378,7 +337,7 @@ export default function LanguageSelector() {
                 {"BhashaAI"}
               </h1>
             </div>
-            <ApiStatusBanner status={apiStatus} />
+            <ApiStatusBanner status={apiStatus} isLoading={isLoading} />
             <ProgressBar />
             <div className="space-y-6">
               <div className="relative overflow-hidden">{renderStep()}</div>

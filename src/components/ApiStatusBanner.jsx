@@ -2,7 +2,25 @@ import React from 'react';
 import { AlertTriangle, AlertCircle, ShieldCheck, XCircle } from "lucide-react";
 import { Link } from 'react-router-dom';
 
-export default function ApiStatusBanner({ status }) {
+const SkeletonBanner = () => (
+  <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-white animate-pulse">
+    <div className="p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-gray-200 p-2 w-9 h-9" />
+          <div>
+            <div className="h-4 w-24 bg-gray-200 rounded mb-2" />
+            <div className="h-3 w-32 bg-gray-200 rounded" />
+          </div>
+        </div>
+        <div className="w-28 h-9 bg-gray-200 rounded-lg" />
+      </div>
+    </div>
+  </div>
+);
+
+export default function ApiStatusBanner({ status, isLoading }) {
+  if (isLoading) return <SkeletonBanner />;
   if (!status) return null;
 
   const configs = {

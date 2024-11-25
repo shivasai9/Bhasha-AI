@@ -147,6 +147,7 @@ export function useConversation() {
     const initialize = async () => {
       if (!isVoicesReady.current) return;
       
+      if(messages && messages.length > 0) return;
       const initialId = getUniqueId();
       setMessages([{
         id: initialId,
@@ -179,6 +180,7 @@ export function useConversation() {
   }, [selectedVoice]);
 
   const toggleListening = () => {
+    if (isSessionExpired) return;
     if (isListening) {
       recognition.current.stop();
     } else {
@@ -228,8 +230,6 @@ export function useConversation() {
         } : msg
       ));
 
-      speak(response, skeletonId, true);
-
       // Update session token info
       const session = aiConversationService.getSession();
       const tokensLeft = session?.tokensLeft || 0;
@@ -239,11 +239,12 @@ export function useConversation() {
         left: tokensLeft,
         total: maxTokens
       });
-      
-      if (tokensLeft < 5500) {
+      let enableMic = true;
+      if (tokensLeft < 5800) {
+        enableMic = false;
         setIsSessionExpired(true);
       }
-
+      speak(response, skeletonId, enableMic);
     } catch (error) {
       console.error("Failed to get AI response:", error);
       setMessages(prev => prev.map(msg => 
@@ -283,50 +284,63 @@ export function useConversation() {
 
     try {
       const sanitizedText = sanitizeText(text);
-      currentUtterance.current = new SpeechSynthesisUtterance(sanitizedText);
+      const sentences = sanitizedText.split(/[.]/).filter(sentence => sentence.trim().length > 0);
       
-      if (!synthesis.current) {
-        synthesis.current = window.speechSynthesis;
-      }
-      
-      if (synthesis.current.paused) {
-        synthesis.current.resume();
-      }
-      
-      const currentVoice = selectedVoice || (availableVoices.length > 0 ? availableVoices[0] : null);
-      
-      if (currentVoice) {
-        currentUtterance.current.voice = currentVoice;
-      }
-      
-      currentUtterance.current.volume = volume;
-      currentUtterance.current.rate = 1.0;
-      currentUtterance.current.pitch = 1.0;
-      currentUtterance.current.lang = 'en-US';
-
-      currentUtterance.current.onstart = () => {
-        setCurrentlyPlayingId(messageId);
-      };
-
-      currentUtterance.current.onend = () => {
-        setCurrentlyPlayingId(null);
-        currentUtterance.current = null;
-        if (enableMicAfter && recognition.current) {
-          recognition.current.start();
-          setIsListening(true);
-        }
-      };
-
-      currentUtterance.current.onerror = (error) => {
-        console.error('Speech error:', error);
-        if (error.error !== 'canceled') {
+      let currentIndex = 0;
+      const speakNextSentence = () => {
+        if (currentIndex >= sentences.length) {
           setCurrentlyPlayingId(null);
           currentUtterance.current = null;
+          if (enableMicAfter && recognition.current && !isSessionExpired) {
+            recognition.current.start();
+            setIsListening(true);
+          }
+          return;
         }
+
+        currentUtterance.current = new SpeechSynthesisUtterance(sentences[currentIndex].trim());
+        
+        if (!synthesis.current) {
+          synthesis.current = window.speechSynthesis;
+        }
+        
+        if (synthesis.current.paused) {
+          synthesis.current.resume();
+        }
+        
+        const currentVoice = selectedVoice || (availableVoices.length > 0 ? availableVoices[0] : null);
+        
+        if (currentVoice) {
+          currentUtterance.current.voice = currentVoice;
+        }
+        
+        currentUtterance.current.volume = volume;
+        currentUtterance.current.rate = 1.0;
+        currentUtterance.current.pitch = 1.0;
+        currentUtterance.current.lang = 'en-US';
+
+        currentUtterance.current.onstart = () => {
+          setCurrentlyPlayingId(messageId);
+        };
+
+        currentUtterance.current.onend = () => {
+          currentIndex++;
+          speakNextSentence();
+        };
+
+        currentUtterance.current.onerror = (error) => {
+          console.error('Speech error:', error);
+          if (error.error !== 'canceled') {
+            setCurrentlyPlayingId(null);
+            currentUtterance.current = null;
+          }
+        };
+
+        setCurrentlyPlayingId(messageId);
+        synthesis.current.speak(currentUtterance.current);
       };
 
-      setCurrentlyPlayingId(messageId);
-      synthesis.current.speak(currentUtterance.current);
+      speakNextSentence();
 
     } catch (error) {
       console.error('Speak error:', error);
@@ -366,7 +380,7 @@ export function useConversation() {
       setMessages(prev => [...prev, {
         id: responseId,
         type: "ai",
-        content: "New session created! You can continue chatting.",
+        content: "A new session has been created! Feel free to continue our conversation, but please note that I've lost our previous chat.",
         timestamp: new Date()
       }]);
     } catch (error) {

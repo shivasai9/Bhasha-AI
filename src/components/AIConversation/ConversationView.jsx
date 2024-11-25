@@ -43,6 +43,9 @@ export default function ConversationView({ topic, onClose }) {
   };
 
   const getMicTooltip = () => {
+    if (isSessionExpired) {
+      return "Session is expired. Create a new one by clicking the button on top.";
+    }
     return isListening ? "Stop listening" : "Start listening";
   };
 
@@ -153,7 +156,10 @@ export default function ConversationView({ topic, onClose }) {
                           isListening
                             ? "bg-indigo-500 hover:bg-indigo-600"
                             : "bg-white hover:bg-white/90"
-                        } ${isListening ? "text-white" : "text-indigo-600"}`}
+                        } ${isListening ? "text-white" : "text-indigo-600"} ${
+                          isSessionExpired ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        disabled={isSessionExpired}
                       >
                         <Mic className="w-6 h-6" />
                         {!isListening && (
@@ -175,7 +181,7 @@ export default function ConversationView({ topic, onClose }) {
                       )}
                       <CustomTooltip
                         text={getMicTooltip()}
-                        visible={activeTooltip === "mic"}
+                        visible={activeTooltip === "mic" || isSessionExpired}
                         containerRef={micRef}
                       />
                     </div>

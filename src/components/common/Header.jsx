@@ -50,7 +50,7 @@ export default function Header() {
             <Link to="/" className="flex items-center space-x-1 group perspective"
                   onMouseEnter={() => setIsFlipped(true)}
                   onMouseLeave={() => setIsFlipped(false)}>
-                <Logo variant="white" width={32} height={32} />
+                <Logo variant="white" width={32} height={32} strokeWidth={2}/>
               <div className="relative h-8 cursor-pointer preserve-3d">
                 <div className={`flex items-center absolute w-full h-full transition-all duration-500 backface-hidden ${isFlipped ? '[transform:rotateX(180deg)]' : ''}`}>
                   <div className="flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm">

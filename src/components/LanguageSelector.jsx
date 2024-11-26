@@ -332,7 +332,9 @@ export default function LanguageSelector() {
           >
             <BackButton />
             <div className="flex items-end justify-center mb-8">
-              <Logo variant="gradient" className="mr-2" width={48} height={48} />
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-0 pl-2.5 py-1 rounded-2xl mr-2">
+                <Logo variant="white" className="mr-2" width={42} height={42} strokeWidth={1}/>
+              </div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
                 {"BhashaAI"}
               </h1>

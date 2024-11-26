@@ -42,6 +42,19 @@ export default function Header() {
     { icon: Settings, label: labels?.userMenu?.settings, href: '/settings' },
   ];
 
+  const featureMenuItems = [
+    { 
+      icon: BookOpen, 
+      label: labels?.navigation?.articles, 
+      href: '/articles' 
+    },
+    { 
+      icon: MessageSquare, 
+      label: labels?.navigation?.aiChat, 
+      href: '/conversations' 
+    }
+  ];
+
   return (
     <div className="sticky top-0 z-50 px-4 py-4 pb-0 bg-gray-50">
       <header className="max-w-4xl mx-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl shadow-lg">
@@ -80,26 +93,25 @@ export default function Header() {
                   onClick={() => setIsFeatureMenuOpen(!isFeatureMenuOpen)}
                   className="text-white/90 hover:text-white transition-colors px-3 py-2 text-sm font-medium hover:bg-white/10 rounded-md"
                 >
-                  Features
+                  {labels?.navigation?.features}
                 </button>
 
                 {isFeatureMenuOpen && (
                   <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 animate-in fade-in slide-in-from-top-5 duration-200">
-                    <Link
-                      to="/articles"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
-                    >
-                      <BookOpen className="w-4 h-4 mr-3" />
-                      Articles
-                    </Link>
-                    <div className="border-b border-gray-100" />
-                    <Link
-                      to="/conversations"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-3" />
-                      AI Chat
-                    </Link>
+                    {featureMenuItems.map((item, index) => (
+                      <React.Fragment key={item.label}>
+                        <Link
+                          to={item.href}
+                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                        >
+                          <item.icon className="w-4 h-4 mr-3" />
+                          {item.label}
+                        </Link>
+                        {index < featureMenuItems.length - 1 && (
+                          <div className="border-b border-gray-100" />
+                        )}
+                      </React.Fragment>
+                    ))}
                   </div>
                 )}
               </div>

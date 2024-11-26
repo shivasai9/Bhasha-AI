@@ -266,7 +266,9 @@ export const QUIZ_SECTION_LABELS = {
 
 export const HEADER_LABELS = {
   navigation: {
-    articles: "Articles"
+    articles: "Articles",
+    features: "Features",
+    aiChat: "AI Chat"
   },
   userMenu: {
     savedWords: "Saved Words",

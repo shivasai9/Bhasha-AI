@@ -162,27 +162,6 @@ Return it in the following Array of JSON Objects format:
 Please provide exactly five questions. Do not include any markdown or code formatting, only the pure array of JSON objects.
 `;
 
-export const CORRECT_SUMMARY = `
-Article: "{{title}}"
-Written Summary: "{{summary}}"
-
-Can you refer the Written Summary and give me if any gramatical mistakes are identified, suggestions to correct them and Corrected Summary.
-
-Response format: {
-  "Errors": [
-    "1. Mistake 1",
-    "2. Mistake 2" 
-  ],
-  "Suggestions": [
-    "1. Suggestion 1",
-    "2. Suggestion 2"
-  ]
-  "Corrected Summary": "Corrected Summary."
-}
-
-Don't find errors in Article. Find errors only from Written Summary. Do not include any markdown or code formatting, only the pure JSON object.
-`;
-
 export const GENERATE_ARTICLE_CONTENT = `
 Generate an article content based on the following title and summary, adhering to the specified tone and length requirements.
 
@@ -265,4 +244,5 @@ Examples:
   "synonyms": "upward | aloft | skyward | overhead | above",
   "antonyms": "down | below | downward | beneath | under",
   "exampleSentence": "The balloon floated up into the sky."
-}`;
+}
+`;

@@ -1,9 +1,9 @@
 import React from "react";
 import { useSummaryWriter } from "../../hooks/useSummaryWriter";
-import { AlertCircle, CheckCircle, Info } from "lucide-react";
+import { AlertCircle, Info } from "lucide-react";
 import { useLabels } from "../../hooks/useLabels";
 
-export default function SummaryWriter(article) {
+export default function SummaryWriter({ article, articleContent }) {
   const labels = useLabels('SUMMARY_WRITER_LABELS');
   const {
     summary,
@@ -13,7 +13,7 @@ export default function SummaryWriter(article) {
     handleSummaryChange,
     handleSubmit,
     isEnglish,
-  } = useSummaryWriter(article);
+  } = useSummaryWriter({ article, articleContent });
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
@@ -53,38 +53,40 @@ export default function SummaryWriter(article) {
 
       {showFeedback && isEnglish && (
         <div className="space-y-6">
-          {feedback.errors.length > 0 && (
+          {feedback.length > 0 && (
             <div className="bg-amber-50 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-amber-800 mb-4">
-                {labels.feedback.suggestions.title}
+                Suggestions for Improvement
               </h3>
               <div className="space-y-4">
-                {feedback.errors.map((error, index) => (
+                {feedback.map((fb, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <AlertCircle className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-amber-800 font-medium">{labels.feedback.suggestions.originalLabel}</p>
-                      {error.original.map((err) => <p className="text-amber-700 mb-2">{err}</p>)}
-                      <p className="text-amber-800 font-medium">{labels.feedback.suggestions.suggestionLabel}</p>
-                      {error.correction.map((suggestion) => <p className="text-amber-700 mb-2">{suggestion}</p>)}
+                    <div className="flex-1">
+                      <div className="mb-3">
+                        <p className="text-amber-800 font-medium">Original Sentence:</p>
+                        <p className="text-amber-700">{fb.originalSentence}</p>
+                      </div>
+                      {fb.identifiedIssues && fb.identifiedIssues.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-amber-800 font-medium">Issues Found:</p>
+                          <ul className="list-disc list-inside text-amber-700">
+                            {fb.identifiedIssues.map((issue, i) => (
+                              <li key={i}>{issue}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-amber-800 font-medium">Improved Version:</p>
+                        <p className="text-amber-700">{fb.correctedSentence}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          <div className="bg-green-50 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <h3 className="text-lg font-semibold text-green-800">
-                {labels.feedback.corrected.title}
-              </h3>
-            </div>
-            <p className="text-green-700 whitespace-pre-wrap">
-              {feedback.corrected}
-            </p>
-          </div>
         </div>
       )}
     </div>

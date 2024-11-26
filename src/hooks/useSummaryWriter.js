@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { getLearningLanguage } from "../lib/languageStorage";
-import { aiWrapper } from "../lib/ai";
+import { articleSummaryService } from "../lib/services/articleSummary.service";
 
-export function useSummaryWriter(article) {
+export function useSummaryWriter({ article, articleContent }) {
   const [summary, setSummary] = useState("");
-  const [feedback, setFeedback] = useState({ errors: [], corrected: "" });
+  const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isEnglish, setIsEnglish] = useState(true);
@@ -17,23 +17,30 @@ export function useSummaryWriter(article) {
     setSummary(e.target.value);
   };
 
+  const processFeedback = (feedbackArray) => {
+    return feedbackArray.map((item, index) => ({
+      id: index,
+      originalSentence: item.originalSentence || "",
+      identifiedIssues: item.identifiedIssues || [],
+      correctedSentence: item.correctedSentence || "",
+      hasIssues: (item.identifiedIssues || []).length > 0
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Calling Correction Summary Prompt
-      console.log(article);
-      const parsedSummary =await aiWrapper.correctSummary(article.article.title, summary);
-      setFeedback({
-        errors: [
-          {
-            original: parsedSummary.Errors,
-            correction: parsedSummary.Suggestions,
-          },
-        ],
-        corrected: parsedSummary["Corrected Summary"],
-      });
+      if (!articleContent) {
+        throw new Error("Article content is required");
+      }
+
+      await articleSummaryService.initializeWithArticle(articleContent);
+      const feedbackResponse = await articleSummaryService.correctSummary(summary);
+      const processedFeedback = processFeedback(feedbackResponse);
+
+      setFeedback(processedFeedback);
       setShowFeedback(true);
     } catch (error) {
       console.error("Error analyzing summary:", error);
@@ -54,6 +61,6 @@ export function useSummaryWriter(article) {
     handleSummaryChange,
     handleSubmit,
     closeFeedback,
-    isEnglish,
+    isEnglish
   };
 }

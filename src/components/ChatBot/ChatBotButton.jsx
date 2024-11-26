@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import Logo from '../Logo';
+import { useLabels } from '../../hooks/useLabels';
 
 const ChatBotButton = ({ 
   showTooltip, 
@@ -9,6 +10,7 @@ const ChatBotButton = ({
   handleMouseLeave, 
   toggleOpen 
 }) => {
+  const labels = useLabels('CHATBOT_BUTTON_LABELS');
 
   const handleTooltipClose = (e) => {
     e.stopPropagation();
@@ -22,8 +24,8 @@ const ChatBotButton = ({
         <div className="absolute bottom-full right-0 mb-2">
           <div className="bg-white text-gray-800 text-sm py-3 px-5 rounded-xl shadow-lg flex items-start gap-4 border border-gray-100 min-w-[300px]">
             <div className="flex flex-col flex-1 gap-1">
-              <span className="font-medium">Hi, I'm Article Buddy, your AI assistant.</span>
-              <span>Ask me anything about the article! 👋</span>
+              <span className="font-medium">{labels.tooltip.title}</span>
+              <span>{labels.tooltip.message}</span>
             </div>
             <button
               onClick={handleTooltipClose}

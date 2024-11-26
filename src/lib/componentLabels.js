@@ -308,3 +308,10 @@ export const TOPIC_LABELS = {
 export const IMAGE_ATTRIBUTION_LABELS = {
   source: "Source"
 };
+
+export const CHATBOT_BUTTON_LABELS = {
+  tooltip: {
+    title: "Hi, I'm Article Buddy, your AI assistant.",
+    message: "Ask me anything about the article! 👋"
+  }
+};

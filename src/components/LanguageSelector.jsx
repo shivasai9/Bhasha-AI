@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Globe2,
   BookOpen,
   Sparkles,
   BookOpenCheck,
@@ -17,6 +16,7 @@ import { useLabels } from "../hooks/useLabels";
 import { useApiStatus } from "../hooks/useApiStatus";
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import ApiStatusBanner from "./ApiStatusBanner";
+import Logo from './Logo';
 
 export default function LanguageSelector() {
   const navigate = useNavigate();
@@ -331,8 +331,8 @@ export default function LanguageSelector() {
             className="p-8 max-h-[90vh] overflow-y-auto relative scroll-smooth"
           >
             <BackButton />
-            <div className="flex items-center justify-center mb-8">
-              <Globe2 className="w-12 h-12 text-indigo-600 mr-4" />
+            <div className="flex items-end justify-center mb-8">
+              <Logo variant="gradient" className="mr-2" width={48} height={48} />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
                 {"BhashaAI"}
               </h1>

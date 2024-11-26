@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, Settings, BookmarkIcon, FileText, MessageSquare } from 'lucide-react';
+import { User, Settings, BookmarkIcon, FileText, MessageSquare } from 'lucide-react';
 import { useLabels } from '../../hooks/useLabels';
 import { getBrandName } from '../../lib/utils';
 import { getInterfaceLanguage } from '../../lib/languageStorage';
+import Logo from '../Logo';
 
 export default function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -46,12 +47,10 @@ export default function Header() {
       <header className="max-w-4xl mx-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl shadow-lg">
         <div className="px-6">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center space-x-3 group perspective"
+            <Link to="/" className="flex items-center space-x-1 group perspective"
                   onMouseEnter={() => setIsFlipped(true)}
                   onMouseLeave={() => setIsFlipped(false)}>
-              <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
+                <Logo variant="white" width={32} height={32} />
               <div className="relative h-8 cursor-pointer preserve-3d">
                 <div className={`flex items-center absolute w-full h-full transition-all duration-500 backface-hidden ${isFlipped ? '[transform:rotateX(180deg)]' : ''}`}>
                   <div className="flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm">

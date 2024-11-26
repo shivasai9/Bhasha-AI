@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Settings, BookmarkIcon, FileText, MessageSquare } from 'lucide-react';
+import { User, Settings, BookmarkIcon, BookOpen, MessageSquare } from 'lucide-react';
 import { useLabels } from '../../hooks/useLabels';
 import { getBrandName } from '../../lib/utils';
 import { getInterfaceLanguage } from '../../lib/languageStorage';

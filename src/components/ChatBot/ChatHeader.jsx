@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bot, X, Maximize2, Minimize2, Maximize } from 'lucide-react';
+import { X, Maximize2, Minimize2, Maximize } from 'lucide-react';
+import Logo from '../Logo';
 
 const ChatHeader = ({ isMinimized, toggleMinimize, toggleOpen, isExpanded, toggleResize }) => {
   return (
@@ -10,7 +11,7 @@ const ChatHeader = ({ isMinimized, toggleMinimize, toggleOpen, isExpanded, toggl
         <div className={`rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors ${
           isMinimized ? 'p-1' : 'p-1.5'
         }`}>
-          <Bot className="w-5 h-5 text-white" />
+          <Logo variant="white" width={24} height={24} strokeWidth={5} />
         </div>
         <h3 className="font-medium text-white">Article Buddy</h3>
       </div>

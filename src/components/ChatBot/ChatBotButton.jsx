@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bot, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import Logo from '../Logo';
 
 const ChatBotButton = ({ 
   showTooltip, 
@@ -40,7 +41,7 @@ const ChatBotButton = ({
         onMouseLeave={handleMouseLeave}
         className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
       >
-        <Bot className="w-6 h-6" />
+        <Logo variant="white" width={32} height={32} strokeWidth={5} />
       </button>
     </div>
   );

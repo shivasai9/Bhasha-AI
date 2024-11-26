@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bot, User } from 'lucide-react';
+import { User } from 'lucide-react';
+import Logo from '../Logo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import LoadingDots from './LoadingDots';
@@ -59,7 +60,7 @@ const ChatMessages = ({
             {message.type === "user" ? (
               <User className="w-5 h-5 text-white" />
             ) : (
-              <Bot className="w-5 h-5 text-white" />
+              <Logo variant="white" width={24} height={24} strokeWidth={5} />
             )}
           </div>
           <div
@@ -93,7 +94,7 @@ const ChatMessages = ({
       {isLoading && !isStreaming && (
         <div className="flex items-start gap-2">
           <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
-            <Bot className="w-5 h-5 text-white" />
+            <Logo variant="white" width={20} height={20} />
           </div>
           <div className="max-w-[75%] bg-gray-100 rounded-lg">
             <LoadingDots />

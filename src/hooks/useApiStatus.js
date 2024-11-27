@@ -27,6 +27,11 @@ export const useApiStatus = () => {
 
         const checkPromptsApi = async () => {
           try {
+            try {
+              await ai.languageModel.create();
+            } catch (error) {
+              console.error('Failed to create language model:', error);
+            }
             const capabilities = await ai.languageModel.capabilities();
             setPromptsStatus(
               capabilities.available === "readily" ? "Available" : "Not Available"

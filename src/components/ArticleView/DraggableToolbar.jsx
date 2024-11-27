@@ -36,7 +36,7 @@ export default function DraggableToolbar({
       setTranslatedDiffLabel(tDL);
     };
     translateDiffLabel();
-  }, []);
+  }, [difficultyLabel]);
 
   const handleHeaderClick = (e) => {
     if (isMinimized && !isDragging) {

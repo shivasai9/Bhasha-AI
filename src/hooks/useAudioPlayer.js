@@ -46,7 +46,12 @@ export function useAudioPlayer(text) {
         const langCode = SPEECH_VOICE_CONFIG[currentLanguage]?.lang || 'en-US';
         const filteredVoices = voices.filter(voice => voice.lang.startsWith(langCode.split('-')[0]));
         setAvailableVoices(filteredVoices);
-        setSelectedVoice(filteredVoices[0]);
+        if (langCode === 'en-US') {
+          const aaronVoice = filteredVoices.find(voice => voice.name === 'Aaron');
+          setSelectedVoice(aaronVoice || filteredVoices[0]);
+        } else {
+          setSelectedVoice(filteredVoices[0]);
+        }
       };
 
       window.speechSynthesis.onvoiceschanged = loadVoices;

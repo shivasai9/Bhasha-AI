@@ -72,7 +72,7 @@ export async function fetchImagesData(keyword) {
     return imagesData;
   } catch (error) {
     console.error("Error fetching image:", error);
-    return null;
+    return [];
   }
 }
 

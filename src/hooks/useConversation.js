@@ -77,8 +77,18 @@ export function useConversation() {
         if (isSubscribed) {
           setAvailableVoices(englishVoices);
           if (englishVoices.length > 0) {
-            const defaultVoice = englishVoices.find(voice => voice.name === SPEECH_VOICE_CONFIG.english.defaultVoice);
-            setSelectedVoice(defaultVoice || englishVoices[1]);
+            const isOnline = window.navigator.onLine;
+            let selectedVoiceToUse;
+
+            if (!isOnline) {
+              selectedVoiceToUse = englishVoices.find(voice => voice.name.toLowerCase().includes('aaron'));
+            }
+            
+            if (!selectedVoiceToUse) {
+              selectedVoiceToUse = englishVoices.find(voice => voice.name === SPEECH_VOICE_CONFIG.english.defaultVoice);
+            }
+
+            setSelectedVoice(selectedVoiceToUse || englishVoices[0]);
             isVoicesReady.current = true;
           }
         }

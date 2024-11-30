@@ -21,7 +21,13 @@ async function generateAndSaveArticle(customTopic = null, language) {
   try {
     const articleData = await aiWrapper.generateArticle(customTopic);
     const mostRelevantKeyword = articleData.imageKeywords[0];
-    const imagesData = await fetchImagesData(mostRelevantKeyword);
+    
+    let imagesData = [];
+    try {
+      imagesData = await fetchImagesData(mostRelevantKeyword);
+    } catch (error) {
+      console.warn('Failed to fetch images, continuing without images:', error);
+    }
 
     const englishArticle = {
       articleID: getUniqueId(),

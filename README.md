@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./logo.png" alt="BhashaAI Logo" width="200"/>
+</p>
+
 # BhashaAI - AI-Powered Language Learning Platform
 BhashaAI is a platform designed to make language learning accessible, engaging, and personalized for everyone. Leveraging AI and cutting-edge web technologies, it offers a unique and interactive way to learn English, Spanish, and French.
 

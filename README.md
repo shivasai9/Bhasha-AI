@@ -1,6 +1,10 @@
 # BhashaAI - AI-Powered Language Learning Platform
 BhashaAI is a platform designed to make language learning accessible, engaging, and personalized for everyone. Leveraging AI and cutting-edge web technologies, it offers a unique and interactive way to learn English, Spanish, and French.
 
+## Quick Links
+🌐 **Website:** [https://www.bhashaai.com/](https://www.bhashaai.com/)  
+🎥 **Demo Video:** [Watch on YouTube](https://www.youtube.com/watch?v=HqIj2gO0Gac)
+
 ## API Setup
 Before using the platform, please visit [API Status Page](https://www.bhashaai.com/api-status) to enable the required APIs and check their current status. Follow the instructions provided on the status page to ensure all necessary APIs are properly configured for the website to function correctly.
 

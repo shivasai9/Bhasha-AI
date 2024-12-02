@@ -3,7 +3,8 @@ BhashaAI is a platform designed to make language learning accessible, engaging, 
 
 ## Quick Links
 🌐 **Website:** [https://www.bhashaai.com/](https://www.bhashaai.com/)  
-🎥 **Demo Video:** [Watch on YouTube](https://www.youtube.com/watch?v=HqIj2gO0Gac)
+🎥 **Demo Video:** [Watch on YouTube](https://www.youtube.com/watch?v=HqIj2gO0Gac)  
+📚 **Full Documentation:** [View on DevPost](https://devpost.com/software/bashaai)
 
 ## API Setup
 Before using the platform, please visit [API Status Page](https://www.bhashaai.com/api-status) to enable the required APIs and check their current status. Follow the instructions provided on the status page to ensure all necessary APIs are properly configured for the website to function correctly.
